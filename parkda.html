@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>⛳ PARKDA</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g1:#1b5e20;--g2:#2e7d32;--g3:#43a047;--g4:#a5d6a7;--g5:#e8f5e9;
+  --b1:#0d47a1;--b2:#1565c0;--b3:#1976d2;--b4:#90caf9;--b5:#e3f2fd;
+  --o2:#e65100;--o3:#f4511e;--o5:#fff3e0;
+  --gold:#f57f17;--gold2:#fffde7;--gold3:#ffd54f;
+  --red:#c62828;--red2:#ffebee;
+  --teal:#00695c;
+  --gray1:#f5f5f5;--gray2:#e0e0e0;--gray3:#9e9e9e;--gray4:#616161;
+  --text:#1a1a1a;--white:#fff;
+  --sh:0 3px 16px rgba(0,0,0,.12);--shs:0 1px 6px rgba(0,0,0,.09);--r:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#e8f0e8;font-family:'Noto Sans KR',sans-serif;color:var(--text)}
+#app{max-width:480px;margin:0 auto;min-height:100vh;background:var(--white);overflow-x:hidden}
+.pg{display:none;min-height:100vh;padding-bottom:90px;animation:fi .18s ease}
+.pg.on{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* 상단바 */
+.bar{position:sticky;top:0;z-index:100;background:var(--g2);color:var(--white);padding:15px 18px 13px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+.bar-back{font-size:28px;cursor:pointer;padding:0 8px 0 0;line-height:1;user-select:none}
+.bar-title{font-size:18px;font-weight:900;flex:1;letter-spacing:-.3px}
+.bar-sub{font-size:11px;opacity:.75}
+
+/* 히어로 */
+.hero{background:linear-gradient(160deg,var(--g1),var(--g2) 55%,#33691e);padding:24px 22px 20px;color:var(--white);position:relative;overflow:hidden}
+.hero::after{content:'⛳';position:absolute;right:-8px;bottom:-16px;font-size:96px;opacity:.07;pointer-events:none}
+.hero-logo{display:flex;align-items:center;justify-content:center;gap:10px;padding:2px 0}
+.hero-logo img{height:52px;width:auto;filter:drop-shadow(0 2px 6px rgba(0,0,0,.3))}
+.hero-logo-text{font-family:'Bebas Neue',sans-serif;font-size:44px;letter-spacing:4px;line-height:1;color:#fff}
+.hero-sub{font-size:12px;opacity:.82;margin-top:4px;letter-spacing:.3px}
+
+/* 유저카드 */
+.ucard{margin:12px 14px 0;background:var(--g5);border:1.5px solid var(--g4);border-radius:14px;padding:12px 15px;display:flex;align-items:center;gap:10px}
+.uavatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--g3),var(--g1));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.uname{font-size:16px;font-weight:900;color:var(--g2)}
+.uclub{font-size:11px;color:var(--gray3);margin-top:1px}
+.ulogout{margin-left:auto;font-size:11px;color:var(--b2);cursor:pointer;text-decoration:underline;white-space:nowrap}
+
+/* KPI */
+.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px 14px}
+.kpi{background:var(--white);border-radius:12px;box-shadow:var(--shs);padding:11px 8px;text-align:center}
+.kpi-n{font-size:22px;font-weight:900;color:var(--g2);font-family:'Bebas Neue',sans-serif}
+.kpi-l{font-size:10px;color:var(--gray3);margin-top:1px}
+
+.sec{padding:12px 16px 5px;font-size:11px;font-weight:700;color:var(--gray3);letter-spacing:.1em;text-transform:uppercase}
+
+/* BIG 버튼 */
+.mbtn{display:flex;align-items:center;gap:12px;margin:0 14px 8px;border:none;border-radius:var(--r);padding:16px;cursor:pointer;text-align:left;box-shadow:var(--sh);transition:transform .12s;width:calc(100% - 28px);position:relative;overflow:hidden}
+.mbtn:active{transform:scale(.97)}
+.mbtn-green{background:linear-gradient(135deg,var(--g2),var(--g3));color:var(--white)}
+.mbtn-blue{background:linear-gradient(135deg,var(--b2),var(--b3));color:var(--white)}
+.mbtn-teal{background:linear-gradient(135deg,var(--teal),#00897b);color:var(--white)}
+.mbtn-orange{background:linear-gradient(135deg,var(--o2),var(--o3));color:var(--white)}
+.mbtn-gray{background:var(--white);color:var(--text);border:1.5px solid var(--gray2);opacity:.7}
+.mbtn-lock::after{content:'🔒 PRO';position:absolute;top:9px;right:12px;font-size:9px;font-weight:700;background:rgba(0,0,0,.2);color:#fff;padding:2px 7px;border-radius:99px}
+.mbtn-ico{font-size:30px;flex-shrink:0}
+.mbtn-info{flex:1;min-width:0}
+.mbtn-label{font-size:17px;font-weight:900;display:block;line-height:1.2}
+.mbtn-desc{font-size:11px;opacity:.82;margin-top:2px;display:block}
+.mbtn-arr{font-size:20px;opacity:.5;flex-shrink:0}
+
+/* 카드 */
+.card{margin:10px 14px;background:var(--white);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
+.card-hd{background:var(--g5);padding:11px 16px;font-size:14px;font-weight:700;color:var(--g2);border-bottom:1px solid var(--g4);display:flex;align-items:center;gap:6px}
+.card-bd{padding:15px}
+
+/* 폼 */
+.fg{margin-bottom:15px}.fg:last-child{margin-bottom:0}
+.fl{font-size:15px;font-weight:700;display:block;margin-bottom:5px}
+.fh{font-size:12px;color:var(--gray3);margin-bottom:6px;display:block;line-height:1.5}
+.fi{width:100%;font-size:16px;font-family:'Noto Sans KR',sans-serif;padding:12px 14px;border:2px solid var(--gray2);border-radius:11px;color:var(--text);background:var(--white);outline:none;transition:border-color .2s}
+.fi:focus{border-color:var(--g3)}
+textarea.fi{resize:vertical;min-height:100px;line-height:1.6}
+select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24'%3E%3Cpath fill='%23666' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") no-repeat right 12px center}
+.rg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.rb{display:block;cursor:pointer}
+.rb input{display:none}
+.rbi{border:2.5px solid var(--gray2);border-radius:11px;padding:11px 8px;text-align:center;font-size:14px;font-weight:700;color:var(--gray3);transition:all .15s;user-select:none}
+.rbi .ri{font-size:22px;display:block;margin-bottom:3px}
+.rb input:checked+.rbi{border-color:var(--g3);background:var(--g5);color:var(--g2)}
+
+/* 버튼 */
+.btn{width:100%;font-size:17px;font-family:'Noto Sans KR',sans-serif;font-weight:900;padding:15px;border:none;border-radius:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .12s;box-shadow:var(--sh)}
+.btn:active{transform:scale(.97)}
+.btn-green{background:var(--g2);color:var(--white)}
+.btn-blue{background:var(--b2);color:var(--white)}
+.btn-orange{background:var(--o2);color:var(--white)}
+.btn-gold{background:var(--gold);color:var(--white)}
+.btn-gray{background:var(--gray1);color:var(--text);box-shadow:none}
+.btn-sm{font-size:14px;padding:12px}
+.btn-xs{font-size:13px;padding:10px;border-radius:10px}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.btn-wrap{padding:0 14px 12px}
+
+/* 도움말 */
+.bubble{margin:8px 14px;background:#fffde7;border:1.5px solid #ffe082;border-radius:12px;padding:10px 13px;font-size:13px;color:#5d4037;display:flex;gap:8px;align-items:flex-start;line-height:1.65}
+.bubble-ico{font-size:18px;flex-shrink:0;margin-top:1px}
+
+/* ══ 게임코드 공유 박스 ══ */
+.gamecode-box{
+  margin:12px 14px;
+  background:linear-gradient(135deg,#1a237e,#283593);
+  border-radius:var(--r);
+  padding:20px;
+  color:var(--white);
+  box-shadow:var(--sh);
+  text-align:center;
+}
+.gc-label{font-size:12px;opacity:.75;margin-bottom:8px;letter-spacing:.1em;text-transform:uppercase}
+.gc-code{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:52px;
+  letter-spacing:8px;
+  color:#ffd54f;
+  line-height:1;
+  margin-bottom:10px;
+}
+.gc-url{font-size:12px;opacity:.7;margin-bottom:16px;word-break:break-all}
+.gc-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.gc-btn{padding:11px;border:none;border-radius:10px;font-size:14px;font-family:'Noto Sans KR',sans-serif;font-weight:700;cursor:pointer;transition:transform .12s}
+.gc-btn:active{transform:scale(.97)}
+.gc-copy{background:rgba(255,255,255,.15);color:var(--white);border:1.5px solid rgba(255,255,255,.3)}
+.gc-kakao{background:#fee500;color:#3b1d1d}
+
+/* ══ 게임 참가 박스 ══ */
+.join-box{
+  margin:0 14px;
+  background:var(--g5);
+  border:2px solid var(--g4);
+  border-radius:var(--r);
+  padding:20px;
+}
+.join-box h3{font-size:16px;font-weight:900;color:var(--g2);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.code-input{
+  width:100%;font-size:28px;font-family:'Bebas Neue',sans-serif;
+  letter-spacing:6px;text-align:center;
+  padding:14px;border:2.5px solid var(--g4);border-radius:12px;
+  color:var(--g1);background:var(--white);outline:none;
+  text-transform:uppercase;
+  transition:border-color .2s;
+}
+.code-input:focus{border-color:var(--g2)}
+.code-input::placeholder{color:var(--gray2);letter-spacing:4px}
+
+/* ══ 조편성 ══ */
+.group-wrap{margin:0 14px 10px}
+.group-card{border-radius:12px;padding:13px 15px;border-left:5px solid}
+.group-title{font-size:15px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{background:var(--white);border:1.5px solid;border-radius:99px;padding:7px 13px;font-size:15px;font-weight:700;display:flex;align-items:center;gap:5px}
+.chip-ldr{font-size:10px;background:#ffd54f;color:#5d4037;border-radius:99px;padding:1px 6px;font-weight:900}
+.ldr-chg{font-size:11px;color:var(--b2);cursor:pointer;text-decoration:underline;margin-left:auto;flex-shrink:0}
+
+/* ══ 9홀 탭 ══ */
+.half-tabs{display:flex;border-bottom:2px solid var(--gray2);margin:0 14px}
+.half-tab{flex:1;padding:11px;text-align:center;font-size:14px;font-weight:700;color:var(--gray3);cursor:pointer;border-bottom:3px solid transparent;transition:all .15s;margin-bottom:-2px}
+.half-tab.on{color:var(--g2);border-bottom-color:var(--g2)}
+
+/* 조 탭 */
+.group-tabs{display:flex;gap:7px;overflow-x:auto;padding:8px 14px 4px;-webkit-overflow-scrolling:touch}
+.group-tabs::-webkit-scrollbar{height:0}
+.gtab{white-space:nowrap;padding:7px 13px;border:2px solid var(--gray2);border-radius:99px;font-size:12px;font-family:'Noto Sans KR',sans-serif;font-weight:700;color:var(--gray3);background:var(--white);cursor:pointer;transition:all .15s;flex-shrink:0}
+.gtab.on{color:var(--white)}
+
+/* 점수 테이블 */
+.score-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:6px 14px 4px}
+.score-scroll::-webkit-scrollbar{height:3px}
+.score-scroll::-webkit-scrollbar-thumb{background:var(--g4);border-radius:99px}
+.stbl{width:100%;border-collapse:collapse;min-width:280px}
+.stbl th{background:var(--g2);color:var(--white);padding:10px 4px;font-size:12px;text-align:center;border:1px solid var(--g1)}
+.stbl th.th-n{text-align:left;padding-left:10px;min-width:58px}
+.stbl td{border:1px solid var(--gray2);text-align:center;padding:3px;background:var(--white)}
+.stbl td.td-n{font-size:14px;font-weight:700;padding:9px 10px;background:#f9fbe7;text-align:left;white-space:nowrap}
+.stbl tr.tr-sum td{background:var(--g5);font-weight:700;font-size:14px;padding:8px 4px}
+.sinp{width:42px;height:40px;font-size:18px;font-family:'Noto Sans KR',sans-serif;font-weight:700;text-align:center;border:2px solid var(--gray2);border-radius:8px;color:var(--text);background:var(--white);outline:none;transition:all .15s}
+.sinp:focus{border-color:var(--g3);background:#f1f8e9}
+.sinp.un{color:var(--b2);background:var(--b5);border-color:var(--b4)}
+.sinp.ov{color:var(--red);background:var(--red2);border-color:#ef9a9a}
+.sinp:disabled{background:var(--gray1);color:var(--gray3);border-color:var(--gray2);cursor:not-allowed}
+
+/* 실시간 현황 */
+.live-box{margin:6px 14px;background:var(--g5);border-radius:11px;padding:10px 12px}
+.live-title{font-size:11px;font-weight:700;color:var(--g2);margin-bottom:6px}
+.live-chips{display:flex;flex-wrap:wrap;gap:5px}
+.live-chip{background:var(--white);border:1px solid var(--g4);border-radius:99px;padding:5px 10px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:4px}
+
+/* 권한 안내 */
+.auth-box{margin:6px 14px;background:var(--red2);border:1.5px solid #ef9a9a;border-radius:11px;padding:10px 14px;font-size:13px;color:var(--red);display:flex;gap:8px;line-height:1.6}
+
+/* ══ 정산 ══ */
+.half-settle{border-radius:14px;overflow:hidden;box-shadow:var(--sh);margin:0 14px 12px}
+.hs-hd{padding:11px 15px;font-size:14px;font-weight:900;color:var(--white);display:flex;align-items:center;justify-content:space-between}
+.hs-sub{font-size:11px;opacity:.8}
+
+.settle-row{display:flex;align-items:center;padding:11px 15px;border-bottom:1px solid var(--gray1);gap:9px}
+.settle-row:last-child{border-bottom:none}
+.sr-rank{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;flex-shrink:0}
+.sr1{background:#ffd54f;color:#5d4037}.sr2{background:#b0bec5;color:#263238}.sr3{background:#ffcc80;color:#4e342e}.srn{background:var(--gray1);color:var(--gray4)}
+.settle-name{flex:1;font-size:15px;font-weight:700}
+.settle-score{font-size:13px;color:var(--gray4);width:34px;text-align:center;flex-shrink:0}
+.settle-amt{font-size:17px;font-weight:900;min-width:68px;text-align:right;flex-shrink:0}
+.aplus{color:var(--g2)}.aminus{color:var(--red)}.azero{color:var(--gray3)}
+
+.arrows{padding:8px 15px 10px;display:flex;flex-direction:column;gap:4px;background:#fafafa}
+.arrow-item{font-size:13px;color:var(--text);display:flex;align-items:center;gap:6px;padding:5px 8px;background:var(--white);border-radius:8px;border:1px solid var(--gray2)}
+.af{font-weight:700;color:var(--red)}.at{font-weight:700;color:var(--g2)}
+.atag{background:var(--gray1);border-radius:99px;padding:2px 8px;font-size:12px;font-weight:900}
+
+.total-board{border-radius:14px;overflow:hidden;box-shadow:var(--sh);margin:0 14px 12px}
+.tb-hd{background:linear-gradient(135deg,var(--gold),#ff8f00);padding:12px 15px;font-size:14px;font-weight:900;color:var(--white)}
+.tb-row{display:flex;align-items:center;padding:12px 15px;border-bottom:1px solid var(--gray1);gap:9px;background:var(--white)}
+.tb-row:last-child{border-bottom:none}
+.tb-name{flex:1;font-size:15px;font-weight:700}
+.tb-total{font-size:21px;font-weight:900;font-family:'Bebas Neue',sans-serif;min-width:80px;text-align:right}
+.tplus{color:var(--g2)}.tminus{color:var(--red)}.tzero{color:var(--gray3)}
+
+/* 수동 정산 */
+.manual-box{margin:0 14px 12px;background:var(--gold2);border:1.5px solid var(--gold3);border-radius:14px;padding:14px 15px}
+.mb-title{font-size:14px;font-weight:900;color:var(--gold);margin-bottom:10px}
+.mb-row{display:flex;align-items:center;gap:7px;margin-bottom:8px;flex-wrap:wrap}
+.mb-row:last-child{margin-bottom:0}
+.mb-lbl{font-size:12px;color:var(--gray4);width:52px;flex-shrink:0;font-weight:700}
+.mb-sel{flex:1;min-width:70px;font-size:13px;font-family:'Noto Sans KR',sans-serif;padding:8px 9px;border:1.5px solid var(--gray2);border-radius:9px;background:var(--white);outline:none}
+.mb-sel:focus{border-color:var(--gold)}
+.mb-amt{width:80px;font-size:15px;font-family:'Noto Sans KR',sans-serif;font-weight:700;padding:8px 9px;border:1.5px solid var(--gray2);border-radius:9px;text-align:center;outline:none}
+.mb-btn{padding:8px 13px;background:var(--gold);color:var(--white);border:none;border-radius:9px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:700;cursor:pointer;white-space:nowrap}
+.mb-btn:active{opacity:.85}
+.mb-logs{margin-top:8px;display:flex;flex-direction:column;gap:4px}
+.mb-log{font-size:12px;color:var(--gray4);background:var(--white);border-radius:7px;padding:5px 9px;display:flex;justify-content:space-between;align-items:center}
+.mb-del{color:var(--red);cursor:pointer;padding:0 4px;font-size:14px}
+
+/* 포디움 */
+.podium{display:flex;gap:7px;padding:12px 14px 4px}
+.p-card{flex:1;border-radius:13px;padding:12px 7px;text-align:center;box-shadow:var(--shs)}
+.p-gold{background:linear-gradient(160deg,#fff8e1,#fffde7);border:2px solid #ffd54f}
+.p-silver{background:linear-gradient(160deg,#fafafa,#f5f5f5);border:2px solid #bdbdbd}
+.p-bronze{background:linear-gradient(160deg,#fff3e0,#ffe8cc);border:2px solid #ffcc80}
+.p-medal{font-size:26px}.p-rnk{font-size:11px;font-weight:700;color:var(--gray3);margin:2px 0}
+.p-name{font-size:15px;font-weight:900}.p-score{font-size:18px;font-weight:900;margin-top:2px}
+.p-gold .p-score{color:var(--gold)}.p-silver .p-score{color:#546e7a}.p-bronze .p-score{color:var(--o2)}
+.p-money{font-size:12px;font-weight:700;margin-top:2px}
+
+.rtbl{width:100%;border-collapse:collapse}
+.rtbl th{background:var(--g2);color:var(--white);padding:10px 10px;font-size:13px;text-align:center}
+.rtbl th:nth-child(2){text-align:left}
+.rtbl td{padding:11px 10px;font-size:14px;text-align:center;border-bottom:1px solid var(--gray1)}
+.rtbl td:nth-child(2){text-align:left;font-weight:700}
+.rtbl tr:nth-child(even) td{background:#fafafa}
+.rbadge{display:inline-flex;width:27px;height:27px;border-radius:50%;align-items:center;justify-content:center;font-weight:900;font-size:12px}
+.rb1{background:#ffd54f;color:#5d4037}.rb2{background:#b0bec5;color:#263238}.rb3{background:#ffcc80;color:#4e342e}.rbn{background:var(--gray1);color:var(--gray4)}
+.dun{color:var(--b2);font-weight:700}.dov{color:var(--red);font-weight:700}.dev{color:var(--g2);font-weight:700}
+.share-box{background:var(--gray1);border:1.5px solid var(--gray2);border-radius:11px;padding:13px;font-size:13px;line-height:1.85;white-space:pre-wrap;color:var(--text);word-break:break-all}
+
+/* 경기목록 */
+.match-card{margin:0 14px 9px;background:var(--white);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
+.mc-hd{background:var(--g5);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.mc-title{font-size:15px;font-weight:900;color:var(--g2)}
+.mc-date{font-size:11px;color:var(--gray3)}
+.mc-code{font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--b2);letter-spacing:2px;background:var(--b5);padding:2px 8px;border-radius:6px}
+.mc-body{padding:8px 14px;display:flex;flex-wrap:wrap;gap:5px}
+.mc-tag{background:var(--gray1);border-radius:99px;padding:3px 10px;font-size:11px;font-weight:700;color:var(--gray4)}
+.mc-foot{padding:8px 14px;border-top:1px solid var(--gray1);display:flex;gap:7px}
+.mc-btn{flex:1;padding:8px;border:none;border-radius:9px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:700;cursor:pointer}
+.mc-btn:active{opacity:.8}
+.mc-btn-g{background:var(--g5);color:var(--g2)}.mc-btn-b{background:var(--b5);color:var(--b2)}
+.mc-btn-share{background:#fee500;color:#3b1d1d}.mc-btn-r{background:var(--red2);color:var(--red)}
+
+/* 상태 뱃지 */
+.status-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700}
+.status-wait{background:#e3f2fd;color:var(--b2)}
+.status-play{background:var(--g5);color:var(--g2)}
+.status-done{background:var(--gray1);color:var(--gray4)}
+
+/* 랭킹 */
+.rank-card{margin:0 14px 9px;background:var(--white);border-radius:13px;box-shadow:var(--shs);padding:13px 15px;display:flex;align-items:center;gap:12px}
+.rank-medal{font-size:26px;flex-shrink:0;width:34px;text-align:center}
+.rank-info{flex:1}
+.rank-name{font-size:16px;font-weight:900}
+.rank-sub{font-size:11px;color:var(--gray3);margin-top:1px}
+.rank-right{text-align:right}
+.rank-avg{font-size:19px;font-weight:900;color:var(--g2);font-family:'Bebas Neue',sans-serif}
+.rank-money{font-size:12px;font-weight:700;margin-top:1px}
+
+.empty{text-align:center;padding:50px 24px;color:var(--gray3)}
+.empty-ico{font-size:52px;margin-bottom:12px}
+.empty-t{font-size:17px;font-weight:700;margin-bottom:6px;color:var(--gray4)}
+.empty-s{font-size:13px;line-height:1.6}
+
+/* 탭바 */
+.tabbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--white);border-top:1.5px solid var(--gray2);display:grid;grid-template-columns:repeat(4,1fr);z-index:200;box-shadow:0 -2px 12px rgba(0,0,0,.08)}
+.tab{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px 7px;cursor:pointer;gap:2px;border:none;background:none;font-family:'Noto Sans KR',sans-serif;transition:background .15s}
+.tab:active{background:var(--gray1)}
+.tab-ico{font-size:23px}.tab-lbl{font-size:10px;font-weight:700;color:var(--gray3)}
+.tab.on .tab-lbl{color:var(--g2)}.tab.on .tab-ico{filter:drop-shadow(0 0 3px rgba(46,125,50,.5))}
+
+#toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(12px);background:rgba(0,0,0,.82);color:var(--white);padding:12px 20px;border-radius:99px;font-size:14px;font-weight:700;z-index:999;opacity:0;transition:all .27s;pointer-events:none;white-space:nowrap}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;align-items:flex-end;justify-content:center}
+.overlay.on{display:flex}
+.modal{background:var(--white);border-radius:22px 22px 0 0;padding:22px 20px 30px;width:100%;max-width:480px;animation:su .27s ease}
+@keyframes su{from{transform:translateY(36px)}to{transform:translateY(0)}}
+.modal-handle{width:36px;height:4px;background:var(--gray2);border-radius:99px;margin:0 auto 16px}
+
+.login-wrap{min-height:100vh;padding:40px 20px 32px;display:flex;flex-direction:column;align-items:center;background:linear-gradient(180deg,var(--g5),var(--white) 40%)}
+.login-logo{font-family:'Bebas Neue',sans-serif;font-size:62px;color:var(--g2);letter-spacing:4px;margin-bottom:4px;line-height:1}
+.login-sub{font-size:14px;color:var(--gray3);margin-bottom:28px;text-align:center;line-height:1.65}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ══ 로그인 ══ -->
+<div class="pg on" id="pg-login">
+<div class="login-wrap">
+  <div class="login-logo">PARKDA</div>
+  <div class="login-sub">파크골프 경기 관리 앱<br>이름과 전화번호로 시작해요</div>
+  <div style="width:100%">
+    <div class="bubble"><span class="bubble-ico">💡</span>처음 오시는 분도 괜찮아요!<br>이름과 번호만 입력하면 바로 시작돼요.</div>
+    <div class="card">
+      <div class="card-hd">👤 내 정보</div>
+      <div class="card-bd">
+        <div class="fg"><label class="fl">이름 *</label><input class="fi" id="l-name" type="text" placeholder="홍길동" maxlength="5"></div>
+        <div class="fg"><label class="fl">전화번호 *</label><input class="fi" id="l-phone" type="tel" placeholder="01012345678" maxlength="11"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hd">🏌️ 클럽 정보 <span style="font-size:11px;font-weight:400;color:var(--gray3)">(선택)</span></div>
+      <div class="card-bd">
+        <div class="fg"><label class="fl">클럽 이름</label><input class="fi" id="l-club" type="text" placeholder="예) 김해 파크골프 클럽"></div>
+        <div class="fg"><label class="fl">지역</label>
+          <select class="fi" id="l-region"><option value="">-- 선택 --</option><option>서울</option><option>경기</option><option>인천</option><option>부산</option><option>경남</option><option>대구</option><option>경북</option><option>광주</option><option>전남</option><option>전북</option><option>대전</option><option>충남</option><option>충북</option><option>울산</option><option>강원</option><option>제주</option></select>
+        </div>
+        <div class="fg"><label class="fl">역할</label>
+          <div class="rg">
+            <label class="rb"><input type="radio" name="role" value="총무/회장" checked><div class="rbi"><span class="ri">👑</span>총무/회장</div></label>
+            <label class="rb"><input type="radio" name="role" value="일반회원"><div class="rbi"><span class="ri">🙋</span>일반회원</div></label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="btn-wrap" style="padding:8px 0 0"><button class="btn btn-green" onclick="doLogin()">✅ &nbsp;시작하기</button></div>
+  </div>
+</div>
+</div>
+
+<!-- ══ 홈 ══ -->
+<div class="pg" id="pg-home">
+  <div class="hero">
+  <div class="hero-logo">
+    <img src="data:image/png;base64,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" alt="PARKDA 로고">
+    <span class="hero-logo-text">PARKDA</span>
+  </div>
+  <div class="hero-sub">파크골프 통합플랫폼</div>
+</div>
+  <div class="ucard">
+    <div class="uavatar">👤</div>
+    <div><div class="uname" id="home-uname"></div><div class="uclub" id="home-uclub"></div></div>
+    <div class="ulogout" onclick="doLogout()">로그아웃</div>
+  </div>
+  <div class="kpi-row" id="home-kpi"></div>
+
+  <!-- 게임 참가 (코드 입력) -->
+  <div class="join-box" style="margin-top:12px">
+    <h3>🔢 게임 참가하기</h3>
+    <span class="fh">총무/회장에게 받은 4자리 코드를 입력하세요</span>
+    <input class="code-input" id="join-code" type="text" maxlength="4" placeholder="ABCD" oninput="this.value=this.value.toUpperCase()">
+    <div style="margin-top:10px"><button class="btn btn-blue btn-sm" onclick="joinGame()">🚪 &nbsp;게임 참가하기</button></div>
+  </div>
+
+  <div class="sec">⛳ 내 경기 관리</div>
+  <button class="mbtn mbtn-green" onclick="go('pg-create')"><span class="mbtn-ico">📝</span><span class="mbtn-info"><span class="mbtn-label">새 경기 만들기</span><span class="mbtn-desc">조편성 + 게임 코드 자동 생성</span></span><span class="mbtn-arr">›</span></button>
+  <button class="mbtn mbtn-blue" onclick="go('pg-matches')"><span class="mbtn-ico">📋</span><span class="mbtn-info"><span class="mbtn-label">경기 목록</span><span class="mbtn-desc">점수 입력 · 정산 · 코드 공유</span></span><span class="mbtn-arr">›</span></button>
+
+  <div class="sec">📊 통계 · 순위</div>
+  <button class="mbtn mbtn-teal" onclick="go('pg-ranking')"><span class="mbtn-ico">🏅</span><span class="mbtn-info"><span class="mbtn-label">누적 랭킹 · 정산</span><span class="mbtn-desc">평균 타수 · 누적 수익 순위</span></span><span class="mbtn-arr">›</span></button>
+  <button class="mbtn mbtn-gray mbtn-lock" onclick="showPro()"><span class="mbtn-ico">📈</span><span class="mbtn-info"><span class="mbtn-label" style="color:var(--gray4)">상세 통계 · KPI</span><span class="mbtn-desc">월별 추이 · 구장 분석</span></span></button>
+  <button class="mbtn mbtn-gray mbtn-lock" onclick="showPro()"><span class="mbtn-ico">📸</span><span class="mbtn-info"><span class="mbtn-label" style="color:var(--gray4)">경기 사진 갤러리</span><span class="mbtn-desc">사진 저장 · 앨범</span></span></button>
+
+  <div style="margin:0 14px 12px;border-radius:14px;background:linear-gradient(135deg,#1a237e,#283593);border:1px solid #3949ab;padding:14px 16px;display:flex;align-items:center;gap:12px;color:var(--white);cursor:pointer;box-shadow:var(--sh)" onclick="showPro()">
+    <div style="font-size:28px">💎</div>
+    <div style="flex:1"><div style="font-size:14px;font-weight:900;margin-bottom:2px">Pro 플랜 준비 중</div><div style="font-size:11px;opacity:.8">무제한 · 사진 · 통계 · 얼리어답터 6개월 무료</div></div>
+    <div style="background:#ffd54f;color:#3b1d1d;font-size:10px;font-weight:900;padding:4px 9px;border-radius:99px">신청</div>
+  </div>
+  <div style="height:8px"></div>
+</div>
+
+<!-- ══ 경기 만들기 ══ -->
+<div class="pg" id="pg-create">
+  <div class="bar"><span class="bar-back" onclick="go('pg-home')">‹</span><span class="bar-title">📝 새 경기 만들기</span></div>
+  <div class="bubble"><span class="bubble-ico">💡</span>소모임 3~4명도, 단체 30명도 똑같이 만들면 돼요!</div>
+  <div class="card">
+    <div class="card-hd">📌 기본 정보</div>
+    <div class="card-bd">
+      <div class="fg"><label class="fl">경기 이름 *</label><input class="fi" id="c-title" type="text" placeholder="예) 5월 정기 경기, 친구들 내기"></div>
+      <div class="fg"><label class="fl">날짜</label><input class="fi" id="c-date" type="date"></div>
+      <div class="fg"><label class="fl">구장</label><input class="fi" id="c-course" type="text" placeholder="예) 김해 파크골프장"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hd">💰 정산 단가</div>
+    <div class="card-bd">
+      <div class="fg">
+        <label class="fl">타수 1개 차이당 금액</label>
+        <span class="fh">예) 200원 × 타수 차 3 = 600원 정산</span>
+        <div class="rg3">
+          <label class="rb"><input type="radio" name="unit" value="100" checked><div class="rbi"><span class="ri">💵</span>100원</div></label>
+          <label class="rb"><input type="radio" name="unit" value="200"><div class="rbi"><span class="ri">💴</span>200원</div></label>
+          <label class="rb"><input type="radio" name="unit" value="500"><div class="rbi"><span class="ri">💶</span>500원</div></label>
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl">직접 입력</label>
+        <input class="fi" id="c-unit-custom" type="number" placeholder="단가 직접 입력 (원)">
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hd">⛳ 경기 방식</div>
+    <div class="card-bd">
+      <div class="fg"><label class="fl">홀 수</label>
+        <div class="rg">
+          <label class="rb"><input type="radio" name="holes" value="9" checked><div class="rbi"><span class="ri">🏌️</span>9홀</div></label>
+          <label class="rb"><input type="radio" name="holes" value="18"><div class="rbi"><span class="ri">🏌️🏌️</span>18홀</div></label>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">조당 인원</label>
+        <div class="rg">
+          <label class="rb"><input type="radio" name="gs" value="3" checked><div class="rbi"><span class="ri">👥</span>3명씩</div></label>
+          <label class="rb"><input type="radio" name="gs" value="4"><div class="rbi"><span class="ri">👥</span>4명씩</div></label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hd">👥 참가자 명단</div>
+    <div class="card-bd">
+      <div class="fg"><label class="fl">이름 목록 *</label><span class="fh">한 줄에 한 명씩 — 소모임 3명도, 단체 30명도 OK</span>
+        <textarea class="fi" id="c-players" placeholder="홍길동&#10;김철수&#10;이영희&#10;박민수"></textarea>
+      </div>
+    </div>
+  </div>
+  <div class="btn-wrap"><button class="btn btn-green" onclick="createMatch()">🚀 &nbsp;경기 만들고 코드 받기</button></div>
+</div>
+
+<!-- ══ 조편성 + 게임코드 ══ -->
+<div class="pg" id="pg-groups">
+  <div class="bar"><span class="bar-back" onclick="go('pg-create')">‹</span><span class="bar-title">👥 조편성 완료!</span></div>
+
+  <!-- 게임 코드 공유 박스 -->
+  <div class="gamecode-box" id="gamecode-display">
+    <div class="gc-label">게임 코드</div>
+    <div class="gc-code" id="gc-code">----</div>
+    <div class="gc-url" id="gc-url"></div>
+    <div class="gc-btns">
+      <button class="gc-btn gc-copy" onclick="copyCode()">📋 코드 복사</button>
+      <button class="gc-btn gc-kakao" onclick="shareKakao()">💬 카톡 공유</button>
+    </div>
+  </div>
+
+  <div class="bubble"><span class="bubble-ico">💡</span>👑 표시가 <b>조장</b>이에요. 조장만 점수를 입력할 수 있어요. <b>변경</b>을 누르면 바꿀 수 있어요.</div>
+  <div class="btn-wrap" style="padding-bottom:6px"><button class="btn btn-gray btn-sm" onclick="reshuffle()">🔀 &nbsp;다시 섞기</button></div>
+  <div id="groups-area"></div>
+  <div class="btn-wrap"><button class="btn btn-green" onclick="goScore()">📊 &nbsp;점수 입력 시작</button></div>
+</div>
+
+<!-- ══ 경기 목록 ══ -->
+<div class="pg" id="pg-matches">
+  <div class="bar"><span class="bar-back" onclick="go('pg-home')">‹</span><span class="bar-title">📋 경기 목록</span></div>
+  <div class="bubble"><span class="bubble-ico">💡</span>경기 카드의 <b>💬 공유</b> 버튼으로 조원들에게 게임 코드를 전송하세요.</div>
+  <div id="matches-area" style="padding-top:6px"></div>
+</div>
+
+<!-- ══ 점수 입력 ══ -->
+<div class="pg" id="pg-score">
+  <div class="bar"><span class="bar-back" onclick="go('pg-matches')">‹</span><span class="bar-title" id="score-bar-title">📊 점수 입력</span><span class="bar-sub" id="score-bar-sub"></span></div>
+  <div id="score-auth-box"></div>
+  <div class="bubble"><span class="bubble-ico">💡</span><span id="score-help">조장만 점수를 입력할 수 있어요.</span></div>
+  <div id="half-tab-wrap" style="display:none">
+    <div class="half-tabs">
+      <div class="half-tab on" id="ht-0" onclick="switchHalf(0)">전반 1~9홀</div>
+      <div class="half-tab" id="ht-1" onclick="switchHalf(1)">후반 10~18홀</div>
+    </div>
+  </div>
+  <div class="group-tabs" id="group-tabs"></div>
+  <div class="score-scroll"><table class="stbl" id="score-tbl"></table></div>
+  <div id="live-area"></div>
+  <div class="btn-wrap">
+    <div class="btn-row">
+      <button class="btn btn-green btn-sm" onclick="saveScore()">💾 저장</button>
+      <button class="btn btn-gold btn-sm" onclick="saveAndResult()">💰 정산 보기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 정산 결과 ══ -->
+<div class="pg" id="pg-result">
+  <div class="bar"><span class="bar-back" onclick="go('pg-matches')">‹</span><span class="bar-title" id="result-title">💰 정산</span></div>
+  <div id="result-settle-area"></div>
+  <div id="result-total-area"></div>
+  <div id="result-manual-area"></div>
+  <div id="podium-area"></div>
+  <div class="card"><div class="card-hd">📋 전체 순위</div><div style="overflow-x:auto"><table class="rtbl" id="result-tbl"></table></div></div>
+  <div class="card"><div class="card-hd">📱 카카오톡 공유</div><div class="card-bd"><div class="share-box" id="share-box"></div><div style="margin-top:9px"><button class="btn btn-orange btn-sm" onclick="copyShare()">📋 &nbsp;복사하기</button></div></div></div>
+  <div class="btn-wrap"><button class="btn btn-gray btn-sm" onclick="go('pg-score')">✏️ 점수 수정</button></div>
+</div>
+
+<!-- ══ 랭킹 ══ -->
+<div class="pg" id="pg-ranking">
+  <div class="bar"><span class="bar-back" onclick="go('pg-home')">‹</span><span class="bar-title">🏅 누적 랭킹</span></div>
+  <div class="bubble"><span class="bubble-ico">💡</span>평균 타수 낮을수록, 누적 수익 높을수록 상위 랭킹이에요.</div>
+  <div id="ranking-area" style="padding-top:6px"></div>
+</div>
+
+<!-- 탭바 -->
+<div class="tabbar" id="tabbar" style="display:none">
+  <button class="tab on" id="tab-home" onclick="goTab('home')"><span class="tab-ico">🏠</span><span class="tab-lbl">홈</span></button>
+  <button class="tab" id="tab-matches" onclick="goTab('matches')"><span class="tab-ico">📋</span><span class="tab-lbl">경기목록</span></button>
+  <button class="tab" id="tab-ranking" onclick="goTab('ranking')"><span class="tab-ico">🏅</span><span class="tab-lbl">랭킹</span></button>
+  <button class="tab" id="tab-pro" onclick="showPro()"><span class="tab-ico">💎</span><span class="tab-lbl">Pro</span></button>
+</div>
+
+<!-- Pro 모달 -->
+<div class="overlay" id="pro-modal" onclick="closePro(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2 style="font-size:20px;font-weight:900;margin-bottom:5px;color:var(--b1)">💎 PARKDA Pro</h2>
+    <p style="font-size:13px;color:var(--gray4);line-height:1.7;margin-bottom:14px">얼리어답터 선착순 30클럽 <strong>6개월 무료</strong> 예정!</p>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+      <div style="display:flex;gap:10px;padding:11px 13px;border-radius:10px;background:var(--gray1)"><span style="font-size:20px">📈</span><div style="font-size:13px;line-height:1.5"><strong style="color:var(--g2)">상세 통계 · KPI</strong><br>월별 추이, 구장 분석</div></div>
+      <div style="display:flex;gap:10px;padding:11px 13px;border-radius:10px;background:var(--gray1)"><span style="font-size:20px">📸</span><div style="font-size:13px;line-height:1.5"><strong style="color:var(--g2)">경기 사진 갤러리</strong><br>무제한 사진 저장</div></div>
+      <div style="display:flex;gap:10px;padding:11px 13px;border-radius:10px;background:var(--gray1)"><span style="font-size:20px">🔄</span><div style="font-size:13px;line-height:1.5"><strong style="color:var(--g2)">실시간 동기화</strong><br>조원들과 실시간 점수 공유</div></div>
+    </div>
+    <button class="btn btn-blue btn-sm" onclick="registerPro()">✉️ &nbsp;얼리어답터 신청하기</button>
+    <div style="text-align:center;margin-top:10px;font-size:13px;color:var(--gray3);cursor:pointer" onclick="closePro()">닫기</div>
+  </div>
+</div>
+
+<div id="toast"></div>
+</div>
+
+<script>
+/* ══════════════════════════════════════
+   ★ Supabase 설정 — 나중에 여기만 바꾸세요
+   SB_URL = 'https://xxxx.supabase.co'
+   SB_KEY = 'eyJ...'
+══════════════════════════════════════ */
+const SB_URL = 'https://szoxnkarkdxirbyxmzgr.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6b3hua2Fya2R4aXJieXhtemdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNDc5NDQsImV4cCI6MjA5MTcyMzk0NH0.Rm3y9LQT7rKASC3Cro2TDFG_b-VkH4HWAci3yURkZes';
+const SB_T   = 'parkda_store';
+const SB_OK  = () => SB_URL !== 'YOUR_SUPABASE_URL';
+
+/* ── DB 레이어 (로컬스토리지 ↔ Supabase 자동 전환) ── */
+async function dbLoad(key, def = null) {
+  const local = lsGet(key);
+  if (!SB_OK()) return local ?? def;
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/${SB_T}?key=eq.${key}&select=value`,
+      { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` } });
+    const d = await r.json();
+    if (d && d[0]) { lsSet(key, d[0].value); return d[0].value; }
+    return local ?? def;
+  } catch { return local ?? def; }
+}
+async function dbSave(key, data) {
+  lsSet(key, data);
+  if (!SB_OK()) return;
+  try {
+    await fetch(`${SB_URL}/rest/v1/${SB_T}`, {
+      method: 'POST',
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`,
+        'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates,return=minimal' },
+      body: JSON.stringify({ key, value: data, updated_at: new Date().toISOString() })
+    });
+  } catch {}
+}
+function lsGet(k) { try { return JSON.parse(localStorage.getItem('pd_' + k)); } catch { return null; } }
+function lsSet(k, v) { try { localStorage.setItem('pd_' + k, JSON.stringify(v)); } catch {} }
+
+/* ══ 앱 상태 ══ */
+let S = { user: null, matches: {}, mid: null, cg: 0, ch: 0 };
+const PAR9  = [4,3,4,3,4,3,4,3,4];
+const PAR18 = [4,3,4,3,4,3,4,3,4,4,3,4,3,4,3,4,3,4];
+const GC    = ['#2e7d32','#1565c0','#e65100','#6a1b9a','#00695c','#c62828'];
+
+/* ══ 4자리 게임 코드 생성 ══ */
+function genCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // 헷갈리는 문자 제외
+  let code = '';
+  for (let i = 0; i < 4; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return code;
+}
+function makeUniqueCode() {
+  let code, tries = 0;
+  do { code = genCode(); tries++; }
+  while (Object.values(S.matches).find(m => m.code === code) && tries < 20);
+  return code;
+}
+
+/* ══ 초기화 ══ */
+async function init() {
+  document.getElementById('c-date').value = new Date().toISOString().slice(0, 10);
+
+  // URL에 게임코드 파라미터 있으면 자동 입력
+  const urlCode = new URLSearchParams(location.search).get('game');
+  if (urlCode) {
+    document.getElementById('join-code').value = urlCode.toUpperCase();
+  }
+
+  S.matches = await dbLoad('matches', {});
+  const u = lsGet('user');
+  if (u) { S.user = u; showHome(); }
+}
+
+/* ══ 페이지 이동 ══ */
+const NO_TAB = ['pg-login','pg-create','pg-groups','pg-score'];
+const TAB_MAP = { 'pg-home':'home','pg-matches':'matches','pg-ranking':'ranking','pg-result':'matches' };
+
+function go(id) {
+  document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  window.scrollTo(0, 0);
+  document.getElementById('tabbar').style.display = NO_TAB.includes(id) ? 'none' : 'grid';
+  if (TAB_MAP[id]) setTab(TAB_MAP[id]);
+  if (id === 'pg-home')    renderHome();
+  if (id === 'pg-matches') renderMatches();
+  if (id === 'pg-ranking') renderRanking();
+}
+function goTab(t) { go({ home:'pg-home', matches:'pg-matches', ranking:'pg-ranking' }[t]); }
+function setTab(t) {
+  document.querySelectorAll('.tab').forEach(e => e.classList.remove('on'));
+  const el = document.getElementById('tab-' + t); if (el) el.classList.add('on');
+}
+
+/* ══ 로그인 ══ */
+function doLogin() {
+  const name  = V('l-name').trim();
+  const phone = V('l-phone').trim();
+  if (!name)  { toast('이름을 입력해 주세요 👤'); return; }
+  if (!phone.startsWith('010') || phone.length < 10) { toast('전화번호를 확인해 주세요 📱'); return; }
+  S.user = { name, phone, club: V('l-club').trim(), region: V('l-region'),
+    role: document.querySelector('input[name="role"]:checked')?.value || '일반회원',
+    joinedAt: new Date().toISOString() };
+  lsSet('user', S.user);
+  saveMeta();
+  showHome();
+}
+async function saveMeta() {
+  if (!S.user?.club) return;
+  const clubs = await dbLoad('clubs', []);
+  if (!clubs.find(c => c.phone === S.user.phone)) {
+    clubs.push({ ...S.user, at: new Date().toISOString() });
+    await dbSave('clubs', clubs);
+  }
+}
+function showHome() { go('pg-home'); }
+function doLogout() {
+  if (!confirm('로그아웃 하시겠어요?')) return;
+  lsSet('user', null); S.user = null;
+  document.getElementById('tabbar').style.display = 'none';
+  go('pg-login');
+}
+
+/* ══ 게임 참가 (코드 입력) ══ */
+function joinGame() {
+  const code = V('join-code').trim().toUpperCase();
+  if (code.length !== 4) { toast('4자리 코드를 입력해 주세요'); return; }
+  const match = Object.values(S.matches).find(m => m.code === code);
+  if (!match) {
+    // ⚠️ Supabase 없을 때는 같은 기기에서만 동작
+    // Supabase 연결 후에는 다른 기기에서도 경기 로드 가능
+    toast('해당 코드의 경기를 찾을 수 없어요\n(Supabase 연결 후 다른 기기에서도 참가 가능)');
+    return;
+  }
+  S.mid = match.id;
+  toast(`✅ "${match.title}" 경기에 참가했어요!`);
+  setTimeout(() => openScore(match.id), 600);
+}
+
+/* ══ 홈 ══ */
+function renderHome() {
+  if (!S.user) return;
+  document.getElementById('home-uname').textContent = S.user.name;
+  document.getElementById('home-uclub').textContent = S.user.club
+    ? `${S.user.club}${S.user.region ? ' · ' + S.user.region : ''} · ${S.user.role}`
+    : `${S.user.role || '일반회원'}`;
+  const ms = Object.values(S.matches);
+  const tp = ms.reduce((s, m) => s + (m.players || []).length, 0);
+  const done = ms.filter(m => m.sd && Object.keys(m.sd).length > 0).length;
+  document.getElementById('home-kpi').innerHTML = `
+    <div class="kpi"><div class="kpi-n">${ms.length}</div><div class="kpi-l">전체 경기</div></div>
+    <div class="kpi"><div class="kpi-n">${tp}</div><div class="kpi-l">누적 참가자</div></div>
+    <div class="kpi"><div class="kpi-n">${done}</div><div class="kpi-l">완료 경기</div></div>`;
+}
+
+/* ══ 경기 만들기 ══ */
+function createMatch() {
+  const title  = V('c-title').trim();
+  const date   = V('c-date');
+  const course = V('c-course').trim() || '미지정';
+  const holes  = +QV('input[name="holes"]:checked');
+  const gs     = +QV('input[name="gs"]:checked');
+  const custom = +V('c-unit-custom');
+  const unit   = custom > 0 ? custom : +QV('input[name="unit"]:checked') || 100;
+  if (!title) { toast('경기 이름을 입력하세요 📝'); return; }
+  const players = parsePlayers(V('c-players'));
+  if (players.length < 2) { toast('참가자를 2명 이상 입력하세요 👥'); return; }
+
+  const id   = 'M' + Date.now().toString(36).toUpperCase();
+  const code = makeUniqueCode();
+  const par  = holes === 9 ? [...PAR9] : [...PAR18];
+  const groups = makeGroups(players, gs);
+
+  S.matches[id] = {
+    id, title, date, course, holes, gs, players, groups, par, unit, code,
+    sd: {}, manualLogs: [],
+    status: 'wait', // wait / play / done
+    createdAt: new Date().toISOString(),
+    by: S.user?.name || ''
+  };
+  S.mid = id;
+  saveMatches();
+  renderGroupsPage();
+  go('pg-groups');
+}
+
+function parsePlayers(raw) {
+  const parts = raw.replace(/[,\/]/g, '\n').split(/[\n\t ]+/);
+  const seen = new Set(), res = [];
+  for (const p of parts) {
+    const t = p.trim();
+    if (/^[가-힣]{2,5}$/.test(t) && !seen.has(t)) { res.push(t); seen.add(t); }
+  }
+  return res;
+}
+function makeGroups(players, gs) {
+  const arr = [...players].sort(() => Math.random() - .5);
+  const n = Math.ceil(arr.length / gs), res = [];
+  for (let i = 0; i < n; i++) {
+    const gp = arr.slice(i * gs, (i + 1) * gs);
+    res.push({ no: i + 1, players: gp, leader: gp[0] });
+  }
+  return res;
+}
+
+/* ══ 게임코드 공유 ══ */
+function renderGamecode() {
+  const m = S.matches[S.mid]; if (!m) return;
+  const baseUrl = location.origin + location.pathname;
+  const url = `${baseUrl}?game=${m.code}`;
+  document.getElementById('gc-code').textContent = m.code;
+  document.getElementById('gc-url').textContent = url;
+}
+function copyCode() {
+  const m = S.matches[S.mid]; if (!m) return;
+  const baseUrl = location.origin + location.pathname;
+  const txt = `⛳ PARKDA 경기 참가\n\n경기: ${m.title}\n게임코드: ${m.code}\n\n아래 링크를 클릭하거나 코드를 입력하세요\n${baseUrl}?game=${m.code}`;
+  navigator.clipboard?.writeText(txt).then(() => toast('📋 복사됐어요! 카톡에 붙여넣으세요'))
+    .catch(() => fbCopy(txt));
+  if (!navigator.clipboard) fbCopy(txt);
+}
+function shareKakao() {
+  const m = S.matches[S.mid]; if (!m) return;
+  const baseUrl = location.origin + location.pathname;
+  const txt = `⛳ PARKDA 경기 참가\n\n📌 ${m.title}\n📅 ${m.date}  🏌️ ${m.course}\n👥 ${m.players.length}명 · ${m.holes}홀 · ${m.unit}원/타\n\n🔑 게임코드: ${m.code}\n🔗 ${baseUrl}?game=${m.code}\n\nPARKDA 앱에서 코드를 입력하면 바로 참가!`;
+  navigator.clipboard?.writeText(txt).then(() => toast('💬 카톡 공유용 텍스트 복사됐어요!'))
+    .catch(() => fbCopy(txt));
+  if (!navigator.clipboard) fbCopy(txt);
+  toast('💬 복사됐어요! 카톡에 붙여넣으세요');
+}
+
+/* ══ 조편성 ══ */
+function renderGroupsPage() {
+  const m = S.matches[S.mid]; if (!m) return;
+  renderGamecode();
+  document.getElementById('groups-area').innerHTML = m.groups.map((g, i) => {
+    const c = GC[i % GC.length];
+    const chips = g.players.map(p => `
+      <div class="chip" style="border-color:${c};color:${c}">
+        ${p}${p === g.leader ? '<span class="chip-ldr">👑조장</span>' : ''}
+      </div>`).join('');
+    return `<div class="group-wrap"><div class="group-card" style="background:${c}14;border-color:${c}">
+      <div class="group-title" style="color:${c}">${g.no}조
+        <span class="ldr-chg" onclick="changeLeader(${i})">조장 변경</span>
+      </div>
+      <div class="chips">${chips}</div>
+    </div></div>`;
+  }).join('');
+}
+function reshuffle() {
+  const m = S.matches[S.mid]; if (!m) return;
+  m.groups = makeGroups(m.players, m.gs);
+  saveMatches(); renderGroupsPage(); toast('🔀 다시 섞었어요!');
+}
+function changeLeader(gi) {
+  const m = S.matches[S.mid]; if (!m) return;
+  const g = m.groups[gi];
+  const input = prompt(`조장 선택\n현재: ${g.leader}\n멤버: ${g.players.join(', ')}\n\n이름을 정확히 입력하세요:`);
+  if (!input) return;
+  const name = input.trim();
+  if (!g.players.includes(name)) { toast('조원 이름을 정확히 입력해주세요'); return; }
+  m.groups[gi].leader = name;
+  saveMatches(); renderGroupsPage(); toast(`👑 ${name} 님이 조장!`);
+}
+function goScore() { openScore(S.mid); }
+
+/* ══ 점수 입력 ══ */
+function openScore(mid) {
+  S.mid = mid; S.cg = 0; S.ch = 0;
+  const m = S.matches[mid]; if (!m) return;
+  // 상태 업데이트
+  if (m.status === 'wait') { m.status = 'play'; saveMatches(); }
+  document.getElementById('score-bar-title').textContent = `📊 ${m.title}`;
+  document.getElementById('score-bar-sub').textContent = `코드: ${m.code}`;
+  document.getElementById('half-tab-wrap').style.display = m.holes === 18 ? 'block' : 'none';
+  renderGroupTabs(); renderAuthBox(); renderScoreTbl();
+  go('pg-score');
+}
+function renderGroupTabs() {
+  const m = S.matches[S.mid];
+  document.getElementById('group-tabs').innerHTML = m.groups.map((g, i) => {
+    const c = GC[i % GC.length];
+    return `<button class="gtab${i===0?' on':''}" id="gtab-${i}"
+      style="${i===0?`background:${c};color:#fff;border-color:${c}`:`border-color:${c}66;color:${c}`}"
+      onclick="switchGroup(${i})">${g.no}조 👑${g.leader}</button>`;
+  }).join('');
+}
+function switchGroup(i) {
+  S.cg = i;
+  S.matches[S.mid].groups.forEach((_, j) => {
+    const el = document.getElementById('gtab-' + j); if (!el) return;
+    const c = GC[j % GC.length];
+    if (j === i) { el.className = 'gtab on'; el.style.cssText = `background:${c};color:#fff;border-color:${c}`; }
+    else { el.className = 'gtab'; el.style.cssText = `border-color:${c}66;color:${c};background:var(--white)`; }
+  });
+  renderAuthBox(); renderScoreTbl();
+}
+function switchHalf(h) {
+  S.ch = h;
+  document.getElementById('ht-0').classList.toggle('on', h === 0);
+  document.getElementById('ht-1').classList.toggle('on', h === 1);
+  renderScoreTbl();
+}
+function canEdit() {
+  const m = S.matches[S.mid], g = m?.groups[S.cg];
+  return g?.leader === S.user?.name || S.user?.role === '총무/회장';
+}
+function renderAuthBox() {
+  const m = S.matches[S.mid], g = m?.groups[S.cg];
+  const ok = canEdit();
+  document.getElementById('score-auth-box').innerHTML = ok ? '' :
+    `<div class="auth-box">🔒 이 조의 점수는 조장 <b>${g?.leader||''}</b> 님만 입력할 수 있어요.</div>`;
+  document.getElementById('score-help').textContent = ok
+    ? `${g?.no}조 조장 입력 모드 · 단가 ${m?.unit}원/타`
+    : `조장 또는 총무/회장만 입력 가능합니다.`;
+}
+function renderScoreTbl() {
+  const m = S.matches[S.mid]; if (!m) return;
+  const g = m.groups[S.cg]; if (!g) return;
+  const H = m.holes, par = m.par, ok = canEdit();
+  const sh = H === 18 ? S.ch * 9 : 0;
+  const hr = Array.from({ length: 9 }, (_, i) => sh + i);
+
+  let head = `<thead><tr><th class="th-n">선수</th>`;
+  hr.forEach(h => head += `<th>${h+1}홀<br><small style="opacity:.6">P${par[h]}</small></th>`);
+  head += `<th>합계</th></tr></thead>`;
+
+  let body = '<tbody>';
+  g.players.forEach(p => {
+    const sc = (m.sd || {})[p] || Array(H).fill('');
+    const isL = p === g.leader;
+    body += `<tr><td class="td-n">${p}${isL?'<small style="margin-left:3px">👑</small>':''}</td>`;
+    hr.forEach(h => {
+      const v = sc[h] || '';
+      if (ok) {
+        body += `<td><input class="sinp" type="number" min="1" max="20" inputmode="numeric"
+          data-p="${p}" data-h="${h}" value="${v}" oninput="onSI(this)"></td>`;
+      } else {
+        const n = +v, pr = par[h];
+        const bg = n > 0 ? (n < pr ? 'var(--b5)' : n > pr ? 'var(--red2)' : 'var(--g5)') : '';
+        body += `<td style="font-size:15px;font-weight:700;background:${bg}">${v||'—'}</td>`;
+      }
+    });
+    let tot = 0; hr.forEach(h => tot += (+((m.sd||{})[p]?.[h] || 0)));
+    body += `<td id="tot-${esc(p)}-${S.cg}-${S.ch}">${tot > 0 ? tot : '—'}</td></tr>`;
+  });
+  body += '</tbody>';
+  document.getElementById('score-tbl').innerHTML = head + body;
+  updLive();
+}
+function esc(s) { return s.replace(/[^가-힣a-zA-Z0-9]/g, '_'); }
+function onSI(el) {
+  if (!canEdit()) { el.value = ''; toast('조장만 입력할 수 있어요 🔒'); return; }
+  const v = +el.value, par = S.matches[S.mid].par[+el.dataset.h];
+  el.className = 'sinp';
+  if (v > 0) el.classList.add(v < par ? 'un' : v > par ? 'ov' : '');
+  updLive();
+}
+function updLive() {
+  const m = S.matches[S.mid]; if (!m) return;
+  const g = m.groups[S.cg]; if (!g) return;
+  const sh = m.holes === 18 ? S.ch * 9 : 0;
+  const hr = Array.from({ length: 9 }, (_, i) => sh + i);
+  const parT = hr.reduce((s, h) => s + m.par[h], 0);
+  const pairs = [];
+  g.players.forEach(p => {
+    let tot = 0;
+    hr.forEach(h => { const inp = document.querySelector(`input[data-p="${p}"][data-h="${h}"]`); tot += (+inp?.value || 0); });
+    const tid = `tot-${esc(p)}-${S.cg}-${S.ch}`;
+    const tel = document.getElementById(tid); if (tel) tel.textContent = tot > 0 ? tot : '—';
+    if (tot > 0) pairs.push({ p, tot });
+  });
+  pairs.sort((a, b) => a.tot - b.tot);
+  const la = document.getElementById('live-area');
+  if (pairs.length) {
+    la.innerHTML = `<div class="live-box"><div class="live-title">⚡ ${g.no}조 현황</div><div class="live-chips">${
+      pairs.map((r, i) => {
+        const d = r.tot - parT, ds = d === 0 ? 'E' : d > 0 ? '+' + d : String(d);
+        const dc = d < 0 ? 'var(--b2)' : d > 0 ? 'var(--red)' : 'var(--g2)';
+        return `<div class="live-chip">${i===0?'🥇':i===1?'🥈':i===2?'🥉':''} ${r.p} <b style="font-size:15px">${r.tot}</b><span style="color:${dc};font-size:11px">${ds}</span></div>`;
+      }).join('')
+    }</div></div>`;
+  } else la.innerHTML = '';
+}
+function collectScores() {
+  const m = S.matches[S.mid], H = m.holes;
+  const sh = H === 18 ? S.ch * 9 : 0;
+  const hr = Array.from({ length: 9 }, (_, i) => sh + i);
+  const g = m.groups[S.cg];
+  g.players.forEach(p => {
+    if (!m.sd[p]) m.sd[p] = Array(H).fill(0);
+    hr.forEach(h => { const inp = document.querySelector(`input[data-p="${p}"][data-h="${h}"]`); m.sd[p][h] = +inp?.value || 0; });
+  });
+}
+async function saveScore() {
+  if (!canEdit()) { toast('저장 권한이 없어요 🔒'); return; }
+  collectScores();
+  await saveMatches();
+  toast('💾 저장됐어요!');
+}
+async function saveAndResult() { if (canEdit()) collectScores(); await saveMatches(); openResult(S.mid); }
+
+/* ══ 정산 계산 ══ */
+function calcHalfSettle(m, halfIdx) {
+  const sh = halfIdx * 9;
+  const hr = Array.from({ length: 9 }, (_, i) => sh + i);
+  const unit = m.unit || 100;
+  const result = {}; m.players.forEach(p => result[p] = 0);
+  m.groups.forEach(g => {
+    const scores = g.players.map(p => {
+      const sc = (m.sd || {})[p] || [];
+      const tot = hr.reduce((s, h) => s + (+sc[h] || 0), 0);
+      return { p, tot };
+    }).filter(r => r.tot > 0).sort((a, b) => a.tot - b.tot);
+    if (scores.length < 2) return;
+    // 계단식: 상위자가 하위자 각각에게서 타수 차이 × 단가
+    for (let i = 0; i < scores.length; i++) {
+      for (let j = i + 1; j < scores.length; j++) {
+        const amt = (scores[j].tot - scores[i].tot) * unit;
+        result[scores[i].p] += amt;
+        result[scores[j].p] -= amt;
+      }
+    }
+  });
+  return result;
+}
+function calcTotalSettle(m) {
+  const halves = m.holes === 18 ? [0, 1] : [0];
+  const total = {}; m.players.forEach(p => total[p] = 0);
+  halves.forEach(h => {
+    const hs = calcHalfSettle(m, h);
+    Object.entries(hs).forEach(([p, v]) => total[p] += v);
+  });
+  (m.manualLogs || []).forEach(l => { total[l.from] -= l.amt; total[l.to] += l.amt; });
+  return total;
+}
+function calcArrows(settleMap, players) {
+  const arrows = [];
+  const g = players.filter(p => settleMap[p] < 0).map(p => ({ p, v: -settleMap[p] })).sort((a,b)=>b.v-a.v);
+  const r = players.filter(p => settleMap[p] > 0).map(p => ({ p, v: settleMap[p] })).sort((a,b)=>b.v-a.v);
+  while (g.length && r.length) {
+    const gi = g[0], ri = r[0], amt = Math.min(gi.v, ri.v);
+    if (amt > 0) arrows.push({ from: gi.p, to: ri.p, amt });
+    gi.v -= amt; ri.v -= amt;
+    if (gi.v <= 0) g.shift(); if (ri.v <= 0) r.shift();
+  }
+  return arrows;
+}
+function fa(v) { const a = Math.abs(v); return a >= 10000 ? `${(a/10000).toFixed(1)}만원` : `${a.toLocaleString()}원`; }
+
+/* ══ 결과 화면 ══ */
+function openResult(mid) {
+  S.mid = mid;
+  const m = S.matches[mid]; if (!m) return;
+  m.status = 'done'; saveMatches();
+  document.getElementById('result-title').textContent = `💰 ${m.title} 정산`;
+  const H = m.holes, par = m.par, parT = par.slice(0, H).reduce((a,b)=>a+b,0), unit = m.unit||100;
+  const sd = m.sd || {};
+  const halves = H===18 ? [{idx:0,label:'⛳ 전반 1~9홀'},{idx:1,label:'⛳ 후반 10~18홀'}] : [{idx:0,label:'⛳ 9홀 정산'}];
+
+  // ── 9홀별 정산 ──
+  let sHtml = '';
+  halves.forEach(({idx, label}) => {
+    const sh = idx*9, hr = Array.from({length:9},(_,i)=>sh+i);
+    const hs = calcHalfSettle(m, idx);
+    const hasData = m.players.some(p => ((m.sd||{})[p]||[]).slice(sh,sh+9).some(v=>+v>0));
+    if (!hasData) return;
+    m.groups.forEach((g, gi) => {
+      const c = GC[gi % GC.length];
+      const rows = g.players.map(p => {
+        const sc = sd[p]||[];
+        const tot = hr.reduce((s,h) => s+(+sc[h]||0), 0);
+        return {p, tot, amt: hs[p]||0};
+      }).filter(r => r.tot > 0).sort((a,b)=>a.tot-b.tot);
+      if (!rows.length) return;
+      const ri = i => i===0?'<span class="sr-rank sr1">🥇</span>':i===1?'<span class="sr-rank sr2">🥈</span>':i===2?'<span class="sr-rank sr3">🥉</span>':'<span class="sr-rank srn">'+(i+1)+'</span>';
+      const ac = v => v>0?'aplus':v<0?'aminus':'azero';
+      const as = v => v>0?`+${fa(v)}`:v<0?`-${fa(v)}`:'0원';
+      const gMap = {}; rows.forEach(r=>gMap[r.p]=hs[r.p]||0);
+      const arrows = calcArrows(gMap, rows.map(r=>r.p));
+      sHtml += `<div class="half-settle">
+        <div class="hs-hd" style="background:${c}">${label} — ${g.no}조 <span class="hs-sub">${unit}원/타</span></div>
+        <div style="background:var(--white)">
+          ${rows.map((r,i)=>`<div class="settle-row">
+            ${ri(i)}
+            <div class="settle-name">${r.p}${g.leader===r.p?'<span style="font-size:10px;margin-left:3px;background:#ffd54f;color:#5d4037;padding:1px 5px;border-radius:99px">👑</span>':''}</div>
+            <div class="settle-score">${r.tot}타</div>
+            <div class="settle-amt ${ac(r.amt)}">${as(r.amt)}</div>
+          </div>`).join('')}
+          ${arrows.length?`<div class="arrows">${arrows.map(a=>`
+            <div class="arrow-item"><span class="af">${a.from}</span> → <span class="at">${a.to}</span>
+            <span class="atag">${fa(a.amt)}</span></div>`).join('')}</div>`:''}
+        </div>
+      </div>`;
+    });
+  });
+  document.getElementById('result-settle-area').innerHTML = sHtml;
+
+  // ── 종합 정산 ──
+  const ts = calcTotalSettle(m);
+  const tSorted = m.players.map(p=>({p,v:ts[p]||0})).sort((a,b)=>b.v-a.v);
+  const tArrows = calcArrows(ts, m.players);
+  document.getElementById('result-total-area').innerHTML = `
+    <div class="total-board">
+      <div class="tb-hd">💰 최종 종합 정산 (${H}홀)</div>
+      ${tSorted.map(({p,v})=>`<div class="tb-row">
+        <div class="tb-name">${p}</div>
+        <div class="tb-total ${v>0?'tplus':v<0?'tminus':'tzero'}">${v>0?'+':''}${fa(v)}</div>
+      </div>`).join('')}
+      ${tArrows.length?`<div style="padding:10px 15px;background:#fafafa;border-top:1px solid var(--gray1)">
+        <div style="font-size:12px;font-weight:700;color:var(--gray4);margin-bottom:6px">📋 정산 방법</div>
+        ${tArrows.map(a=>`<div style="font-size:13px;padding:4px 0;display:flex;align-items:center;gap:6px">
+          <span style="color:var(--red);font-weight:700">${a.from}</span> →
+          <span style="color:var(--g2);font-weight:700">${a.to}</span>
+          <span style="background:var(--gray1);border-radius:99px;padding:2px 9px;font-size:12px;font-weight:900">${fa(a.amt)}</span>
+        </div>`).join('')}
+      </div>`:''}
+    </div>`;
+
+  // ── 수동 추가 정산 ──
+  const logs = m.manualLogs || [];
+  document.getElementById('result-manual-area').innerHTML = `
+    <div class="manual-box">
+      <div class="mb-title">💸 추가 정산 (도우미 비용 등)</div>
+      <div class="mb-row"><div class="mb-lbl">보내는 분</div><select class="mb-sel" id="mb-from">${m.players.map(p=>`<option>${p}</option>`).join('')}</select></div>
+      <div class="mb-row"><div class="mb-lbl">받는 분</div><select class="mb-sel" id="mb-to">${m.players.map(p=>`<option>${p}</option>`).join('')}</select></div>
+      <div class="mb-row"><div class="mb-lbl">금액</div><input class="mb-amt" id="mb-amt" type="number" min="100" placeholder="1000"><button class="mb-btn" onclick="doManual()">전송 💸</button></div>
+      ${logs.length?`<div class="mb-logs">${logs.map((l,i)=>`<div class="mb-log"><span>${l.from} → ${l.to} <b>${fa(l.amt)}</b></span><span class="mb-del" onclick="delManual(${i})">✕</span></div>`).join('')}</div>`:''}
+    </div>`;
+
+  // ── 포디움 ──
+  const allRows = m.players.map(p => {
+    const sc = (sd[p]||Array(H).fill(0)).slice(0,H);
+    const tot = sc.reduce((a,b)=>a+b,0);
+    return {p, tot, diff:tot-parT, money:ts[p]||0};
+  }).sort((a,b)=>a.tot-b.tot);
+  allRows.forEach((r,i)=>r.rank=i+1);
+  const pm = [{cls:'p-gold',ico:'🥇'},{cls:'p-silver',ico:'🥈'},{cls:'p-bronze',ico:'🥉'}];
+  document.getElementById('podium-area').innerHTML = `<div class="podium">${
+    allRows.slice(0,3).map((r,i)=>`<div class="p-card ${pm[i].cls}">
+      <div class="p-medal">${pm[i].ico}</div><div class="p-rnk">${i+1}위</div>
+      <div class="p-name">${r.p}</div>
+      <div class="p-score">${r.tot>0?r.tot+'타':'—'}</div>
+      <div class="p-money" style="color:${r.money>0?'var(--g2)':r.money<0?'var(--red)':'var(--gray3)'}">${r.money>0?'+':''}${r.money!==0?fa(r.money):'±0'}</div>
+    </div>`).join('')}</div>`;
+
+  // ── 순위표 ──
+  const rb = r => r===1?`<span class="rbadge rb1">🥇</span>`:r===2?`<span class="rbadge rb2">🥈</span>`:r===3?`<span class="rbadge rb3">🥉</span>`:`<span class="rbadge rbn">${r}</span>`;
+  const dc = d => d<0?'dun':d>0?'dov':'dev';
+  const dt = d => d===0?'E':d>0?'+'+d:String(d);
+  document.getElementById('result-tbl').innerHTML = `
+    <thead><tr><th>순위</th><th>이름</th><th>합계</th><th>PAR</th><th>정산</th></tr></thead>
+    <tbody>${allRows.map(r=>`<tr>
+      <td>${rb(r.rank)}</td><td>${r.p}</td>
+      <td style="font-size:16px;font-weight:900">${r.tot>0?r.tot:'—'}</td>
+      <td class="${dc(r.diff)}">${r.tot>0?dt(r.diff):'—'}</td>
+      <td style="font-size:13px;font-weight:900;color:${r.money>0?'var(--g2)':r.money<0?'var(--red)':'var(--gray3)'}">${r.money>0?'+':''}${r.money!==0?fa(r.money):'±0'}</td>
+    </tr>`).join('')}</tbody>`;
+
+  // ── 공유 텍스트 ──
+  const lines = [`⛳ ━━━━━━━━━━━━━━`,`  PARKDA 정산 결과`,`⛳ ━━━━━━━━━━━━━━`,
+    `📌 ${m.title}`,`📅 ${m.date}  🏌️ ${m.course}`,`단가: ${unit}원/타 · ${H}홀`,``,
+    `💰 최종 정산`,
+    ...tSorted.map(({p,v})=>`  ${p.padEnd(5)} ${v>0?'+':v<0?'':' '}${v!==0?fa(v):'±0'}`),
+    ...(tArrows.length?[``,`📋 정산 방법`,...tArrows.map(a=>`  ${a.from} → ${a.to}  ${fa(a.amt)}`)]:[]),
+    ``,`🏆 최종 순위`,
+    ...allRows.map(r=>`  ${r.rank===1?'🥇':r.rank===2?'🥈':r.rank===3?'🥉':r.rank+'.'} ${r.p.padEnd(4)} ${r.tot>0?r.tot+'타':'—'}`),
+    ``,`🔑 게임코드: ${m.code}`,`📱 PARKDA 앱으로 확인`,`⛳ ━━━━━━━━━━━━━━`];
+  document.getElementById('share-box').textContent = lines.join('\n');
+  go('pg-result');
+}
+async function doManual() {
+  const from=document.getElementById('mb-from')?.value, to=document.getElementById('mb-to')?.value, amt=+document.getElementById('mb-amt')?.value;
+  if (!from||!to||from===to){toast('보내는 분과 받는 분이 달라야 해요');return;}
+  if (!amt||amt<1){toast('금액을 입력하세요');return;}
+  const m=S.matches[S.mid];
+  if(!m.manualLogs)m.manualLogs=[];
+  m.manualLogs.push({from,to,amt,at:new Date().toISOString()});
+  await saveMatches(); toast(`💸 ${from} → ${to} ${fa(amt)}`);
+  setTimeout(()=>openResult(S.mid),500);
+}
+async function delManual(i){const m=S.matches[S.mid];m.manualLogs.splice(i,1);await saveMatches();openResult(S.mid);}
+
+/* ══ 경기 목록 ══ */
+function renderMatches() {
+  const ms = Object.values(S.matches).reverse();
+  const el = document.getElementById('matches-area');
+  if (!ms.length) {
+    el.innerHTML=`<div class="empty"><div class="empty-ico">📋</div><div class="empty-t">경기가 없어요</div><div class="empty-s">홈에서 새 경기를 만들어보세요!</div></div>`;
+    return;
+  }
+  const statusHtml = s => {
+    if (s==='play') return '<span class="status-badge status-play">🟢 진행중</span>';
+    if (s==='done') return '<span class="status-badge status-done">✅ 완료</span>';
+    return '<span class="status-badge status-wait">⏳ 대기중</span>';
+  };
+  el.innerHTML = ms.map(m => {
+    const done = m.sd && Object.keys(m.sd).length > 0;
+    const ts = done ? calcTotalSettle(m) : {};
+    const top = Object.entries(ts).sort((a,b)=>b[1]-a[1])[0];
+    return `<div class="match-card">
+      <div class="mc-hd">
+        <div>
+          <div class="mc-title">${m.title}</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:3px">
+            ${statusHtml(m.status||'wait')}
+            <span class="mc-code">${m.code}</span>
+          </div>
+        </div>
+        <div class="mc-date">${m.date}</div>
+      </div>
+      <div class="mc-body">
+        <span class="mc-tag">⛳ ${m.holes}홀</span>
+        <span class="mc-tag">👥 ${m.players.length}명</span>
+        <span class="mc-tag">💵 ${m.unit}원/타</span>
+        ${top&&top[1]>0?`<span class="mc-tag" style="background:var(--gold2);color:var(--gold)">🏆${top[0]} +${fa(top[1])}</span>`:''}
+      </div>
+      <div class="mc-foot">
+        <button class="mc-btn mc-btn-g" onclick="openScore('${m.id}')">📊 점수</button>
+        <button class="mc-btn mc-btn-b" onclick="openResult('${m.id}')">💰 정산</button>
+        <button class="mc-btn mc-btn-share" onclick="shareMatch('${m.id}')">💬 공유</button>
+        <button class="mc-btn mc-btn-r" onclick="delMatch('${m.id}')" style="flex:.4">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function shareMatch(id) {
+  const m = S.matches[id]; if (!m) return;
+  const baseUrl = location.origin + location.pathname;
+  const txt = `⛳ PARKDA 경기 참가\n\n📌 ${m.title}\n📅 ${m.date}  🏌️ ${m.course}\n👥 ${m.players.length}명 · ${m.holes}홀 · ${m.unit}원/타\n\n🔑 게임코드: ${m.code}\n🔗 ${baseUrl}?game=${m.code}\n\nPARKDA 앱에서 코드를 입력하면 바로 참가!`;
+  navigator.clipboard?.writeText(txt).then(()=>toast('💬 복사됐어요! 카톡에 붙여넣으세요')).catch(()=>fbCopy(txt));
+  if(!navigator.clipboard)fbCopy(txt);
+}
+function delMatch(id){if(!confirm('삭제할까요?'))return;delete S.matches[id];saveMatches();renderMatches();toast('🗑️ 삭제됐어요');}
+
+/* ══ 랭킹 ══ */
+function renderRanking() {
+  const stats = {};
+  Object.values(S.matches).forEach(m => {
+    const sd = m.sd||{}, ts = calcTotalSettle(m);
+    m.players.forEach(p => {
+      const sc = (sd[p]||[]).slice(0,m.holes);
+      const tot = sc.reduce((a,b)=>a+b,0);
+      if(!stats[p]) stats[p]={n:0,sum:0,money:0};
+      if(tot>0){stats[p].n++;stats[p].sum+=tot;}
+      stats[p].money+=(ts[p]||0);
+    });
+  });
+  const el = document.getElementById('ranking-area');
+  const sorted = Object.entries(stats).filter(([,s])=>s.n>0)
+    .map(([p,s])=>({p,n:s.n,avg:(s.sum/s.n).toFixed(1),money:s.money}))
+    .sort((a,b)=>+a.avg-+b.avg);
+  if(!sorted.length){el.innerHTML=`<div class="empty"><div class="empty-ico">🏅</div><div class="empty-t">데이터가 없어요</div><div class="empty-s">점수를 입력하면 랭킹이 표시돼요</div></div>`;return;}
+  const medals=['🥇','🥈','🥉'];
+  el.innerHTML = sorted.map((r,i)=>`<div class="rank-card">
+    <div class="rank-medal">${medals[i]||(i+1+'위')}</div>
+    <div class="rank-info"><div class="rank-name">${r.p}</div><div class="rank-sub">${r.n}경기 참가</div></div>
+    <div class="rank-right">
+      <div class="rank-avg">${r.avg}</div>
+      <div style="font-size:10px;color:var(--gray3)">평균 타수</div>
+      <div class="rank-money" style="color:${r.money>0?'var(--g2)':r.money<0?'var(--red)':'var(--gray3)'}">${r.money>0?'+':''}${r.money!==0?fa(r.money):'±0'}</div>
+    </div>
+  </div>`).join('');
+}
+
+/* ══ Pro 모달 ══ */
+function showPro(){document.getElementById('pro-modal').classList.add('on');}
+function closePro(e){if(!e||e.target.id==='pro-modal')document.getElementById('pro-modal').classList.remove('on');}
+function registerPro(){
+  toast('✉️ 신청 감사합니다! 오픈 시 연락드릴게요');
+  dbLoad('early_adopters',[]).then(arr=>{if(!arr.find(a=>a.phone===S.user?.phone)){arr.push({...S.user,at:new Date().toISOString()});dbSave('early_adopters',arr);}});
+  closePro();
+}
+
+/* ══ 유틸 ══ */
+async function saveMatches(){await dbSave('matches',S.matches);}
+function copyShare(){const t=document.getElementById('share-box').textContent;navigator.clipboard?.writeText(t).then(()=>toast('📋 복사됐어요!')).catch(()=>fbCopy(t));if(!navigator.clipboard)fbCopy(t);}
+function fbCopy(t){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');document.body.removeChild(a);}
+function V(id){return document.getElementById(id)?.value||'';}
+function QV(sel){return document.querySelector(sel)?.value||'';}
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('on'),2700);}
+
+init();
+</script>
+</body>
+</html>
