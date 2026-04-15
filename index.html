@@ -43,12 +43,12 @@ html,body{height:100%;background:#e8f0e8;font-family:'Noto Sans KR',sans-serif;c
 .bar-sub{font-size:11px;opacity:.75}
 
 /* 히어로 */
-.hero{background:linear-gradient(160deg,var(--g1),var(--g2) 55%,#33691e);padding:24px 22px 20px;color:var(--white);position:relative;overflow:hidden}
-.hero::after{content:'⛳';position:absolute;right:-8px;bottom:-16px;font-size:96px;opacity:.07;pointer-events:none}
+.hero{background:linear-gradient(160deg,#0a1432 0%,#0f2040 55%,#162a50 100%);padding:24px 22px 20px;color:var(--white);position:relative;overflow:hidden}
+.hero::after{display:none}
 .hero-logo{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 0 0}
 .hero-logo img{height:110px;width:auto;filter:drop-shadow(0 3px 12px rgba(0,0,0,.5))}
 .hero-logo-text{display:none}
-.hero-sub{font-size:13px;opacity:.85;margin-top:6px;letter-spacing:.5px;text-align:center}
+.hero-sub{font-size:13px;opacity:.9;margin-top:6px;letter-spacing:.5px;text-align:center;color:#90caf9}
 
 /* 유저카드 */
 .ucard{margin:12px 14px 0;background:var(--g5);border:1.5px solid var(--g4);border-radius:14px;padding:12px 15px;display:flex;align-items:center;gap:10px}
@@ -392,10 +392,10 @@ select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg
 
   <div class="sec">⛳ 내 경기 관리</div>
   <button class="mbtn mbtn-green" onclick="go('pg-create')"><span class="mbtn-ico">📝</span><span class="mbtn-info"><span class="mbtn-label">새 경기 만들기</span><span class="mbtn-desc">조편성 + 게임 코드 자동 생성</span></span><span class="mbtn-arr">›</span></button>
-  <button class="mbtn mbtn-blue" onclick="go('pg-matches')"><span class="mbtn-ico">📋</span><span class="mbtn-info"><span class="mbtn-label">경기 목록</span><span class="mbtn-desc">점수 입력 · 정산 · 코드 공유</span></span><span class="mbtn-arr">›</span></button>
+  <button class="mbtn mbtn-blue" onclick="go('pg-matches')"><span class="mbtn-ico">📋</span><span class="mbtn-info"><span class="mbtn-label">경기 목록</span><span class="mbtn-desc">점수 입력 · 포인트 · 코드 공유</span></span><span class="mbtn-arr">›</span></button>
 
   <div class="sec">📊 통계 · 순위</div>
-  <button class="mbtn mbtn-teal" onclick="go('pg-ranking')"><span class="mbtn-ico">🏅</span><span class="mbtn-info"><span class="mbtn-label">누적 랭킹 · 정산</span><span class="mbtn-desc">평균 타수 · 누적 수익 순위</span></span><span class="mbtn-arr">›</span></button>
+  <button class="mbtn mbtn-teal" onclick="go('pg-ranking')"><span class="mbtn-ico">🏅</span><span class="mbtn-info"><span class="mbtn-label">누적 랭킹 · 포인트</span><span class="mbtn-desc">평균 타수 · 누적 포인트 순위</span></span><span class="mbtn-arr">›</span></button>
   <button class="mbtn mbtn-gray mbtn-lock" onclick="showPro()"><span class="mbtn-ico">📈</span><span class="mbtn-info"><span class="mbtn-label" style="color:var(--gray4)">상세 통계 · KPI</span><span class="mbtn-desc">월별 추이 · 구장 분석</span></span></button>
   <button class="mbtn mbtn-gray mbtn-lock" onclick="showPro()"><span class="mbtn-ico">📸</span><span class="mbtn-info"><span class="mbtn-label" style="color:var(--gray4)">경기 사진 갤러리</span><span class="mbtn-desc">사진 저장 · 앨범</span></span></button>
 
@@ -405,6 +405,12 @@ select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg
     <div style="background:#ffd54f;color:#3b1d1d;font-size:10px;font-weight:900;padding:4px 9px;border-radius:99px">신청</div>
   </div>
   <div style="height:8px"></div>
+  <!-- 관리자 진입 (하단 작게) -->
+  <div style="text-align:center;padding:0 0 16px">
+    <span onclick="showAdminModal()" style="font-size:11px;color:var(--gray3);cursor:pointer;text-decoration:none;user-select:none">
+      🔧 관리자
+    </span>
+  </div>
 </div>
 
 <!-- ══ 경기 만들기 ══ -->
@@ -420,20 +426,20 @@ select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg
     </div>
   </div>
   <div class="card">
-    <div class="card-hd">💰 정산 단가</div>
+    <div class="card-hd">🏆 포인트 단가 설정</div>
     <div class="card-bd">
       <div class="fg">
-        <label class="fl">타수 1개 차이당 금액</label>
-        <span class="fh">예) 200원 × 타수 차 3 = 600원 정산</span>
+        <label class="fl">타수 1개 차이당 포인트</label>
+        <span class="fh">예) 200P × 타수 차 3 = 600P 획득 (현장에서 자유롭게 정산)</span>
         <div class="rg3">
-          <label class="rb"><input type="radio" name="unit" value="100" checked><div class="rbi"><span class="ri">💵</span>100원</div></label>
-          <label class="rb"><input type="radio" name="unit" value="200"><div class="rbi"><span class="ri">💴</span>200원</div></label>
-          <label class="rb"><input type="radio" name="unit" value="500"><div class="rbi"><span class="ri">💶</span>500원</div></label>
+          <label class="rb"><input type="radio" name="unit" value="100" checked><div class="rbi"><span class="ri">🟡</span>100P</div></label>
+          <label class="rb"><input type="radio" name="unit" value="200"><div class="rbi"><span class="ri">🟡</span>200P</div></label>
+          <label class="rb"><input type="radio" name="unit" value="500"><div class="rbi"><span class="ri">🟡</span>500P</div></label>
         </div>
       </div>
       <div class="fg">
         <label class="fl">직접 입력</label>
-        <input class="fi" id="c-unit-custom" type="number" placeholder="단가 직접 입력 (원)">
+        <input class="fi" id="c-unit-custom" type="number" placeholder="포인트 직접 입력">
       </div>
     </div>
   </div>
@@ -510,14 +516,14 @@ select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg
   <div class="btn-wrap">
     <div class="btn-row">
       <button class="btn btn-green btn-sm" onclick="saveScore()">💾 저장</button>
-      <button class="btn btn-gold btn-sm" onclick="saveAndResult()">💰 정산 보기</button>
+      <button class="btn btn-gold btn-sm" onclick="saveAndResult()">🏆 포인트 결과</button>
     </div>
   </div>
 </div>
 
 <!-- ══ 정산 결과 ══ -->
 <div class="pg" id="pg-result">
-  <div class="bar"><span class="bar-back" onclick="go('pg-matches')">‹</span><span class="bar-title" id="result-title">💰 정산</span></div>
+  <div class="bar"><span class="bar-back" onclick="go('pg-matches')">‹</span><span class="bar-title" id="result-title">🏆 포인트 결과</span></div>
   <div id="result-settle-area"></div>
   <div id="result-total-area"></div>
   <div id="result-manual-area"></div>
@@ -532,6 +538,37 @@ select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg
   <div class="bar"><span class="bar-back" onclick="go('pg-home')">‹</span><span class="bar-title">🏅 누적 랭킹</span></div>
   <div class="bubble"><span class="bubble-ico">💡</span>평균 타수 낮을수록, 누적 수익 높을수록 상위 랭킹이에요.</div>
   <div id="ranking-area" style="padding-top:6px"></div>
+</div>
+
+
+<!-- ══ 관리자 페이지 ══ -->
+<div class="pg" id="pg-admin">
+  <div class="bar"><span class="bar-back" onclick="go('pg-home')">‹</span><span class="bar-title">🔧 관리자</span></div>
+  <div class="bubble"><span class="bubble-ico">🔒</span>관리자 전용 화면입니다. 전체 경기를 관리할 수 있어요.</div>
+
+  <div class="card">
+    <div class="card-hd">📊 전체 현황</div>
+    <div class="card-bd" id="admin-stats"></div>
+  </div>
+
+  <div style="padding:0 14px 8px;font-size:14px;font-weight:700;color:var(--gray4)">전체 경기 목록</div>
+  <div id="admin-matches"></div>
+
+  <div class="btn-wrap">
+    <button class="btn btn-gray btn-sm" onclick="adminLogout()">🔒 관리자 로그아웃</button>
+  </div>
+</div>
+
+<!-- ══ 관리자 로그인 모달 ══ -->
+<div class="overlay" id="admin-modal" onclick="closeAdminModal(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2 style="font-size:19px;font-weight:900;margin-bottom:6px;color:var(--b1)">🔧 관리자 로그인</h2>
+    <p style="font-size:13px;color:var(--gray4);margin-bottom:16px">관리자 코드를 입력하세요</p>
+    <input class="fi" id="admin-pw" type="password" placeholder="관리자 코드 입력" style="margin-bottom:12px;font-size:18px;letter-spacing:4px;text-align:center">
+    <button class="btn btn-blue btn-sm" onclick="doAdminLogin()">🔐 로그인</button>
+    <div style="text-align:center;margin-top:10px;font-size:13px;color:var(--gray3);cursor:pointer" onclick="closeAdminModal()">닫기</div>
+  </div>
 </div>
 
 <!-- 탭바 -->
@@ -635,7 +672,7 @@ async function init() {
 }
 
 /* ══ 페이지 이동 ══ */
-const NO_TAB = ['pg-login','pg-create','pg-groups','pg-score'];
+const NO_TAB = ['pg-login','pg-create','pg-groups','pg-score','pg-admin'];
 const TAB_MAP = { 'pg-home':'home','pg-matches':'matches','pg-ranking':'ranking','pg-result':'matches' };
 
 function go(id) {
@@ -784,7 +821,7 @@ function copyCode() {
 function shareKakao() {
   const m = S.matches[S.mid]; if (!m) return;
   const baseUrl = location.origin + location.pathname;
-  const txt = `⛳ PARKDA 경기 참가\n\n📌 ${m.title}\n📅 ${m.date}  🏌️ ${m.course}\n👥 ${m.players.length}명 · ${m.holes}홀 · ${m.unit}원/타\n\n🔑 게임코드: ${m.code}\n🔗 ${baseUrl}?game=${m.code}\n\nPARKDA 앱에서 코드를 입력하면 바로 참가!`;
+  const txt = `⛳ PARKDA 경기 참가\n\n📌 ${m.title}\n📅 ${m.date}  🏌️ ${m.course}\n👥 ${m.players.length}명 · ${m.holes}홀 · ${m.unit}P/타\n\n🔑 게임코드: ${m.code}\n🔗 ${baseUrl}?game=${m.code}\n\nPARKDA 앱에서 코드를 입력하면 바로 참가!`;
   navigator.clipboard?.writeText(txt).then(() => toast('💬 카톡 공유용 텍스트 복사됐어요!'))
     .catch(() => fbCopy(txt));
   if (!navigator.clipboard) fbCopy(txt);
@@ -873,7 +910,7 @@ function renderAuthBox() {
   document.getElementById('score-auth-box').innerHTML = ok ? '' :
     `<div class="auth-box">🔒 이 조의 점수는 조장 <b>${g?.leader||''}</b> 님만 입력할 수 있어요.</div>`;
   document.getElementById('score-help').textContent = ok
-    ? `${g?.no}조 조장 입력 모드 · 단가 ${m?.unit}원/타`
+    ? `${g?.no}조 조장 입력 모드 · 단가 ${m?.unit}P/타`
     : `조장 또는 총무/회장만 입력 가능합니다.`;
 }
 function renderScoreTbl() {
@@ -1008,17 +1045,17 @@ function calcArrows(settleMap, players) {
   }
   return arrows;
 }
-function fa(v) { const a = Math.abs(v); return a >= 10000 ? `${(a/10000).toFixed(1)}만원` : `${a.toLocaleString()}원`; }
+function fa(v) { const a = Math.abs(v); return a >= 10000 ? `${(a/10000).toFixed(1)}만P` : `${a.toLocaleString()}P`; }
 
 /* ══ 결과 화면 ══ */
 function openResult(mid) {
   S.mid = mid;
   const m = S.matches[mid]; if (!m) return;
   m.status = 'done'; saveMatches();
-  document.getElementById('result-title').textContent = `💰 ${m.title} 정산`;
+  document.getElementById('result-title').textContent = `🏆 ${m.title} 포인트 결과`;
   const H = m.holes, par = m.par, parT = par.slice(0, H).reduce((a,b)=>a+b,0), unit = m.unit||100;
   const sd = m.sd || {};
-  const halves = H===18 ? [{idx:0,label:'⛳ 전반 1~9홀'},{idx:1,label:'⛳ 후반 10~18홀'}] : [{idx:0,label:'⛳ 9홀 정산'}];
+  const halves = H===18 ? [{idx:0,label:'⛳ 전반 1~9홀'},{idx:1,label:'⛳ 후반 10~18홀'}] : [{idx:0,label:'⛳ 9홀 포인트'}];
 
   // ── 9홀별 정산 ──
   let sHtml = '';
@@ -1064,7 +1101,7 @@ function openResult(mid) {
   const tArrows = calcArrows(ts, m.players);
   document.getElementById('result-total-area').innerHTML = `
     <div class="total-board">
-      <div class="tb-hd">💰 최종 종합 정산 (${H}홀)</div>
+      <div class="tb-hd">🏆 최종 포인트 합산 (${H}홀)</div>
       ${tSorted.map(({p,v})=>`<div class="tb-row">
         <div class="tb-name">${p}</div>
         <div class="tb-total ${v>0?'tplus':v<0?'tminus':'tzero'}">${v>0?'+':''}${fa(v)}</div>
@@ -1083,10 +1120,10 @@ function openResult(mid) {
   const logs = m.manualLogs || [];
   document.getElementById('result-manual-area').innerHTML = `
     <div class="manual-box">
-      <div class="mb-title">💸 추가 정산 (도우미 비용 등)</div>
+      <div class="mb-title">💸 추가 포인트 조정</div>
       <div class="mb-row"><div class="mb-lbl">보내는 분</div><select class="mb-sel" id="mb-from">${m.players.map(p=>`<option>${p}</option>`).join('')}</select></div>
       <div class="mb-row"><div class="mb-lbl">받는 분</div><select class="mb-sel" id="mb-to">${m.players.map(p=>`<option>${p}</option>`).join('')}</select></div>
-      <div class="mb-row"><div class="mb-lbl">금액</div><input class="mb-amt" id="mb-amt" type="number" min="100" placeholder="1000"><button class="mb-btn" onclick="doManual()">전송 💸</button></div>
+      <div class="mb-row"><div class="mb-lbl">금액</div><input class="mb-amt" id="mb-amt" type="number" min="100" placeholder="100"><button class="mb-btn" onclick="doManual()">전송 💸</button></div>
       ${logs.length?`<div class="mb-logs">${logs.map((l,i)=>`<div class="mb-log"><span>${l.from} → ${l.to} <b>${fa(l.amt)}</b></span><span class="mb-del" onclick="delManual(${i})">✕</span></div>`).join('')}</div>`:''}
     </div>`;
 
@@ -1111,7 +1148,7 @@ function openResult(mid) {
   const dc = d => d<0?'dun':d>0?'dov':'dev';
   const dt = d => d===0?'E':d>0?'+'+d:String(d);
   document.getElementById('result-tbl').innerHTML = `
-    <thead><tr><th>순위</th><th>이름</th><th>합계</th><th>PAR</th><th>정산</th></tr></thead>
+    <thead><tr><th>순위</th><th>이름</th><th>합계</th><th>PAR</th><th>포인트</th></tr></thead>
     <tbody>${allRows.map(r=>`<tr>
       <td>${rb(r.rank)}</td><td>${r.p}</td>
       <td style="font-size:16px;font-weight:900">${r.tot>0?r.tot:'—'}</td>
@@ -1120,9 +1157,9 @@ function openResult(mid) {
     </tr>`).join('')}</tbody>`;
 
   // ── 공유 텍스트 ──
-  const lines = [`⛳ ━━━━━━━━━━━━━━`,`  PARKDA 정산 결과`,`⛳ ━━━━━━━━━━━━━━`,
-    `📌 ${m.title}`,`📅 ${m.date}  🏌️ ${m.course}`,`단가: ${unit}원/타 · ${H}홀`,``,
-    `💰 최종 정산`,
+  const lines = [`⛳ ━━━━━━━━━━━━━━`,`  PARKDA 포인트 결과`,`⛳ ━━━━━━━━━━━━━━`,
+    `📌 ${m.title}`,`📅 ${m.date}  🏌️ ${m.course}`,`단가: ${unit}P/타 · ${H}홀`,``,
+    `🏆 최종 포인트`,
     ...tSorted.map(({p,v})=>`  ${p.padEnd(5)} ${v>0?'+':v<0?'':' '}${v!==0?fa(v):'±0'}`),
     ...(tArrows.length?[``,`📋 정산 방법`,...tArrows.map(a=>`  ${a.from} → ${a.to}  ${fa(a.amt)}`)]:[]),
     ``,`🏆 최종 순위`,
@@ -1174,7 +1211,7 @@ function renderMatches() {
       <div class="mc-body">
         <span class="mc-tag">⛳ ${m.holes}홀</span>
         <span class="mc-tag">👥 ${m.players.length}명</span>
-        <span class="mc-tag">💵 ${m.unit}원/타</span>
+        <span class="mc-tag">💵 ${m.unit}P/타</span>
         ${top&&top[1]>0?`<span class="mc-tag" style="background:var(--gold2);color:var(--gold)">🏆${top[0]} +${fa(top[1])}</span>`:''}
       </div>
       <div class="mc-foot">
@@ -1189,7 +1226,7 @@ function renderMatches() {
 function shareMatch(id) {
   const m = S.matches[id]; if (!m) return;
   const baseUrl = location.origin + location.pathname;
-  const txt = `⛳ PARKDA 경기 참가\n\n📌 ${m.title}\n📅 ${m.date}  🏌️ ${m.course}\n👥 ${m.players.length}명 · ${m.holes}홀 · ${m.unit}원/타\n\n🔑 게임코드: ${m.code}\n🔗 ${baseUrl}?game=${m.code}\n\nPARKDA 앱에서 코드를 입력하면 바로 참가!`;
+  const txt = `⛳ PARKDA 경기 참가\n\n📌 ${m.title}\n📅 ${m.date}  🏌️ ${m.course}\n👥 ${m.players.length}명 · ${m.holes}홀 · ${m.unit}P/타\n\n🔑 게임코드: ${m.code}\n🔗 ${baseUrl}?game=${m.code}\n\nPARKDA 앱에서 코드를 입력하면 바로 참가!`;
   navigator.clipboard?.writeText(txt).then(()=>toast('💬 복사됐어요! 카톡에 붙여넣으세요')).catch(()=>fbCopy(txt));
   if(!navigator.clipboard)fbCopy(txt);
 }
@@ -1235,6 +1272,100 @@ function registerPro(){
 }
 
 /* ══ 유틸 ══ */
+
+/* ══ 관리자 기능 ══ */
+const ADMIN_PW = 'PARKDA2024';
+let isAdmin = false;
+
+function showAdminModal(){
+  document.getElementById('admin-modal').classList.add('on');
+  setTimeout(()=>document.getElementById('admin-pw').focus(),300);
+}
+function closeAdminModal(e){
+  if(!e||e.target.id==='admin-modal') document.getElementById('admin-modal').classList.remove('on');
+}
+function doAdminLogin(){
+  const pw = document.getElementById('admin-pw').value;
+  if(pw === ADMIN_PW){
+    isAdmin = true;
+    document.getElementById('admin-modal').classList.remove('on');
+    document.getElementById('admin-pw').value = '';
+    toast('🔧 관리자 모드 활성화!');
+    renderAdmin();
+    go('pg-admin');
+  } else {
+    toast('❌ 코드가 틀렸습니다');
+    document.getElementById('admin-pw').value = '';
+  }
+}
+function adminLogout(){
+  isAdmin = false;
+  toast('🔒 관리자 로그아웃');
+  go('pg-home');
+}
+function renderAdmin(){
+  const ms = Object.values(S.matches);
+  const done = ms.filter(m=>m.sd&&Object.keys(m.sd).length>0).length;
+  const total = ms.reduce((s,m)=>s+(m.players||[]).length,0);
+  document.getElementById('admin-stats').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center">
+      <div style="background:var(--g5);border-radius:10px;padding:12px 6px">
+        <div style="font-size:22px;font-weight:900;color:var(--g2)">${ms.length}</div>
+        <div style="font-size:11px;color:var(--gray3)">전체 경기</div>
+      </div>
+      <div style="background:var(--b5);border-radius:10px;padding:12px 6px">
+        <div style="font-size:22px;font-weight:900;color:var(--b2)">${total}</div>
+        <div style="font-size:11px;color:var(--gray3)">누적 참가자</div>
+      </div>
+      <div style="background:var(--red2);border-radius:10px;padding:12px 6px">
+        <div style="font-size:22px;font-weight:900;color:var(--red)">${ms.length - done}</div>
+        <div style="font-size:11px;color:var(--gray3)">미완료</div>
+      </div>
+    </div>`;
+
+  if(!ms.length){
+    document.getElementById('admin-matches').innerHTML = '<div class="empty"><div class="empty-ico">📋</div><div class="empty-t">경기 없음</div></div>';
+    return;
+  }
+
+  document.getElementById('admin-matches').innerHTML = `
+    <div style="padding:0 14px 8px">
+      <button class="btn btn-gray btn-sm" onclick="adminDeleteAll()" style="margin-bottom:8px;color:var(--red)">🗑️ 전체 경기 삭제</button>
+    </div>` +
+    [...ms].reverse().map(m=>{
+      const isDone = m.sd&&Object.keys(m.sd).length>0;
+      return `<div style="margin:0 14px 8px;background:var(--white);border-radius:12px;border:1px solid var(--gray2);overflow:hidden">
+        <div style="padding:10px 14px;background:${isDone?'var(--g5)':'var(--gray1)'};display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-size:14px;font-weight:700;color:${isDone?'var(--g2)':'var(--gray4)'}">${m.title}</div>
+            <div style="font-size:11px;color:var(--gray3)">${m.date} · ${m.course} · ${m.players.length}명 · 코드:${m.code}</div>
+          </div>
+          <span style="font-size:11px;background:${isDone?'var(--g5)':'var(--gray2)'};color:${isDone?'var(--g2)':'var(--gray4)'};padding:3px 8px;border-radius:99px">${isDone?'✅완료':'⏳미완료'}</span>
+        </div>
+        <div style="padding:8px 14px;display:flex;gap:7px">
+          <button onclick="openResult('${m.id}')" style="flex:1;padding:8px;border:none;border-radius:9px;background:var(--b5);color:var(--b2);font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:700;cursor:pointer">🏆 결과</button>
+          <button onclick="adminDelMatch('${m.id}')" style="flex:0.5;padding:8px;border:none;border-radius:9px;background:var(--red2);color:var(--red);font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:700;cursor:pointer">🗑️ 삭제</button>
+        </div>
+      </div>`;
+    }).join('');
+}
+async function adminDelMatch(id){
+  if(!confirm('이 경기를 삭제할까요?'))return;
+  delete S.matches[id];
+  await saveMatches();
+  toast('🗑️ 삭제됐어요');
+  renderAdmin();
+  renderHome();
+}
+async function adminDeleteAll(){
+  if(!confirm('⚠️ 전체 경기를 모두 삭제할까요?\n이 작업은 되돌릴 수 없습니다.'))return;
+  S.matches = {};
+  await saveMatches();
+  toast('🗑️ 전체 삭제 완료');
+  renderAdmin();
+  renderHome();
+}
+
 async function saveMatches(){await dbSave('matches',S.matches);}
 function copyShare(){const t=document.getElementById('share-box').textContent;navigator.clipboard?.writeText(t).then(()=>toast('📋 복사됐어요!')).catch(()=>fbCopy(t));if(!navigator.clipboard)fbCopy(t);}
 function fbCopy(t){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');document.body.removeChild(a);}
