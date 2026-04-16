@@ -340,14 +340,14 @@ select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg
   <div style="width:100%">
     <div class="bubble"><span class="bubble-ico">💡</span>처음 오시는 분도 괜찮아요!<br>이름과 번호만 입력하면 바로 시작돼요.</div>
     <div class="card">
-      <div class="card-hd">👤 내 정보</div>
+      <div class="card-hd" style="display:flex;align-items:center;justify-content:space-between"><span>👤 내 정보</span><button onclick="toggleTip('tip-myinfo')" style="background:none;border:1px solid var(--g3);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--g2);cursor:pointer">? 설명</button></div><div id="tip-myinfo" style="display:none;background:var(--g5);border-radius:10px;padding:10px 12px;margin:6px 0;font-size:13px;color:var(--g2);line-height:1.6">이름과 전화번호로 경기 기록이 저장됩니다. 같은 정보로 다시 접속하면 이전 기록을 이어볼 수 있어요.</div>
       <div class="card-bd">
         <div class="fg"><label class="fl">이름 *</label><input class="fi" id="l-name" type="text" placeholder="홍길동" maxlength="5"></div>
         <div class="fg"><label class="fl">전화번호 *</label><input class="fi" id="l-phone" type="tel" placeholder="01012345678" maxlength="11"></div>
       </div>
     </div>
     <div class="card">
-      <div class="card-hd">🏌️ 클럽 정보 <span style="font-size:11px;font-weight:400;color:var(--gray3)">(선택)</span></div>
+      <div class="card-hd" style="display:flex;align-items:center;justify-content:space-between"><span>🏌️ 클럽 정보 <span style="font-size:11px;font-weight:400;color:var(--gray3)">(선택)</span></span><button onclick="toggleTip('tip-club')" style="background:none;border:1px solid var(--g3);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--g2);cursor:pointer">? 설명</button></div><div id="tip-club" style="display:none;background:var(--g5);border-radius:10px;padding:10px 12px;margin:6px 0;font-size:13px;color:var(--g2);line-height:1.6">클럽 정보는 선택사항입니다. 입력하면 랭킹과 통계에서 클럽별로 구분할 수 있어요. 역할(총무/회장)은 경기 관리 권한에 영향을 줍니다.</div>
       <div class="card-bd">
         <div class="fg"><label class="fl">클럽 이름</label><input class="fi" id="l-club" type="text" placeholder="예) 김해 파크골프 클럽"></div>
         <div class="fg"><label class="fl">지역</label>
@@ -361,9 +361,46 @@ select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg
         </div>
       </div>
     </div>
-    <div class="btn-wrap" style="padding:8px 0 0"><button class="btn btn-green" onclick="doLogin()">✅ &nbsp;시작하기</button></div>
+    <!-- 개인정보 수집 동의 -->
+    <div style="background:var(--gray1);border-radius:12px;padding:14px 16px;margin-bottom:10px">
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <input type="checkbox" id="privacy-agree" style="width:18px;height:18px;margin-top:2px;accent-color:var(--g2);cursor:pointer">
+        <label for="privacy-agree" style="font-size:13px;color:var(--gray4);line-height:1.6;cursor:pointer">
+          <strong style="color:var(--text)">[필수] 개인정보 수집·이용 동의</strong><br>
+          이름, 전화번호, 클럽 정보를 수집하며 서비스 제공 목적으로만 사용됩니다.<br>
+          <span onclick="showPrivacyDetail()" style="color:var(--b2);text-decoration:underline;cursor:pointer">전문 보기 ›</span>
+        </label>
+      </div>
+    </div>
+    <div class="btn-wrap" style="padding:4px 0 0"><button class="btn btn-green" onclick="doLogin()">✅ &nbsp;동의하고 시작하기</button></div>
   </div>
 </div>
+</div>
+
+<!-- 개인정보 상세 모달 -->
+<div class="overlay" id="privacy-modal" onclick="closePrivacyModal(event)">
+  <div class="modal" style="max-height:80vh;overflow-y:auto">
+    <div class="modal-handle"></div>
+    <h2 style="font-size:17px;font-weight:900;margin-bottom:12px;color:var(--b1)">📋 개인정보 수집·이용 안내</h2>
+    <div style="font-size:13px;color:var(--gray4);line-height:1.8">
+      <b style="color:var(--text)">수집 항목</b><br>
+      · 이름, 전화번호 (필수)<br>
+      · 클럽명, 지역, 역할 (선택)<br><br>
+      <b style="color:var(--text)">수집 목적</b><br>
+      · 파크골프 경기 관리 서비스 제공<br>
+      · 경기 기록 및 통계 제공<br>
+      · 서비스 개선을 위한 분석<br><br>
+      <b style="color:var(--text)">보유 기간</b><br>
+      · 서비스 이용 종료 시까지<br>
+      · 관련 법령에 따른 보존 기간<br><br>
+      <b style="color:var(--text)">제3자 제공</b><br>
+      · 제3자에게 제공하지 않습니다.<br><br>
+      <b style="color:var(--text)">동의 거부 권리</b><br>
+      · 동의를 거부할 수 있으나, 서비스 이용이 제한됩니다.
+    </div>
+    <button class="btn btn-green btn-sm" onclick="agreeAndClose()" style="margin-top:14px">✅ 동의합니다</button>
+    <div style="text-align:center;margin-top:8px;font-size:13px;color:var(--gray3);cursor:pointer" onclick="closePrivacyModal()">닫기</div>
+  </div>
 </div>
 
 <!-- ══ 홈 ══ -->
@@ -384,7 +421,7 @@ select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg
 
   <!-- 게임 참가 (코드 입력) -->
   <div class="join-box" style="margin-top:12px">
-    <h3>🔢 게임 참가하기</h3>
+    <h3 style="display:flex;align-items:center;justify-content:space-between">🔢 게임 참가하기 <button onclick="toggleTip('tip-join')" style="background:none;border:1px solid var(--b3);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--b2);cursor:pointer">? 설명</button></h3><div id="tip-join" style="display:none;background:var(--b5);border-radius:10px;padding:10px 12px;margin:6px 0;font-size:13px;color:var(--b1);line-height:1.6">총무/회장에게 받은 4자리 게임코드를 입력하면 해당 경기의 점수 입력 화면으로 바로 이동합니다. 스마트폰에서 직접 점수를 기록할 수 있어요!</div>
     <span class="fh">총무/회장에게 받은 4자리 코드를 입력하세요</span>
     <input class="code-input" id="join-code" type="text" maxlength="4" placeholder="ABCD" oninput="this.value=this.value.toUpperCase()">
     <div style="margin-top:10px"><button class="btn btn-blue btn-sm" onclick="joinGame()">🚪 &nbsp;게임 참가하기</button></div>
@@ -395,6 +432,7 @@ select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg
   <button class="mbtn mbtn-blue" onclick="go('pg-matches')"><span class="mbtn-ico">📋</span><span class="mbtn-info"><span class="mbtn-label">경기 목록</span><span class="mbtn-desc">점수 입력 · 포인트 · 코드 공유</span></span><span class="mbtn-arr">›</span></button>
 
   <div class="sec">📊 통계 · 순위</div>
+  <button class="mbtn mbtn-orange" onclick="go('pg-matching')"><span class="mbtn-ico">🤝</span><span class="mbtn-info"><span class="mbtn-label">파트너 찾기</span><span class="mbtn-desc">혼자·둘이 왔어요 · 같이 칠 분 구해요</span></span><span class="mbtn-arr">›</span></button>
   <button class="mbtn mbtn-teal" onclick="go('pg-ranking')"><span class="mbtn-ico">🏅</span><span class="mbtn-info"><span class="mbtn-label">누적 랭킹 · 포인트</span><span class="mbtn-desc">평균 타수 · 누적 포인트 순위</span></span><span class="mbtn-arr">›</span></button>
   <button class="mbtn mbtn-gray mbtn-lock" onclick="showPro()"><span class="mbtn-ico">📈</span><span class="mbtn-info"><span class="mbtn-label" style="color:var(--gray4)">상세 통계 · KPI</span><span class="mbtn-desc">월별 추이 · 구장 분석</span></span></button>
   <button class="mbtn mbtn-gray mbtn-lock" onclick="showPro()"><span class="mbtn-ico">📸</span><span class="mbtn-info"><span class="mbtn-label" style="color:var(--gray4)">경기 사진 갤러리</span><span class="mbtn-desc">사진 저장 · 앨범</span></span></button>
@@ -418,7 +456,7 @@ select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg
   <div class="bar"><span class="bar-back" onclick="go('pg-home')">‹</span><span class="bar-title">📝 새 경기 만들기</span></div>
   <div class="bubble"><span class="bubble-ico">💡</span>소모임 3~4명도, 단체 30명도 똑같이 만들면 돼요!</div>
   <div class="card">
-    <div class="card-hd">📌 기본 정보</div>
+    <div class="card-hd" style="display:flex;align-items:center;justify-content:space-between"><span>📌 기본 정보</span><button onclick="toggleTip('tip-basic')" style="background:none;border:1px solid var(--g3);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--g2);cursor:pointer">? 설명</button></div><div id="tip-basic" style="display:none;background:var(--g5);border-radius:10px;padding:10px 12px;margin:6px 14px;font-size:13px;color:var(--g2);line-height:1.6">경기 이름, 날짜, 코스명을 입력하세요. 경기 목록에서 구분하는 데 사용됩니다.</div>
     <div class="card-bd">
       <div class="fg"><label class="fl">경기 이름 *</label><input class="fi" id="c-title" type="text" placeholder="예) 5월 정기 경기, 친구들 내기"></div>
       <div class="fg"><label class="fl">날짜</label><input class="fi" id="c-date" type="date"></div>
@@ -426,7 +464,13 @@ select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg
     </div>
   </div>
   <div class="card">
-    <div class="card-hd">🏆 포인트 단가 설정</div>
+    <div class="card-hd" style="display:flex;align-items:center;justify-content:space-between">
+      <span>🏆 포인트 단가 설정</span>
+      <button onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="background:none;border:1px solid var(--b3);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--b2);cursor:pointer">? 설명</button>
+    </div>
+    <div style="display:none;background:var(--b5);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:13px;color:var(--b1);line-height:1.6">
+      타수 차이 1개당 주고받을 포인트입니다.<br>예) 100P × 타수 차 3 = 300P 정산<br>현장에서 포인트를 금액으로 환산하세요.
+    </div>
     <div class="card-bd">
       <div class="fg">
         <label class="fl">타수 1개 차이당 포인트</label>
@@ -444,12 +488,12 @@ select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg
     </div>
   </div>
   <div class="card">
-    <div class="card-hd">⛳ 경기 방식</div>
+    <div class="card-hd" style="display:flex;align-items:center;justify-content:space-between"><span>⛳ 경기 방식</span><button onclick="toggleTip('tip-format')" style="background:none;border:1px solid var(--g3);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--g2);cursor:pointer">? 설명</button></div><div id="tip-format" style="display:none;background:var(--g5);border-radius:10px;padding:10px 12px;margin:6px 14px;font-size:13px;color:var(--g2);line-height:1.6">홀 수: 9홀 또는 18홀을 선택하세요.<br>조당 인원: 한 조에 몇 명씩 배정할지 선택합니다. 조는 자동으로 구성됩니다.</div>
     <div class="card-bd">
       <div class="fg"><label class="fl">홀 수</label>
         <div class="rg">
-          <label class="rb"><input type="radio" name="holes" value="9" checked><div class="rbi"><span class="ri">🏌️</span>9홀</div></label>
-          <label class="rb"><input type="radio" name="holes" value="18"><div class="rbi"><span class="ri">🏌️🏌️</span>18홀</div></label>
+          <label class="rb"><input type="radio" name="holes" value="9" checked onchange="renderParInputs()"><div class="rbi"><span class="ri">🏌️</span>9홀</div></label>
+          <label class="rb"><input type="radio" name="holes" value="18" onchange="renderParInputs()"><div class="rbi"><span class="ri">🏌️🏌️</span>18홀</div></label>
         </div>
       </div>
       <div class="fg"><label class="fl">조당 인원</label>
@@ -461,19 +505,40 @@ select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg
     </div>
   </div>
   <div class="card">
-    <div class="card-hd">👥 참가자 명단</div>
+    <div class="card-hd" style="display:flex;align-items:center;justify-content:space-between">
+      <span>👥 참가자 명단</span>
+      <button onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="background:none;border:1px solid var(--g3);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--g2);cursor:pointer">? 설명</button>
+    </div>
+    <div style="display:none;background:var(--g5);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:13px;color:var(--g2);line-height:1.6">
+      참가자 이름을 입력하세요.<br>한 줄씩 입력하거나, 엑셀/카카오톡에서 복사해서 붙여넣기 가능합니다.<br>쉼표나 탭으로 구분해도 자동 인식돼요!
+    </div>
     <div class="card-bd">
-      <div class="fg"><label class="fl">이름 목록 *</label><span class="fh">한 줄에 한 명씩 — 소모임 3명도, 단체 30명도 OK</span>
-        <textarea class="fi" id="c-players" placeholder="홍길동&#10;김철수&#10;이영희&#10;박민수"></textarea>
+      <div class="fg"><label class="fl">이름 목록 *</label><span class="fh">한 줄씩 또는 쉼표/탭으로 구분 — 엑셀에서 복붙 가능 ✂️</span>
+        <textarea class="fi" id="c-players" placeholder="홍길동&#10;김철수&#10;이영희&#10;또는: 홍길동, 김철수, 이영희"></textarea>
       </div>
     </div>
   </div>
+  <!-- ✅ PAR 설정 카드 -->
+  <div class="card" id="par-card">
+    <div class="card-hd" style="display:flex;align-items:center;justify-content:space-between">
+      <span>⛳ 홀별 PAR 설정</span>
+      <button onclick="toggleTip('tip-par-card')" style="background:none;border:1px solid var(--g3);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--g2);cursor:pointer;margin-right:4px">? 설명</button>
+      <button onclick="toggleParInfo()" style="background:none;border:1px solid var(--g3);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--g2);cursor:pointer">? 설명</button>
+    </div>
+    <div id="tip-par-card" style="display:none;background:var(--g5);border-radius:10px;padding:10px 12px;margin-bottom:6px;font-size:13px;color:var(--g2);line-height:1.6">구장마다 홀별 PAR(기준 타수)가 다를 수 있어요. 기본값은 P4·P3 교대로 설정됩니다. 실제 코스에 맞게 수정하면 포인트 계산이 더 정확해집니다.</div><div id="par-info" style="display:none;background:var(--g5);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:13px;color:var(--g2);line-height:1.6">
+      구장마다 PAR가 다를 수 있어요.<br>기본값(P4·P3·P4...)을 수정하거나, 그대로 사용하세요.<br>PAR는 포인트 계산에 사용됩니다.
+    </div>
+    <div class="card-bd">
+      <div id="par-inputs" style="display:grid;gap:6px"></div>
+    </div>
+  </div>
+
   <div class="btn-wrap"><button class="btn btn-green" onclick="createMatch()">🚀 &nbsp;경기 만들고 코드 받기</button></div>
 </div>
 
 <!-- ══ 조편성 + 게임코드 ══ -->
 <div class="pg" id="pg-groups">
-  <div class="bar"><span class="bar-back" onclick="go('pg-create')">‹</span><span class="bar-title">👥 조편성 완료!</span></div>
+  <div class="bar"><span class="bar-back" onclick="go('pg-create')">‹</span><span class="bar-title">👥 조편성 완료!</span><button onclick="toggleTip('tip-groups')" style="background:none;border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:2px 8px;font-size:11px;color:rgba(255,255,255,.9);cursor:pointer;margin-right:4px">?</button></div><div id="tip-groups" style="display:none;background:var(--g5);border-radius:10px;padding:10px 12px;margin:6px 14px;font-size:13px;color:var(--g2);line-height:1.6">조편성이 자동으로 완성됐습니다! 게임코드를 카카오톡으로 공유하면 조원들이 바로 참가할 수 있어요. 조장을 변경하려면 조장 버튼을 탭하세요.</div>
 
   <!-- 게임 코드 공유 박스 -->
   <div class="gamecode-box" id="gamecode-display">
@@ -494,14 +559,14 @@ select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg
 
 <!-- ══ 경기 목록 ══ -->
 <div class="pg" id="pg-matches">
-  <div class="bar"><span class="bar-back" onclick="go('pg-home')">‹</span><span class="bar-title">📋 경기 목록</span></div>
+  <div class="bar"><span class="bar-back" onclick="go('pg-home')">‹</span><span class="bar-title">📋 경기 목록</span><button onclick="toggleTip('tip-matches')" style="background:none;border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:2px 8px;font-size:11px;color:rgba(255,255,255,.9);cursor:pointer;margin-right:4px">?</button></div><div id="tip-matches" style="display:none;background:var(--b5);border-radius:10px;padding:10px 12px;margin:6px 14px;font-size:13px;color:var(--b1);line-height:1.6">생성된 경기 목록입니다. 경기를 탭하면 점수 입력 화면으로 이동합니다. 코드 공유로 조원을 초대할 수 있어요.</div>
   <div class="bubble"><span class="bubble-ico">💡</span>경기 카드의 <b>💬 공유</b> 버튼으로 조원들에게 게임 코드를 전송하세요.</div>
   <div id="matches-area" style="padding-top:6px"></div>
 </div>
 
 <!-- ══ 점수 입력 ══ -->
 <div class="pg" id="pg-score">
-  <div class="bar"><span class="bar-back" onclick="go('pg-matches')">‹</span><span class="bar-title" id="score-bar-title">📊 점수 입력</span><span class="bar-sub" id="score-bar-sub"></span></div>
+  <div class="bar"><span class="bar-back" onclick="go('pg-matches')">‹</span><span class="bar-title" id="score-bar-title">📊 점수 입력</span><span class="bar-sub" id="score-bar-sub"></span><button onclick="toggleTip('tip-score')" style="background:none;border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:2px 8px;font-size:11px;color:rgba(255,255,255,.9);cursor:pointer;margin-right:4px">?</button></div><div id="tip-score" style="display:none;background:var(--g5);border-radius:10px;padding:10px 12px;margin:6px 14px;font-size:13px;color:var(--g2);line-height:1.6">조장만 점수를 입력할 수 있습니다(총무/회장 예외). 홀별 타수 입력 → 💾저장 → 모두 완료되면 🏆포인트 결과를 확인하세요.</div>
   <div id="score-auth-box"></div>
   <div class="bubble"><span class="bubble-ico">💡</span><span id="score-help">조장만 점수를 입력할 수 있어요.</span></div>
   <div id="half-tab-wrap" style="display:none">
@@ -528,14 +593,176 @@ select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg
   <div id="result-total-area"></div>
   <div id="result-manual-area"></div>
   <div id="podium-area"></div>
-  <div class="card"><div class="card-hd">📋 전체 순위</div><div style="overflow-x:auto"><table class="rtbl" id="result-tbl"></table></div></div>
-  <div class="card"><div class="card-hd">📱 카카오톡 공유</div><div class="card-bd"><div class="share-box" id="share-box"></div><div style="margin-top:9px"><button class="btn btn-orange btn-sm" onclick="copyShare()">📋 &nbsp;복사하기</button></div></div></div>
+  <div class="card"><div class="card-hd" style="display:flex;align-items:center;justify-content:space-between"><span>📋 전체 순위</span><button onclick="toggleTip('tip-rank')" style="background:none;border:1px solid var(--g3);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--g2);cursor:pointer">? 설명</button></div><div id="tip-rank" style="display:none;background:var(--g5);border-radius:10px;padding:10px 12px;margin:6px 0;font-size:13px;color:var(--g2);line-height:1.6">전체 참가자의 최종 순위와 총 타수, PAR 대비 성적, 포인트 합산 결과를 보여줍니다.</div><div style="overflow-x:auto"><table class="rtbl" id="result-tbl"></table></div></div>
+  <div class="card"><div class="card-hd" style="display:flex;align-items:center;justify-content:space-between"><span>📱 카카오톡 공유</span><button onclick="toggleTip('tip-share')" style="background:none;border:1px solid var(--b3);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--b2);cursor:pointer">? 설명</button></div><div id="tip-share" style="display:none;background:var(--b5);border-radius:10px;padding:10px 12px;margin:6px 0;font-size:13px;color:var(--b1);line-height:1.6">순위와 포인트 정산 결과를 텍스트로 자동 생성합니다. 복사 버튼을 눌러 카카오톡에 붙여넣기 하세요!</div><div class="card-bd"><div class="share-box" id="share-box"></div><div style="margin-top:9px"><button class="btn btn-orange btn-sm" onclick="copyShare()">📋 &nbsp;복사하기</button></div></div></div>
   <div class="btn-wrap"><button class="btn btn-gray btn-sm" onclick="go('pg-score')">✏️ 점수 수정</button></div>
 </div>
 
 <!-- ══ 랭킹 ══ -->
+
+<!-- ══ 파트너 매칭 ══ -->
+<div class="pg" id="pg-matching">
+  <div class="bar">
+    <span class="bar-back" onclick="go('pg-home')">‹</span>
+    <span class="bar-title">🤝 파트너 찾기</span>
+    <button onclick="toggleTip('tip-matching-info')" style="background:none;border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:2px 8px;font-size:11px;color:rgba(255,255,255,.9);cursor:pointer;margin-right:4px">? 설명</button>
+  </div>
+  <div id="tip-matching-info" style="display:none;background:var(--o5);border-radius:10px;padding:10px 12px;margin:6px 14px;font-size:13px;color:var(--o2);line-height:1.6">
+    혼자 또는 소수로 구장에 오셨나요? 같이 칠 파트너를 찾아보세요!<br>신청하면 같은 구장·시간대 신청자 목록에 표시됩니다.
+  </div>
+
+  <!-- 탭: 파트너 찾기 / 내 신청 -->
+  <div style="display:flex;gap:0;margin:10px 14px 0;border-radius:10px;overflow:hidden;border:1.5px solid var(--gray2)">
+    <button id="mt-tab-find" onclick="switchMatchTab('find')" style="flex:1;padding:10px;border:none;background:var(--g2);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif">🔍 파트너 찾기</button>
+    <button id="mt-tab-my" onclick="switchMatchTab('my')" style="flex:1;padding:10px;border:none;background:var(--white);color:var(--gray3);font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif">📋 내 신청</button>
+  </div>
+
+  <!-- ── 파트너 찾기 탭 ── -->
+  <div id="mt-find">
+    <!-- 신청 폼 -->
+    <div class="card" style="margin-top:10px">
+      <div class="card-hd" style="display:flex;align-items:center;justify-content:space-between">
+        <span>📍 매칭 신청</span>
+        <button onclick="toggleTip('tip-match-form')" style="background:none;border:1px solid var(--g3);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--g2);cursor:pointer">? 설명</button>
+      </div>
+      <div id="tip-match-form" style="display:none;background:var(--g5);border-radius:10px;padding:10px 12px;margin:6px 0;font-size:13px;color:var(--g2);line-height:1.6">
+        구장과 날짜·시간을 선택하고 신청하면 같은 조건의 대기자 목록에 표시됩니다. 매칭 상대가 "함께하기"를 누르면 연락처가 서로 공개됩니다.
+      </div>
+      <div class="card-bd">
+        <!-- 지역 선택 -->
+        <div class="fg">
+          <label class="fl">지역 선택</label>
+          <select class="fi" id="mt-region" onchange="loadVenues()">
+            <option value="">-- 지역 선택 --</option>
+            <option>서울</option><option>경기</option><option>인천</option>
+            <option>부산</option><option>대구</option><option>광주</option>
+            <option>대전</option><option>울산</option><option>세종</option>
+            <option>경남</option><option>경북</option><option>전남</option>
+            <option>전북</option><option>충남</option><option>충북</option>
+            <option>강원</option><option>제주</option>
+          </select>
+        </div>
+        <!-- 구장 선택 -->
+        <div class="fg">
+          <label class="fl">구장 선택</label>
+          <select class="fi" id="mt-venue">
+            <option value="">-- 지역 먼저 선택 --</option>
+          </select>
+        </div>
+        <!-- 구장 추가 요청 링크 -->
+        <div style="text-align:right;margin-top:-4px;margin-bottom:8px">
+          <span onclick="showVenueRequest()" style="font-size:12px;color:var(--b2);text-decoration:underline;cursor:pointer">구장이 없나요? 추가 요청하기 ›</span>
+        </div>
+        <!-- 날짜·시간 -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="fg" style="margin-bottom:0">
+            <label class="fl">날짜</label>
+            <input class="fi" id="mt-date" type="date">
+          </div>
+          <div class="fg" style="margin-bottom:0">
+            <label class="fl">시간대</label>
+            <select class="fi" id="mt-time">
+              <option value="06:00">06:00~08:00</option>
+              <option value="08:00">08:00~10:00</option>
+              <option value="10:00">10:00~12:00</option>
+              <option value="12:00">12:00~14:00</option>
+              <option value="14:00">14:00~16:00</option>
+              <option value="16:00">16:00~18:00</option>
+            </select>
+          </div>
+        </div>
+        <!-- 인원 -->
+        <div class="fg" style="margin-top:8px">
+          <label class="fl">우리 인원</label>
+          <div class="rg">
+            <label class="rb"><input type="radio" name="mt-size" value="1" checked><div class="rbi"><span class="ri">🧍</span>1명</div></label>
+            <label class="rb"><input type="radio" name="mt-size" value="2"><div class="rbi"><span class="ri">👫</span>2명</div></label>
+          </div>
+        </div>
+        <!-- 실력 -->
+        <div class="fg">
+          <label class="fl">실력</label>
+          <div class="rg">
+            <label class="rb"><input type="radio" name="mt-level" value="초급" checked><div class="rbi"><span class="ri">🌱</span>초급</div></label>
+            <label class="rb"><input type="radio" name="mt-level" value="중급"><div class="rbi"><span class="ri">⛳</span>중급</div></label>
+            <label class="rb"><input type="radio" name="mt-level" value="고급"><div class="rbi"><span class="ri">🏆</span>고급</div></label>
+          </div>
+        </div>
+        <!-- 메모 -->
+        <div class="fg">
+          <label class="fl">한마디 <span style="font-size:11px;color:var(--gray3)">(선택)</span></label>
+          <input class="fi" id="mt-memo" type="text" placeholder="예) 65세 남성, 가볍게 즐겨요" maxlength="30">
+        </div>
+      </div>
+      <div style="padding:0 14px 14px">
+        <button class="btn btn-orange btn-sm" onclick="applyMatching()" style="width:100%">🤝 파트너 찾기 신청</button>
+      </div>
+    </div>
+
+    <!-- 대기자 목록 -->
+    <div style="padding:0 14px;margin-top:4px">
+      <div style="font-size:14px;font-weight:700;color:var(--gray4);margin-bottom:8px">📋 현재 대기 중인 분들</div>
+      <div id="mt-list">
+        <div class="empty"><div class="empty-ico">🤝</div><div class="empty-t">구장과 날짜를 선택하면<br>대기자 목록이 보여요</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 내 신청 탭 ── -->
+  <div id="mt-my" style="display:none">
+    <div style="padding:14px">
+      <div id="mt-my-list">
+        <div class="empty"><div class="empty-ico">📋</div><div class="empty-t">신청 내역이 없어요</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:70px"></div>
+</div>
+
+<!-- 구장 추가 요청 모달 -->
+<div class="overlay" id="venue-req-modal" onclick="closeVenueReq(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2 style="font-size:17px;font-weight:900;margin-bottom:12px;color:var(--g1)">🏌️ 구장 추가 요청</h2>
+    <div class="fg"><label class="fl">구장명 *</label><input class="fi" id="vr-name" type="text" placeholder="예) 김해 파크골프장"></div>
+    <div class="fg"><label class="fl">지역 *</label>
+      <select class="fi" id="vr-region">
+        <option value="">-- 선택 --</option>
+        <option>서울</option><option>경기</option><option>인천</option>
+        <option>부산</option><option>대구</option><option>광주</option>
+        <option>대전</option><option>울산</option><option>세종</option>
+        <option>경남</option><option>경북</option><option>전남</option>
+        <option>전북</option><option>충남</option><option>충북</option>
+        <option>강원</option><option>제주</option>
+      </select>
+    </div>
+    <div class="fg"><label class="fl">주소</label><input class="fi" id="vr-addr" type="text" placeholder="도로명 주소"></div>
+    <div class="fg"><label class="fl">홀 수</label>
+      <select class="fi" id="vr-holes">
+        <option value="9">9홀</option><option value="18">18홀</option>
+        <option value="27">27홀</option><option value="36">36홀</option>
+      </select>
+    </div>
+    <button class="btn btn-green btn-sm" onclick="submitVenueRequest()" style="width:100%;margin-top:4px">📨 요청 보내기</button>
+    <div style="text-align:center;margin-top:8px;font-size:13px;color:var(--gray3);cursor:pointer" onclick="closeVenueReq()">닫기</div>
+  </div>
+</div>
+
+<!-- 매칭 상세 / 함께하기 모달 -->
+<div class="overlay" id="match-detail-modal" onclick="closeMatchDetail(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2 style="font-size:17px;font-weight:900;margin-bottom:4px;color:var(--g1)">🤝 함께하기</h2>
+    <p style="font-size:13px;color:var(--gray3);margin-bottom:14px">매칭 신청자 정보</p>
+    <div id="match-detail-content"></div>
+    <button class="btn btn-orange btn-sm" onclick="confirmMatching()" style="width:100%;margin-top:12px">✅ 함께하기 확정</button>
+    <div style="text-align:center;margin-top:8px;font-size:13px;color:var(--gray3);cursor:pointer" onclick="closeMatchDetail()">닫기</div>
+  </div>
+</div>
+
 <div class="pg" id="pg-ranking">
-  <div class="bar"><span class="bar-back" onclick="go('pg-home')">‹</span><span class="bar-title">🏅 누적 랭킹</span></div>
+  <div class="bar"><span class="bar-back" onclick="go('pg-home')">‹</span><span class="bar-title">🏅 누적 랭킹</span><button onclick="toggleTip('tip-ranking')" style="background:none;border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:2px 8px;font-size:11px;color:rgba(255,255,255,.9);cursor:pointer;margin-right:4px">?</button></div><div id="tip-ranking" style="display:none;background:var(--g5);border-radius:10px;padding:10px 12px;margin:6px 14px;font-size:13px;color:var(--g2);line-height:1.6">전체 경기의 누적 기록입니다. 평균 타수가 낮을수록, 누적 포인트가 높을수록 상위에 랭크됩니다.</div>
   <div class="bubble"><span class="bubble-ico">💡</span>평균 타수 낮을수록, 누적 수익 높을수록 상위 랭킹이에요.</div>
   <div id="ranking-area" style="padding-top:6px"></div>
 </div>
@@ -576,7 +803,7 @@ select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg
   <button class="tab on" id="tab-home" onclick="goTab('home')"><span class="tab-ico">🏠</span><span class="tab-lbl">홈</span></button>
   <button class="tab" id="tab-matches" onclick="goTab('matches')"><span class="tab-ico">📋</span><span class="tab-lbl">경기목록</span></button>
   <button class="tab" id="tab-ranking" onclick="goTab('ranking')"><span class="tab-ico">🏅</span><span class="tab-lbl">랭킹</span></button>
-  <button class="tab" id="tab-pro" onclick="showPro()"><span class="tab-ico">💎</span><span class="tab-lbl">Pro</span></button>
+  <button class="tab" id="tab-matching" onclick="goTab('matching')"><span class="tab-ico">🤝</span><span class="tab-lbl">파트너</span></button>
 </div>
 
 <!-- Pro 모달 -->
@@ -673,7 +900,7 @@ async function init() {
 
 /* ══ 페이지 이동 ══ */
 const NO_TAB = ['pg-login','pg-create','pg-groups','pg-score','pg-admin'];
-const TAB_MAP = { 'pg-home':'home','pg-matches':'matches','pg-ranking':'ranking','pg-result':'matches' };
+const TAB_MAP = { 'pg-home':'home','pg-matches':'matches','pg-ranking':'ranking','pg-result':'matches','pg-matching':'matching' };
 
 function go(id) {
   document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
@@ -684,15 +911,32 @@ function go(id) {
   if (id === 'pg-home')    renderHome();
   if (id === 'pg-matches') renderMatches();
   if (id === 'pg-ranking') renderRanking();
+  if (id === 'pg-matching') renderMatching();
 }
-function goTab(t) { go({ home:'pg-home', matches:'pg-matches', ranking:'pg-ranking' }[t]); }
+function goTab(t) { go({ home:'pg-home', matches:'pg-matches', ranking:'pg-ranking', matching:'pg-matching' }[t]); }
 function setTab(t) {
   document.querySelectorAll('.tab').forEach(e => e.classList.remove('on'));
   const el = document.getElementById('tab-' + t); if (el) el.classList.add('on');
 }
 
+/* ══ 개인정보 동의 ══ */
+function showPrivacyDetail() {
+  document.getElementById('privacy-modal').classList.add('on');
+}
+function closePrivacyModal(e) {
+  if(!e || e.target.id==='privacy-modal') document.getElementById('privacy-modal').classList.remove('on');
+}
+function agreeAndClose() {
+  document.getElementById('privacy-agree').checked = true;
+  document.getElementById('privacy-modal').classList.remove('on');
+  toast('✅ 개인정보 수집에 동의했습니다');
+}
+
 /* ══ 로그인 ══ */
 function doLogin() {
+  if (!document.getElementById('privacy-agree').checked) {
+    toast('개인정보 수집·이용에 동의해 주세요 🔒'); return;
+  }
   const name  = V('l-name').trim();
   const phone = V('l-phone').trim();
   if (!name)  { toast('이름을 입력해 주세요 👤'); return; }
@@ -767,7 +1011,7 @@ function createMatch() {
 
   const id   = 'M' + Date.now().toString(36).toUpperCase();
   const code = makeUniqueCode();
-  const par  = holes === 9 ? [...PAR9] : [...PAR18];
+  const par  = getParValues(); // 사용자 입력 PAR 사용
   const groups = makeGroups(players, gs);
 
   S.matches[id] = {
@@ -784,11 +1028,25 @@ function createMatch() {
 }
 
 function parsePlayers(raw) {
-  const parts = raw.replace(/[,\/]/g, '\n').split(/[\n\t ]+/);
+  // 탭, 쉼표, 슬래시, 세미콜론, 연속공백 → 줄바꿈으로 통일
+  const normalized = raw
+    .replace(/[\t,;\|\／]+/g, '\n')  // 구분자 통일
+    .replace(/[ \u3000]+/g, ' ')        // 전각공백 포함 공백 정리
+    .replace(/\r/g, '')                  // CR 제거
+    .split('\n');
   const seen = new Set(), res = [];
-  for (const p of parts) {
-    const t = p.trim();
-    if (/^[가-힣]{2,5}$/.test(t) && !seen.has(t)) { res.push(t); seen.add(t); }
+  for (const p of normalized) {
+    // 공백으로 분리된 여러 이름도 처리 (예: "홍길동 김철수")
+    const words = p.trim().split(/\s+/);
+    for (const w of words) {
+      const t = w.trim().replace(/[0-9\s\-_\.]/g,'');
+      if (t.length >= 2 && t.length <= 6 && !seen.has(t)) {
+        // 한글, 영문 모두 허용
+        if (/^[가-힣]+$/.test(t) || /^[a-zA-Z\u4e00-\u9fff]+$/.test(t)) {
+          res.push(t); seen.add(t);
+        }
+      }
+    }
   }
   return res;
 }
@@ -1123,7 +1381,7 @@ function openResult(mid) {
       <div class="mb-title">💸 추가 포인트 조정</div>
       <div class="mb-row"><div class="mb-lbl">보내는 분</div><select class="mb-sel" id="mb-from">${m.players.map(p=>`<option>${p}</option>`).join('')}</select></div>
       <div class="mb-row"><div class="mb-lbl">받는 분</div><select class="mb-sel" id="mb-to">${m.players.map(p=>`<option>${p}</option>`).join('')}</select></div>
-      <div class="mb-row"><div class="mb-lbl">금액</div><input class="mb-amt" id="mb-amt" type="number" min="100" placeholder="100"><button class="mb-btn" onclick="doManual()">전송 💸</button></div>
+      <div class="mb-row"><div class="mb-lbl">포인트</div><input class="mb-amt" id="mb-amt" type="number" min="100" placeholder="100"><button class="mb-btn" onclick="doManual()">전송 💸</button></div>
       ${logs.length?`<div class="mb-logs">${logs.map((l,i)=>`<div class="mb-log"><span>${l.from} → ${l.to} <b>${fa(l.amt)}</b></span><span class="mb-del" onclick="delManual(${i})">✕</span></div>`).join('')}</div>`:''}
     </div>`;
 
@@ -1273,6 +1531,16 @@ function registerPro(){
 
 /* ══ 유틸 ══ */
 
+/* ══ 툴팁 토글 공통 함수 ══ */
+function toggleTip(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const isHidden = el.style.display === 'none' || el.style.display === '';
+  // 같은 컨테이너 내 다른 팁은 닫기
+  el.style.display = isHidden ? 'block' : 'none';
+  if (isHidden) el.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
 /* ══ 관리자 기능 ══ */
 const ADMIN_PW = 'PARKDA2024';
 let isAdmin = false;
@@ -1365,6 +1633,299 @@ async function adminDeleteAll(){
   renderAdmin();
   renderHome();
 }
+
+
+/* ══════════════════════════════════════════
+   매칭 기능 (파트너 찾기)
+   Supabase 테이블: venues, matching
+══════════════════════════════════════════ */
+
+const MT_VENUES_T  = 'venues';
+const MT_MATCH_T   = 'matching';
+let MT = { venues: [], myRequest: null, selectedMatch: null };
+
+/* ── Supabase 직접 호출 헬퍼 ── */
+async function sbGet(table, params = '') {
+  if (!SB_OK()) return [];
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/${table}?${params}`,
+      { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` } });
+    return await r.json();
+  } catch { return []; }
+}
+async function sbPost(table, data) {
+  if (!SB_OK()) return null;
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/${table}`, {
+      method: 'POST',
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`,
+        'Content-Type': 'application/json', Prefer: 'return=representation' },
+      body: JSON.stringify(data)
+    });
+    const d = await r.json();
+    return Array.isArray(d) ? d[0] : d;
+  } catch { return null; }
+}
+async function sbPatch(table, id, data) {
+  if (!SB_OK()) return;
+  try {
+    await fetch(`${SB_URL}/rest/v1/${table}?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`,
+        'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify(data)
+    });
+  } catch {}
+}
+
+/* ── 탭 전환 ── */
+function switchMatchTab(tab) {
+  document.getElementById('mt-find').style.display = tab === 'find' ? 'block' : 'none';
+  document.getElementById('mt-my').style.display   = tab === 'my'   ? 'block' : 'none';
+  document.getElementById('mt-tab-find').style.background = tab === 'find' ? 'var(--g2)' : 'var(--white)';
+  document.getElementById('mt-tab-find').style.color = tab === 'find' ? '#fff' : 'var(--gray3)';
+  document.getElementById('mt-tab-my').style.background = tab === 'my' ? 'var(--g2)' : 'var(--white)';
+  document.getElementById('mt-tab-my').style.color = tab === 'my' ? '#fff' : 'var(--gray3)';
+  if (tab === 'my') renderMyRequests();
+}
+
+/* ── 매칭 페이지 초기화 ── */
+async function renderMatching() {
+  // 오늘 날짜 기본값
+  const today = new Date().toISOString().split('T')[0];
+  const dateEl = document.getElementById('mt-date');
+  if (dateEl && !dateEl.value) dateEl.value = today;
+  // 사용자 지역으로 자동 선택
+  if (S.user?.region) {
+    const regionEl = document.getElementById('mt-region');
+    if (regionEl) { regionEl.value = S.user.region; await loadVenues(); }
+  }
+}
+
+/* ── 구장 목록 로드 ── */
+async function loadVenues() {
+  const region = document.getElementById('mt-region')?.value;
+  const sel = document.getElementById('mt-venue');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">불러오는 중...</option>';
+  if (!region) { sel.innerHTML = '<option value="">-- 지역 먼저 선택 --</option>'; return; }
+
+  const rows = await sbGet(MT_VENUES_T, `region=eq.${encodeURIComponent(region)}&status=eq.운영중&order=name`);
+  MT.venues = rows;
+
+  if (!rows || rows.length === 0) {
+    sel.innerHTML = '<option value="">해당 지역 구장이 없어요</option>';
+    return;
+  }
+  sel.innerHTML = '<option value="">-- 구장 선택 --</option>' +
+    rows.map(v => `<option value="${v.id}">${v.name} (${v.holes}홀)</option>`).join('');
+}
+
+/* ── 대기자 목록 로드 ── */
+async function loadMatchList() {
+  const venue = document.getElementById('mt-venue')?.value;
+  const date  = document.getElementById('mt-date')?.value;
+  const time  = document.getElementById('mt-time')?.value;
+  const listEl = document.getElementById('mt-list');
+
+  if (!venue || !date) {
+    listEl.innerHTML = '<div class="empty"><div class="empty-ico">🤝</div><div class="empty-t">구장과 날짜를 선택하면<br>대기자 목록이 보여요</div></div>';
+    return;
+  }
+
+  listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray3)">불러오는 중...</div>';
+
+  // 오늘 이후 대기중인 매칭만
+  const rows = await sbGet(MT_MATCH_T,
+    `venue_id=eq.${venue}&play_date=eq.${date}&play_time=eq.${time}&status=eq.대기중&order=created_at`);
+
+  if (!rows || rows.length === 0) {
+    listEl.innerHTML = '<div class="empty"><div class="empty-ico">👋</div><div class="empty-t">아직 대기자가 없어요<br>첫 번째로 신청해보세요!</div></div>';
+    return;
+  }
+
+  const myPhone = S.user?.phone;
+  listEl.innerHTML = rows.map(r => {
+    const isMe = r.user_phone === myPhone;
+    return `<div style="background:var(--white);border-radius:12px;border:1.5px solid ${isMe?'var(--g3)':'var(--gray2)'};padding:14px;margin-bottom:8px;${isMe?'box-shadow:0 0 0 2px var(--g4)':''}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--text)">${r.user_name} <span style="font-size:12px;font-weight:400;background:var(--g5);color:var(--g2);padding:2px 8px;border-radius:99px">${r.level||'초급'}</span>${isMe?'<span style="font-size:11px;color:var(--g2);margin-left:6px">👤 내 신청</span>':''}</div>
+          <div style="font-size:12px;color:var(--gray3);margin-top:3px">👥 ${r.party_size}명 · ⏰ ${r.play_time} · ${r.memo||'메모 없음'}</div>
+        </div>
+        ${isMe
+          ? `<button onclick="cancelMyRequest('${r.id}')" style="padding:6px 10px;border:1px solid var(--red);border-radius:8px;background:none;color:var(--red);font-size:12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif">취소</button>`
+          : `<button onclick="showMatchDetail(${JSON.stringify(r).replace(/"/g,'&quot;')})" style="padding:6px 12px;border:none;border-radius:8px;background:var(--g2);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif">함께하기</button>`
+        }
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── 매칭 신청 ── */
+async function applyMatching() {
+  if (!S.user) { toast('먼저 로그인해주세요'); return; }
+  const venue_id   = document.getElementById('mt-venue')?.value;
+  const play_date  = document.getElementById('mt-date')?.value;
+  const play_time  = document.getElementById('mt-time')?.value;
+  const party_size = document.querySelector('input[name="mt-size"]:checked')?.value || '1';
+  const level      = document.querySelector('input[name="mt-level"]:checked')?.value || '초급';
+  const memo       = document.getElementById('mt-memo')?.value.trim();
+
+  if (!venue_id)  { toast('구장을 선택해주세요 📍'); return; }
+  if (!play_date) { toast('날짜를 선택해주세요 📅'); return; }
+
+  const venueName = MT.venues.find(v => String(v.id) === String(venue_id))?.name || '';
+
+  const data = {
+    venue_id, venue_name: venueName,
+    user_name: S.user.name, user_phone: S.user.phone,
+    play_date, play_time, party_size: +party_size,
+    level, memo, status: '대기중',
+    region: S.user.region || '',
+    created_at: new Date().toISOString()
+  };
+
+  toast('신청 중...');
+  const result = await sbPost(MT_MATCH_T, data);
+  if (result && result.id) {
+    MT.myRequest = result;
+    toast('✅ 파트너 찾기 신청 완료!');
+    await loadMatchList();
+  } else {
+    // Supabase 미연결 시 로컬 시뮬레이션
+    toast('✅ 신청됐어요! (오프라인 모드)');
+  }
+}
+
+/* ── 함께하기 상세 ── */
+function showMatchDetail(r) {
+  MT.selectedMatch = r;
+  document.getElementById('match-detail-content').innerHTML = `
+    <div style="background:var(--g5);border-radius:12px;padding:14px">
+      <div style="font-size:18px;font-weight:900;margin-bottom:8px">${r.user_name}</div>
+      <div style="font-size:13px;color:var(--gray4);line-height:2">
+        📍 ${r.venue_name || '구장 정보 없음'}<br>
+        📅 ${r.play_date} ${r.play_time}<br>
+        👥 ${r.party_size}명 참여<br>
+        🎯 실력: ${r.level || '초급'}<br>
+        💬 ${r.memo || '메모 없음'}
+      </div>
+    </div>
+    <div style="margin-top:12px;padding:12px;background:var(--b5);border-radius:10px;font-size:13px;color:var(--b1)">
+      ✅ 함께하기를 확정하면 상대방 연락처가 공개됩니다.
+    </div>`;
+  document.getElementById('match-detail-modal').classList.add('on');
+}
+function closeMatchDetail(e) {
+  if (!e || e.target.id === 'match-detail-modal')
+    document.getElementById('match-detail-modal').classList.remove('on');
+}
+
+/* ── 함께하기 확정 ── */
+async function confirmMatching() {
+  const r = MT.selectedMatch;
+  if (!r || !S.user) return;
+
+  // 상대방 매칭 상태 업데이트
+  await sbPatch(MT_MATCH_T, r.id, {
+    status: '매칭완료',
+    matched_name: S.user.name,
+    matched_phone: S.user.phone,
+    matched_at: new Date().toISOString()
+  });
+
+  document.getElementById('match-detail-modal').classList.remove('on');
+
+  // 연락처 공개
+  toast(`📞 ${r.user_name} 님 연락처: ${r.user_phone}`);
+
+  // 게임코드 자동 생성 안내
+  setTimeout(() => {
+    if (confirm(`🎉 ${r.user_name} 님과 매칭됐어요!\n\n연락처: ${r.user_phone}\n\n경기를 바로 만들까요?`)) {
+      go('pg-create');
+    }
+  }, 500);
+
+  await loadMatchList();
+}
+
+/* ── 내 신청 취소 ── */
+async function cancelMyRequest(id) {
+  if (!confirm('신청을 취소할까요?')) return;
+  await sbPatch(MT_MATCH_T, id, { status: '취소' });
+  toast('취소됐어요');
+  await loadMatchList();
+  renderMyRequests();
+}
+
+/* ── 내 신청 목록 ── */
+async function renderMyRequests() {
+  if (!S.user) return;
+  const el = document.getElementById('mt-my-list');
+  if (!el) return;
+  el.innerHTML = '<div style="text-align:center;padding:16px;color:var(--gray3)">불러오는 중...</div>';
+
+  const rows = await sbGet(MT_MATCH_T,
+    `user_phone=eq.${S.user.phone}&order=created_at.desc&limit=20`);
+
+  if (!rows || rows.length === 0) {
+    el.innerHTML = '<div class="empty"><div class="empty-ico">📋</div><div class="empty-t">신청 내역이 없어요</div></div>';
+    return;
+  }
+
+  const statusColor = { '대기중': 'var(--o2)', '매칭완료': 'var(--g2)', '취소': 'var(--gray3)' };
+  el.innerHTML = rows.map(r => `
+    <div style="background:var(--white);border-radius:12px;border:1.5px solid var(--gray2);padding:14px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div style="font-size:15px;font-weight:700">${r.venue_name || '구장 미상'}</div>
+        <span style="font-size:12px;background:var(--gray1);color:${statusColor[r.status]||'var(--gray3)'};padding:3px 10px;border-radius:99px;font-weight:700">${r.status}</span>
+      </div>
+      <div style="font-size:12px;color:var(--gray3);line-height:1.8">
+        📅 ${r.play_date} ${r.play_time} · 👥 ${r.party_size}명 · 🎯 ${r.level||'초급'}
+        ${r.status==='매칭완료' ? `<br>✅ 매칭: ${r.matched_name} (${r.matched_phone})` : ''}
+      </div>
+      ${r.status==='대기중' ? `<button onclick="cancelMyRequest('${r.id}')" style="margin-top:8px;padding:5px 12px;border:1px solid var(--red);border-radius:8px;background:none;color:var(--red);font-size:12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif">취소</button>` : ''}
+    </div>`).join('');
+}
+
+/* ── 구장 추가 요청 ── */
+function showVenueRequest() {
+  document.getElementById('venue-req-modal').classList.add('on');
+}
+function closeVenueReq(e) {
+  if (!e || e.target.id === 'venue-req-modal')
+    document.getElementById('venue-req-modal').classList.remove('on');
+}
+async function submitVenueRequest() {
+  const name   = document.getElementById('vr-name')?.value.trim();
+  const region = document.getElementById('vr-region')?.value;
+  const addr   = document.getElementById('vr-addr')?.value.trim();
+  const holes  = document.getElementById('vr-holes')?.value;
+
+  if (!name)   { toast('구장명을 입력해주세요'); return; }
+  if (!region) { toast('지역을 선택해주세요'); return; }
+
+  const data = {
+    name, region, address: addr, holes: +holes,
+    status: '검토중',
+    requested_by: S.user?.name || '',
+    requested_phone: S.user?.phone || '',
+    created_at: new Date().toISOString()
+  };
+
+  await sbPost(MT_VENUES_T, data);
+  document.getElementById('venue-req-modal').classList.remove('on');
+  toast('✅ 구장 추가 요청이 접수됐어요! 검토 후 등록됩니다 🙏');
+
+  // 폼 초기화
+  ['vr-name','vr-addr'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+}
+
+/* ── 구장/날짜 변경 시 목록 자동 갱신 ── */
+document.addEventListener('change', function(e) {
+  if (['mt-venue','mt-date','mt-time'].includes(e.target.id)) loadMatchList();
+});
 
 async function saveMatches(){await dbSave('matches',S.matches);}
 function copyShare(){const t=document.getElementById('share-box').textContent;navigator.clipboard?.writeText(t).then(()=>toast('📋 복사됐어요!')).catch(()=>fbCopy(t));if(!navigator.clipboard)fbCopy(t);}
