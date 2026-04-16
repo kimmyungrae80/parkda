@@ -47,12 +47,12 @@ html,body{height:100%;background:#e8f0e8;font-family:'Noto Sans KR',sans-serif;c
 .hero::after{display:none}
 .hero-logo{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 0 0}
 .hero-logo img{height:110px;width:auto;filter:drop-shadow(0 3px 12px rgba(0,0,0,.5))}
-.hero-logo-text{display:none}
+.hero-logo-text{display:block;font-family:'Bebas Neue',sans-serif;font-size:28px;color:#ffffff;letter-spacing:4px;margin-top:4px;text-shadow:0 1px 4px rgba(0,0,0,.4)}
 .hero-sub{font-size:13px;opacity:.9;margin-top:6px;letter-spacing:.5px;text-align:center;color:#b0bec5}
 
 /* 유저카드 */
 .ucard{margin:12px 14px 0;background:var(--g5);border:1.5px solid var(--g4);border-radius:14px;padding:12px 15px;display:flex;align-items:center;gap:10px}
-.uavatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--g3),var(--g1));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.uavatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#f9a825,#f57f17);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;box-shadow:0 2px 8px rgba(245,127,23,.4)}
 .uname{font-size:16px;font-weight:900;color:var(--g2)}
 .uclub{font-size:11px;color:var(--gray3);margin-top:1px}
 .ulogout{margin-left:auto;font-size:11px;color:var(--b2);cursor:pointer;text-decoration:underline;white-space:nowrap}
@@ -1236,12 +1236,23 @@ async function applyParEdit() {
     newPar.push(sel ? +sel.value : m.par[h]);
   }
   m.par = newPar;
+  // 저장 전에 현재 상태 백업 (saveMatches가 상태를 건드리지 않도록)
+  const savedMid = S.mid;
+  const savedCg  = S.cg;
+  const savedCh  = S.ch;
   await saveMatches();
+  // 저장 후 상태 복원
+  S.mid = savedMid;
+  S.cg  = savedCg;
+  S.ch  = savedCh;
   // 닫기
   document.getElementById('par-edit-body').style.display = 'none';
   document.getElementById('par-edit-arrow').style.transform = 'rotate(0deg)';
   updateParSummary();
-  renderScoreTbl(); // 표 갱신
+  // 전체 점수화면 재렌더링 (canEdit 포함)
+  renderGroupTabs();
+  renderAuthBox();
+  renderScoreTbl();
   toast('✅ PAR 설정이 저장됐어요!');
 }
 
