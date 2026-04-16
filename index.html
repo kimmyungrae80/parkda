@@ -37,13 +37,13 @@ html,body{height:100%;background:#e8f0e8;font-family:'Noto Sans KR',sans-serif;c
 @keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 
 /* 상단바 */
-.bar{position:sticky;top:0;z-index:100;background:#2d3448;color:var(--white);padding:15px 18px 13px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+.bar{position:sticky;top:0;z-index:100;background:#353b52;color:var(--white);padding:15px 18px 13px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 10px rgba(0,0,0,.25)}
 .bar-back{font-size:28px;cursor:pointer;padding:0 8px 0 0;line-height:1;user-select:none}
 .bar-title{font-size:18px;font-weight:900;flex:1;letter-spacing:-.3px}
 .bar-sub{font-size:11px;opacity:.75}
 
 /* 히어로 */
-.hero{background:linear-gradient(160deg,#1a1f2e 0%,#252b3b 55%,#2d3448 100%);padding:24px 22px 20px;color:var(--white);position:relative;overflow:hidden}
+.hero{background:linear-gradient(160deg,#2c3145 0%,#353b52 55%,#3d4460 100%);padding:24px 22px 20px;color:var(--white);position:relative;overflow:hidden}
 .hero::after{display:none}
 .hero-logo{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 0 0}
 .hero-logo img{height:110px;width:auto;filter:drop-shadow(0 3px 12px rgba(0,0,0,.5))}
@@ -423,7 +423,7 @@ select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg
   <div class="join-box" style="margin-top:12px">
     <h3 style="display:flex;align-items:center;justify-content:space-between">🔢 게임 참가하기 <button onclick="toggleTip('tip-join')" style="background:none;border:1px solid var(--b3);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--b2);cursor:pointer">? 설명</button></h3><div id="tip-join" style="display:none;background:var(--b5);border-radius:10px;padding:10px 12px;margin:6px 0;font-size:13px;color:var(--b1);line-height:1.6">총무/회장에게 받은 4자리 게임코드를 입력하면 해당 경기의 점수 입력 화면으로 바로 이동합니다. 스마트폰에서 직접 점수를 기록할 수 있어요!</div>
     <span class="fh">총무/회장에게 받은 4자리 코드를 입력하세요</span>
-    <input class="code-input" id="join-code" type="text" maxlength="4" placeholder="ABCD" oninput="this.value=this.value.toUpperCase()">
+    <input class="code-input" id="join-code" type="text" maxlength="4" placeholder="게임코드" oninput="this.value=this.value.toUpperCase().slice(0,4)">
     <div style="margin-top:10px"><button class="btn btn-blue btn-sm" onclick="joinGame()">🚪 &nbsp;게임 참가하기</button></div>
   </div>
 
@@ -466,9 +466,9 @@ select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg
   <div class="card">
     <div class="card-hd" style="display:flex;align-items:center;justify-content:space-between">
       <span>🏆 포인트 단가 설정</span>
-      <button onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="background:none;border:1px solid var(--b3);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--b2);cursor:pointer">? 설명</button>
+      <button onclick="toggleTip('tip-unit')" style="background:none;border:1px solid var(--b3);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--b2);cursor:pointer">? 설명</button>
     </div>
-    <div style="display:none;background:var(--b5);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:13px;color:var(--b1);line-height:1.6">
+    <div id="tip-unit" style="display:none;background:var(--b5);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:13px;color:var(--b1);line-height:1.6">
       타수 차이 1개당 주고받을 포인트입니다.<br>예) 100P × 타수 차 3 = 300P 정산<br>현장에서 포인트를 금액으로 환산하세요.
     </div>
     <div class="card-bd">
@@ -507,9 +507,9 @@ select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg
   <div class="card">
     <div class="card-hd" style="display:flex;align-items:center;justify-content:space-between">
       <span>👥 참가자 명단</span>
-      <button onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="background:none;border:1px solid var(--g3);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--g2);cursor:pointer">? 설명</button>
+      <button onclick="toggleTip('tip-players')" style="background:none;border:1px solid var(--g3);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--g2);cursor:pointer">? 설명</button>
     </div>
-    <div style="display:none;background:var(--g5);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:13px;color:var(--g2);line-height:1.6">
+    <div id="tip-players" style="display:none;background:var(--g5);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:13px;color:var(--g2);line-height:1.6">
       참가자 이름을 입력하세요.<br>한 줄씩 입력하거나, 엑셀/카카오톡에서 복사해서 붙여넣기 가능합니다.<br>쉼표나 탭으로 구분해도 자동 인식돼요!
     </div>
     <div class="card-bd">
@@ -888,15 +888,28 @@ function makeUniqueCode() {
 async function init() {
   document.getElementById('c-date').value = new Date().toISOString().slice(0, 10);
 
-  // URL에 게임코드 파라미터 있으면 자동 입력
+  // URL에 게임코드 파라미터 있으면 자동 입력 + 자동 참가 시도
   const urlCode = new URLSearchParams(location.search).get('game');
-  if (urlCode) {
-    document.getElementById('join-code').value = urlCode.toUpperCase();
+  if (urlCode && /^[A-Z0-9]{4}$/.test(urlCode.toUpperCase())) {
+    const el = document.getElementById('join-code');
+    if (el) el.value = urlCode.toUpperCase().slice(0, 4);
   }
 
   S.matches = await dbLoad('matches', {});
   const u = lsGet('user');
-  if (u) { S.user = u; showHome(); }
+  if (u) {
+    S.user = u;
+    showHome();
+    // 로그인 상태 + URL 게임코드 있으면 자동 참가
+    const autoCode = new URLSearchParams(location.search).get('game');
+    if (autoCode && /^[A-Z0-9]{4}$/i.test(autoCode)) {
+      setTimeout(() => {
+        const el = document.getElementById('join-code');
+        if (el) el.value = autoCode.toUpperCase();
+        joinGame();
+      }, 300);
+    }
+  }
 }
 
 /* ══ 페이지 이동 ══ */
@@ -1029,23 +1042,24 @@ function createMatch() {
 }
 
 function parsePlayers(raw) {
-  // 탭, 쉼표, 슬래시, 세미콜론, 연속공백 → 줄바꿈으로 통일
-  const normalized = raw
-    .replace(/[\t,;\|\／]+/g, '\n')  // 구분자 통일
-    .replace(/[ \u3000]+/g, ' ')        // 전각공백 포함 공백 정리
-    .replace(/\r/g, '')                  // CR 제거
+  // 엑셀(탭), 쉼표, 슬래시, 세미콜론, 줄바꿈 → 토큰 분리
+  const tokens = raw
+    .replace(/\r\n|\r/g, '\n')           // 줄바꿈 통일
+    .replace(/[\t,;|／\u3000]+/g, '\n')   // 구분자 → 줄바꿈
     .split('\n');
+
   const seen = new Set(), res = [];
-  for (const p of normalized) {
-    // 공백으로 분리된 여러 이름도 처리 (예: "홍길동 김철수")
-    const words = p.trim().split(/\s+/);
+  for (const token of tokens) {
+    // 한 토큰 안에 공백으로 여러 이름이 있을 수 있음 (예: "홍길동 김철수")
+    const words = token.trim().split(/\s+/);
     for (const w of words) {
-      const t = w.trim().replace(/[0-9\s\-_\.]/g,'');
-      if (t.length >= 2 && t.length <= 6 && !seen.has(t)) {
-        // 한글, 영문 모두 허용
-        if (/^[가-힣]+$/.test(t) || /^[a-zA-Z\u4e00-\u9fff]+$/.test(t)) {
-          res.push(t); seen.add(t);
-        }
+      // 숫자·특수문자 제거 후 이름만 추출
+      const t = w.replace(/[^가-힣a-zA-Z]/g, '').trim();
+      if (!t || seen.has(t)) continue;
+      // 한글 2~5자 또는 영문 2~15자
+      if (/^[가-힣]{2,5}$/.test(t) || /^[a-zA-Z]{2,15}$/.test(t)) {
+        res.push(t);
+        seen.add(t);
       }
     }
   }
