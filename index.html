@@ -468,7 +468,29 @@ select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg
     <div class="card-bd">
       <div class="fg"><label class="fl">경기 이름 *</label><input class="fi" id="c-title" type="text" placeholder="예) 5월 정기 경기, 친구들 내기"></div>
       <div class="fg"><label class="fl">날짜</label><input class="fi" id="c-date" type="date"></div>
-      <div class="fg"><label class="fl">구장</label><input class="fi" id="c-course" type="text" placeholder="예) 김해 파크골프장"></div>
+      <!-- 구장 선택 (Supabase venues DB 연동) -->
+      <div class="fg">
+        <label class="fl">구장 지역</label>
+        <select class="fi" id="c-region-sel" onchange="loadCourseVenues()">
+          <option value="">-- 지역 선택 --</option>
+          <option>서울</option><option>경기</option><option>인천</option>
+          <option>부산</option><option>대구</option><option>광주</option>
+          <option>대전</option><option>울산</option><option>세종</option>
+          <option>경남</option><option>경북</option><option>전남</option>
+          <option>전북</option><option>충남</option><option>충북</option>
+          <option>강원</option><option>제주</option>
+        </select>
+      </div>
+      <div class="fg" id="c-venue-wrap" style="display:none">
+        <label class="fl">구장 선택</label>
+        <select class="fi" id="c-venue-sel" onchange="onCourseSelect()">
+          <option value="">-- 구장 선택 --</option>
+        </select>
+      </div>
+      <div class="fg" id="c-course-wrap">
+        <label class="fl">구장명 <span style="font-size:11px;color:var(--gray3)" id="c-course-label">(직접 입력 또는 위에서 선택)</span></label>
+        <input class="fi" id="c-course" type="text" placeholder="예) 김해 파크골프장">
+      </div>
     </div>
   </div>
   <div class="card">
@@ -1023,6 +1045,7 @@ function go(id) {
   if (id === 'pg-matches') renderMatches();
   if (id === 'pg-ranking') renderRanking();
   if (id === 'pg-matching') renderMatching();
+  if (id === 'pg-create')   setTimeout(initCourseRegion, 150);
 }
 function goTab(t) { go({ home:'pg-home', matches:'pg-matches', ranking:'pg-ranking', matching:'pg-matching' }[t]); }
 function setTab(t) {
@@ -2110,6 +2133,65 @@ async function submitVenueRequest() {
 document.addEventListener('change', function(e) {
   if (['mt-venue','mt-date','mt-time'].includes(e.target.id)) loadMatchList();
 });
+
+
+/* ══ 경기 만들기 - 구장 DB 연동 ══ */
+async function loadCourseVenues() {
+  const region = document.getElementById('c-region-sel')?.value;
+  const wrap   = document.getElementById('c-venue-wrap');
+  const sel    = document.getElementById('c-venue-sel');
+  const label  = document.getElementById('c-course-label');
+
+  if (!region) {
+    wrap.style.display = 'none';
+    label.textContent  = '(직접 입력 또는 위에서 선택)';
+    return;
+  }
+
+  sel.innerHTML = '<option value="">불러오는 중...</option>';
+  wrap.style.display = 'block';
+
+  const rows = await sbGet('venues',
+    `region=eq.${encodeURIComponent(region)}&status=eq.운영중&order=name&select=id,name,holes`);
+
+  if (!rows || rows.length === 0) {
+    sel.innerHTML = '<option value="">해당 지역 구장 없음 — 직접 입력하세요</option>';
+    label.textContent = '(직접 입력)';
+    return;
+  }
+
+  sel.innerHTML = '<option value="">-- 구장 선택 --</option>' +
+    rows.map(v => `<option value="${v.name}" data-holes="${v.holes}">${v.name} (${v.holes}홀)</option>`).join('');
+  label.textContent = '(선택됨 또는 직접 입력)';
+}
+
+function onCourseSelect() {
+  const sel = document.getElementById('c-venue-sel');
+  const opt = sel.options[sel.selectedIndex];
+  if (!opt || !opt.value) return;
+
+  // 구장명 자동 입력
+  document.getElementById('c-course').value = opt.value;
+
+  // 홀 수 자동 선택 (구장 홀수에 맞게)
+  const holes = parseInt(opt.dataset.holes) || 0;
+  if (holes >= 18) {
+    const h18 = document.querySelector('input[name="holes"][value="18"]');
+    if (h18) { h18.checked = true; }
+  } else {
+    const h9 = document.querySelector('input[name="holes"][value="9"]');
+    if (h9) { h9.checked = true; }
+  }
+}
+
+// 사용자 지역 자동 선택 (renderCreate 호출 시)
+function initCourseRegion() {
+  const regionSel = document.getElementById('c-region-sel');
+  if (regionSel && S.user?.region) {
+    regionSel.value = S.user.region;
+    loadCourseVenues();
+  }
+}
 
 async function saveMatches(){await dbSave('matches',S.matches);}
 function copyShare(){const t=document.getElementById('share-box').textContent;navigator.clipboard?.writeText(t).then(()=>toast('📋 복사됐어요!')).catch(()=>fbCopy(t));if(!navigator.clipboard)fbCopy(t);}
