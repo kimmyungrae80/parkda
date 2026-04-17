@@ -439,8 +439,10 @@ select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg
   <button class="mbtn mbtn-green" onclick="go('pg-create')"><span class="mbtn-ico">📝</span><span class="mbtn-info"><span class="mbtn-label">새 경기 만들기</span><span class="mbtn-desc">조편성 + 게임 코드 자동 생성</span></span><span class="mbtn-arr">›</span></button>
   <button class="mbtn mbtn-blue" onclick="go('pg-matches')"><span class="mbtn-ico">📋</span><span class="mbtn-info"><span class="mbtn-label">경기 목록</span><span class="mbtn-desc">점수 입력 · 포인트 · 코드 공유</span></span><span class="mbtn-arr">›</span></button>
 
-  <div class="sec">📊 통계 · 순위</div>
+  <div class="sec">🤝 파트너 매칭</div>
   <button class="mbtn mbtn-orange" onclick="go('pg-matching')"><span class="mbtn-ico">🤝</span><span class="mbtn-info"><span class="mbtn-label">파트너 찾기</span><span class="mbtn-desc">혼자·둘이 왔어요 · 같이 칠 분 구해요</span></span><span class="mbtn-arr">›</span></button>
+
+  <div class="sec">📊 통계 · 순위</div>
   <button class="mbtn mbtn-teal" onclick="go('pg-ranking')"><span class="mbtn-ico">🏅</span><span class="mbtn-info"><span class="mbtn-label">누적 랭킹 · 포인트</span><span class="mbtn-desc">평균 타수 · 누적 포인트 순위</span></span><span class="mbtn-arr">›</span></button>
   <button class="mbtn mbtn-gray mbtn-lock" onclick="showPro()"><span class="mbtn-ico">📈</span><span class="mbtn-info"><span class="mbtn-label" style="color:var(--gray4)">상세 통계 · KPI</span><span class="mbtn-desc">월별 추이 · 구장 분석</span></span></button>
   <button class="mbtn mbtn-gray mbtn-lock" onclick="showPro()"><span class="mbtn-ico">📸</span><span class="mbtn-info"><span class="mbtn-label" style="color:var(--gray4)">경기 사진 갤러리</span><span class="mbtn-desc">사진 저장 · 앨범</span></span></button>
@@ -524,6 +526,8 @@ select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg
         <div class="rg">
           <label class="rb"><input type="radio" name="holes" value="9" checked onchange="renderParInputs()"><div class="rbi"><span class="ri">🏌️</span>9홀</div></label>
           <label class="rb"><input type="radio" name="holes" value="18" onchange="renderParInputs()"><div class="rbi"><span class="ri">🏌️🏌️</span>18홀</div></label>
+          <label class="rb"><input type="radio" name="holes" value="27" onchange="renderParInputs()"><div class="rbi"><span class="ri">🏌️🏌️🏌️</span>27홀</div></label>
+          <label class="rb"><input type="radio" name="holes" value="36" onchange="renderParInputs()"><div class="rbi"><span class="ri">⛳</span>36홀</div></label>
         </div>
       </div>
       <div class="fg"><label class="fl">조당 인원</label>
@@ -2179,13 +2183,11 @@ function onCourseSelect() {
 
   // 홀 수 자동 선택 (구장 홀수에 맞게)
   const holes = parseInt(opt.dataset.holes) || 0;
-  if (holes >= 18) {
-    const h18 = document.querySelector('input[name="holes"][value="18"]');
-    if (h18) { h18.checked = true; }
-  } else {
-    const h9 = document.querySelector('input[name="holes"][value="9"]');
-    if (h9) { h9.checked = true; }
-  }
+  // 구장 홀수에 가장 가까운 옵션 자동 선택
+  const holeOpts = [9,18,27,36];
+  const closest = holeOpts.reduce((a,b) => Math.abs(b-holes)<Math.abs(a-holes)?b:a);
+  const hEl = document.querySelector(`input[name="holes"][value="${closest}"]`);
+  if (hEl) { hEl.checked = true; renderParInputs(); }
 }
 
 // 사용자 지역 자동 선택 (renderCreate 호출 시)
