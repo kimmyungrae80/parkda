@@ -898,6 +898,8 @@ function lsSet(k, v) { try { localStorage.setItem('pd_' + k, JSON.stringify(v));
 let S = { user: null, matches: {}, mid: null, cg: 0, ch: 0 };
 const PAR9  = [4,3,4,3,4,3,4,3,4];
 const PAR18 = [4,3,4,3,4,3,4,3,4,4,3,4,3,4,3,4,3,4];
+const PAR27 = [4,3,4,3,4,3,4,3,4,4,3,4,3,4,3,4,3,4,4,3,4,3,4,3,4,3,4];
+const PAR36 = [4,3,4,3,4,3,4,3,4,4,3,4,3,4,3,4,3,4,4,3,4,3,4,3,4,3,4,4,3,4,3,4,3,4,3,4];
 const GC    = ['#2e7d32','#1565c0','#e65100','#6a1b9a','#00695c','#c62828'];
 
 /* ══ 4자리 게임 코드 생성 ══ */
@@ -1145,7 +1147,7 @@ function createMatch() {
 
   const id   = 'M' + Date.now().toString(36).toUpperCase();
   const code = makeUniqueCode();
-  const par  = holes === 9 ? [...PAR9] : [...PAR18]; // 기본 PAR (점수 입력 화면에서 수정 가능)
+  const par  = holes === 9 ? [...PAR9] : holes === 18 ? [...PAR18] : holes === 27 ? [...PAR27] : [...PAR36];
   const groups = makeGroups(players, gs);
 
   S.matches[id] = {
@@ -1264,7 +1266,9 @@ function openScore(mid) {
   if (m.status === 'wait') { m.status = 'play'; saveMatches(); }
   document.getElementById('score-bar-title').textContent = `📊 ${m.title}`;
   document.getElementById('score-bar-sub').textContent = `코드: ${m.code}`;
-  document.getElementById('half-tab-wrap').style.display = m.holes === 18 ? 'block' : 'none';
+  document.getElementById('half-tab-wrap').style.display = m.holes >= 18 ? 'block' : 'none';
+  // 27홀: 전반9/중반9/후반9, 36홀: 1~9/10~18/19~27/28~36
+  renderHalfTabs(m.holes);
   renderGroupTabs(); renderAuthBox(); renderScoreTbl();
   updateParSummary();
   go('pg-score');
@@ -2191,6 +2195,25 @@ function initCourseRegion() {
     regionSel.value = S.user.region;
     loadCourseVenues();
   }
+}
+
+
+/* ══ 홀 탭 (9/18/27/36홀 대응) ══ */
+function renderHalfTabs(holes) {
+  const wrap = document.getElementById('half-tab-wrap');
+  const tabs = document.querySelector('.half-tabs');
+  if (!tabs) return;
+  if (holes <= 9) { wrap.style.display='none'; return; }
+  wrap.style.display = 'block';
+  const labels = holes === 18
+    ? ['전반 1~9홀','후반 10~18홀']
+    : holes === 27
+    ? ['전반 1~9홀','중반 10~18홀','후반 19~27홀']
+    : ['1~9홀','10~18홀','19~27홀','28~36홀'];
+  tabs.innerHTML = labels.map((l,i) =>
+    `<div class="half-tab${i===0?' on':''}" id="ht-${i}" onclick="switchHalf(${i})">${l}</div>`
+  ).join('');
+  S.ch = 0;
 }
 
 async function saveMatches(){await dbSave('matches',S.matches);}
