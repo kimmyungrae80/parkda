@@ -328,7 +328,7 @@ select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg
 .login-logo{font-family:'Bebas Neue',sans-serif;font-size:62px;color:var(--g2);letter-spacing:4px;margin-bottom:4px;line-height:1}
 .login-sub{font-size:14px;color:var(--gray3);margin-bottom:28px;text-align:center;line-height:1.65}
 </style>
-  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" crossorigin="anonymous"></script>
+  <!-- 카카오 SDK: 버튼 클릭 시 동적 로드 -->
 </head>
 <body>
 <div id="app">
@@ -869,7 +869,7 @@ select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg
 const SB_URL = 'https://szoxnkarkdxirbyxmzgr.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6b3hua2Fya2R4aXJieXhtemdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNDc5NDQsImV4cCI6MjA5MTcyMzk0NH0.Rm3y9LQT7rKASC3Cro2TDFG_b-VkH4HWAci3yURkZes';
 const SB_T   = 'parkda_store';
-const SB_OK  = () => SB_URL !== 'YOUR_SUPABASE_URL';
+const SB_OK  = () => SB_URL !== 'YOUR_SUPABASE_URL' && location.protocol !== 'file:';
 
 /* ── DB 레이어 (로컬스토리지 ↔ Supabase 자동 전환) ── */
 async function dbLoad(key, def = null) {
@@ -878,10 +878,11 @@ async function dbLoad(key, def = null) {
   try {
     const r = await fetch(`${SB_URL}/rest/v1/${SB_T}?key=eq.${key}&select=value`,
       { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` } });
+    if (!r.ok) return local ?? def;
     const d = await r.json();
     if (d && d[0]) { lsSet(key, d[0].value); return d[0].value; }
     return local ?? def;
-  } catch { return local ?? def; }
+  } catch(e) { return local ?? def; }
 }
 async function dbSave(key, data) {
   lsSet(key, data);
@@ -925,53 +926,80 @@ function makeUniqueCode() {
 const KAKAO_KEY = 'eabfd4e97064004b40404d6a25b8c743'; // ← 카카오 앱 키 입력
 
 function kakaoInit() {
-  try {
-    if (window.Kakao && !Kakao.isInitialized()) {
-      Kakao.init(KAKAO_KEY);
+  return new Promise((resolve) => {
+    if (window.Kakao) {
+      try { if (!Kakao.isInitialized()) Kakao.init(KAKAO_KEY); } catch(e) {}
+      resolve();
+      return;
     }
-  } catch(e) {}
+    // SDK 동적 로드
+    const s = document.createElement('script');
+    s.src = 'https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js';
+    s.crossOrigin = 'anonymous';
+    s.onload = () => {
+      try { Kakao.init(KAKAO_KEY); } catch(e) {}
+      resolve();
+    };
+    s.onerror = () => resolve(); // 실패해도 계속
+    document.head.appendChild(s);
+  });
 }
 
-function kakaoLogin() {
-  kakaoInit();
-  if (!window.Kakao || KAKAO_KEY === 'YOUR_KAKAO_JS_KEY') {
-    toast('카카오 앱 키를 설정해주세요 (개발자 설정 필요)');
+async function kakaoLogin() {
+  await kakaoInit();
+  if (!window.Kakao) {
+    toast('카카오 SDK를 불러오지 못했어요. 잠시 후 다시 시도해주세요.');
     return;
   }
   try {
+    // 팝업 방식 우선 시도 (Railway/일반 호스팅 환경에서 더 안정적)
     Kakao.Auth.login({
-      success: function(auth) {
-        Kakao.API.request({
-          url: '/v2/user/me',
-          success: function(res) {
-            const kakaoName  = res.kakao_account?.profile?.nickname || '카카오사용자';
-            const kakaoId    = String(res.id);
-            // 카카오 ID를 전화번호 대신 사용 (앞에 KK 붙여서 구분)
-            const fakePhone  = 'KK' + kakaoId.slice(-8);
-            // 기존 저장 정보 확인
-            const saved = lsGet('user');
-            if (saved && saved.phone === fakePhone) {
-              // 재방문: 바로 홈으로
-              S.user = saved;
-              showHome();
-              toast(`👋 ${saved.name}님, 반갑습니다!`);
-            } else {
-              // 신규: 카카오 이름으로 자동 설정 후 바로 시작
-              S.user = { name: kakaoName, phone: fakePhone,
-                club: '', region: '', role: '일반회원',
-                privacyAgreed: true, kakao: true };
-              lsSet('user', S.user);
-              showHome();
-              toast(`✅ ${kakaoName}님, PARKDA에 오신 걸 환영해요!`);
-            }
-          },
-          fail: function(e) { toast('카카오 정보를 불러오지 못했어요'); }
-        });
-      },
-      fail: function(e) { toast('카카오 로그인을 취소했어요'); }
+      success: function(auth) { handleKakaoAuth(); },
+      fail: function(e) {
+        // 팝업 실패시 리다이렉트 방식 시도
+        try {
+          Kakao.Auth.authorize({
+            redirectUri: location.origin + location.pathname,
+            prompt: 'select_account'
+          });
+        } catch(e2) {
+          toast('카카오 로그인 오류: 개발자센터에서 플랫폼 도메인을 등록해주세요');
+        }
+      }
     });
   } catch(e) {
-    toast('카카오 로그인 오류: ' + e.message);
+    toast('카카오 로그인을 사용할 수 없어요. 이름으로 직접 입력해주세요.');
+  }
+}
+
+// 카카오 인증 후 사용자 정보 처리
+async function handleKakaoAuth() {
+  try {
+    const token = Kakao.Auth.getAccessToken();
+    if (!token) return;
+    const res = await fetch('https://kapi.kakao.com/v2/user/me', {
+      headers: { Authorization: 'Bearer ' + token }
+    });
+    const data = await res.json();
+    const kakaoName = data.kakao_account?.profile?.nickname
+                   || data.properties?.nickname
+                   || '카카오사용자';
+    const kakaoId   = String(data.id);
+    const fakePhone = 'KK' + kakaoId.slice(-8);
+    const saved = lsGet('user');
+    if (saved && saved.phone === fakePhone) {
+      S.user = saved; showHome();
+      toast(`👋 ${saved.name}님, 반갑습니다!`);
+    } else {
+      S.user = { name: kakaoName, phone: fakePhone,
+        club: '', region: '', role: '일반회원',
+        privacyAgreed: true, kakao: true };
+      lsSet('user', S.user);
+      showHome();
+      toast(`✅ ${kakaoName}님, PARKDA에 오신 걸 환영해요!`);
+    }
+  } catch(e) {
+    toast('카카오 정보를 불러오지 못했어요: ' + e.message);
   }
 }
 
@@ -1000,41 +1028,61 @@ function checkReturningUser() {
   return true;
 }
 
-function quickLogin() {
+async function quickLogin() {
   const u = lsGet('user');
   if (!u) return;
   S.user = u;
+  try { await loadMyMatches(); } catch(e) {
+    const old = lsGet('matches'); S.matches = old || {};
+  }
   showHome();
   toast(`👋 ${u.name}님, 반갑습니다!`);
 }
 
 /* ══ 초기화 ══ */
 async function init() {
-  document.getElementById('c-date').value = new Date().toISOString().slice(0, 10);
+  // 날짜 기본값
+  const dateEl = document.getElementById('c-date');
+  if (dateEl) dateEl.value = new Date().toISOString().slice(0, 10);
 
-  // URL에 게임코드 파라미터 있으면 자동 입력 + 자동 참가 시도
+  // URL 게임코드 파라미터 저장
   const urlCode = new URLSearchParams(location.search).get('game');
-  if (urlCode && /^[A-Z0-9]{4}$/.test(urlCode.toUpperCase())) {
+  if (urlCode && /^[A-Z0-9]{4}$/i.test(urlCode)) {
     const el = document.getElementById('join-code');
     if (el) el.value = urlCode.toUpperCase().slice(0, 4);
   }
 
-  S.matches = await dbLoad('matches', {});
-  checkReturningUser(); // 재방문자 배너 표시
+  // 로그인 상태 확인
   const u = lsGet('user');
   if (u) {
     S.user = u;
-    showHome();
-    // 로그인 상태 + URL 게임코드 있으면 자동 참가
-    const autoCode = new URLSearchParams(location.search).get('game');
-    if (autoCode && /^[A-Z0-9]{4}$/i.test(autoCode)) {
-      setTimeout(() => {
-        const el = document.getElementById('join-code');
-        if (el) el.value = autoCode.toUpperCase();
-        joinGame();
-      }, 300);
+    // 로그인된 경우에만 경기 로드
+    try {
+      await loadMyMatches();
+    } catch(e) {
+      console.warn('경기 로드 실패 (로컬 모드):', e.message);
+      // 로컬스토리지에서 기존 데이터 복구 시도
+      const oldMatches = lsGet('matches');
+      S.matches = oldMatches || {};
     }
+    showHome();
+    // URL 게임코드로 자동 참가
+    if (urlCode && /^[A-Z0-9]{4}$/i.test(urlCode)) {
+      setTimeout(async () => { await joinGame(); }, 500);
+    }
+  } else {
+    // 비로그인: 재방문 배너 표시 (카카오 redirect 콜백 처리 포함)
+    const urlParams = new URLSearchParams(location.search);
+    const kakaoCode = urlParams.get('code'); // 카카오 redirect 후 code 파라미터
+    if (kakaoCode && window.Kakao) {
+      // 카카오 리다이렉트 복귀 시 자동 처리
+      try { await handleKakaoAuth(); } catch(e) {}
+    }
+    checkReturningUser();
   }
+
+  // 카카오 초기화 (오류나도 앱 실행 방해 안 함)
+  try { await kakaoInit(); } catch(e) {}
 }
 
 /* ══ 페이지 이동 ══ */
@@ -1104,19 +1152,44 @@ function doLogout() {
   go('pg-login');
 }
 
-/* ══ 게임 참가 (코드 입력) ══ */
-function joinGame() {
+/* ══ 게임 참가 (코드 입력 → Supabase 조회) ══ */
+async function joinGame() {
   const code = V('join-code').trim().toUpperCase();
   if (code.length !== 4) { toast('4자리 코드를 입력해 주세요'); return; }
-  const match = Object.values(S.matches).find(m => m.code === code);
+
+  toast('경기 찾는 중...');
+
+  // 1. 로컬에서 먼저 찾기
+  let match = Object.values(S.matches).find(m => m.code === code);
+
+  // 2. 없으면 Supabase에서 코드로 조회
   if (!match) {
-    // ⚠️ Supabase 없을 때는 같은 기기에서만 동작
-    // Supabase 연결 후에는 다른 기기에서도 경기 로드 가능
-    toast('해당 코드의 경기를 찾을 수 없어요\n(Supabase 연결 후 다른 기기에서도 참가 가능)');
+    match = await loadMatchByCode(code);
+    if (match) {
+      S.matches[match.id] = match;
+      await addToMyList(code); // 내 목록에 추가
+    }
+  }
+
+  if (!match) {
+    toast('해당 코드의 경기를 찾을 수 없어요 😢\n총무/회장에게 코드를 다시 확인하세요');
     return;
   }
+
+  // 3. 참가자 권한 확인
+  const myName = S.user?.name;
+  const isCreator = match.by === myName || S.user?.role === '총무/회장';
+  const isLeader  = match.groups?.some(g => g.leader === myName);
+  const isMember  = match.players?.includes(myName);
+
+  if (!isCreator && !isMember) {
+    toast(`"${match.title}" 경기의 참가자가 아니에요\n총무/회장에게 명단 추가를 요청하세요`);
+    return;
+  }
+
   S.mid = match.id;
-  toast(`✅ "${match.title}" 경기에 참가했어요!`);
+  const role = isCreator ? '총무/회장' : isLeader ? '조장' : '조원';
+  toast(`✅ "${match.title}" 참가! (${role})`);
   setTimeout(() => openScore(match.id), 600);
 }
 
@@ -1137,7 +1210,7 @@ function renderHome() {
 }
 
 /* ══ 경기 만들기 ══ */
-function createMatch() {
+async function createMatch() {
   const title  = V('c-title').trim();
   const date   = V('c-date');
   const course = V('c-course').trim() || '미지정';
@@ -1162,7 +1235,7 @@ function createMatch() {
     by: S.user?.name || ''
   };
   S.mid = id;
-  saveMatches();
+  await saveMatch(S.matches[id]); // 개별 저장
   renderGroupsPage();
   go('pg-groups');
 }
@@ -1248,7 +1321,7 @@ function renderGroupsPage() {
 function reshuffle() {
   const m = S.matches[S.mid]; if (!m) return;
   m.groups = makeGroups(m.players, m.gs);
-  saveMatches(); renderGroupsPage(); toast('🔀 다시 섞었어요!');
+  saveMatch(S.matches[S.mid]); renderGroupsPage(); toast('🔀 다시 섞었어요!');
 }
 function changeLeader(gi) {
   const m = S.matches[S.mid]; if (!m) return;
@@ -1258,7 +1331,7 @@ function changeLeader(gi) {
   const name = input.trim();
   if (!g.players.includes(name)) { toast('조원 이름을 정확히 입력해주세요'); return; }
   m.groups[gi].leader = name;
-  saveMatches(); renderGroupsPage(); toast(`👑 ${name} 님이 조장!`);
+  saveMatch(S.matches[S.mid]); renderGroupsPage(); toast(`👑 ${name} 님이 조장!`);
 }
 function goScore() { openScore(S.mid); }
 
@@ -1267,7 +1340,7 @@ function openScore(mid) {
   S.mid = mid; S.cg = 0; S.ch = 0;
   const m = S.matches[mid]; if (!m) return;
   // 상태 업데이트
-  if (m.status === 'wait') { m.status = 'play'; saveMatches(); }
+  if (m.status === 'wait') { m.status = 'play'; saveMatch(m); }
   document.getElementById('score-bar-title').textContent = `📊 ${m.title}`;
   document.getElementById('score-bar-sub').textContent = `코드: ${m.code}`;
   document.getElementById('half-tab-wrap').style.display = m.holes >= 18 ? 'block' : 'none';
@@ -1368,7 +1441,7 @@ async function applyParEdit() {
   const savedMid = S.mid;
   const savedCg  = S.cg;
   const savedCh  = S.ch;
-  await saveMatches();
+  await saveMatch(S.matches[S.mid]);
   // 저장 후 상태 복원
   S.mid = savedMid;
   S.cg  = savedCg;
@@ -1465,12 +1538,32 @@ function collectScores() {
   });
 }
 async function saveScore() {
-  if (!canEdit()) { toast('저장 권한이 없어요 🔒'); return; }
+  if (!canEdit()) { toast('조장 또는 총무/회장만 저장할 수 있어요 🔒'); return; }
   collectScores();
-  await saveMatches();
+
+  // 9홀 단위 빈 칸 검증
+  const m = S.matches[S.mid];
+  if (m) {
+    const g = m.groups[S.cg];
+    const start = S.ch * 9;
+    const end   = Math.min(start + 9, m.holes);
+    let missing = 0;
+    (g?.players || []).forEach(p => {
+      const sc = (m.sd || {})[p] || [];
+      for (let h = start; h < end; h++) {
+        if (!sc[h] || sc[h] === '') missing++;
+      }
+    });
+    if (missing > 0) {
+      const ok = confirm(`아직 입력 안 된 칸이 ${missing}개 있어요.\n빈 칸 그대로 저장할까요?`);
+      if (!ok) return;
+    }
+  }
+
+  await saveMatch(S.matches[S.mid]);
   toast('💾 저장됐어요!');
 }
-async function saveAndResult() { if (canEdit()) collectScores(); await saveMatches(); openResult(S.mid); }
+async function saveAndResult() { if (canEdit()) collectScores(); await saveMatch(S.matches[S.mid]); openResult(S.mid); }
 
 /* ══ 정산 계산 ══ */
 function calcHalfSettle(m, halfIdx) {
@@ -1524,7 +1617,7 @@ function fa(v) { const a = Math.abs(v); return a >= 10000 ? `${(a/10000).toFixed
 function openResult(mid) {
   S.mid = mid;
   const m = S.matches[mid]; if (!m) return;
-  m.status = 'done'; saveMatches();
+  m.status = 'done'; saveMatch(S.matches[S.mid]);
   document.getElementById('result-title').textContent = `🏆 ${m.title} 포인트 결과`;
   const H = m.holes, par = m.par, parT = par.slice(0, H).reduce((a,b)=>a+b,0), unit = m.unit||100;
   const sd = m.sd || {};
@@ -1648,10 +1741,10 @@ async function doManual() {
   const m=S.matches[S.mid];
   if(!m.manualLogs)m.manualLogs=[];
   m.manualLogs.push({from,to,amt,at:new Date().toISOString()});
-  await saveMatches(); toast(`💸 ${from} → ${to} ${fa(amt)}`);
+  await saveMatch(S.matches[S.mid]); toast(`💸 ${from} → ${to} ${fa(amt)}`);
   setTimeout(()=>openResult(S.mid),500);
 }
-async function delManual(i){const m=S.matches[S.mid];m.manualLogs.splice(i,1);await saveMatches();openResult(S.mid);}
+async function delManual(i){const m=S.matches[S.mid];m.manualLogs.splice(i,1);await saveMatch(S.matches[S.mid]);openResult(S.mid);}
 
 /* ══ 경기 목록 ══ */
 function renderMatches() {
@@ -1666,10 +1759,16 @@ function renderMatches() {
     if (s==='done') return '<span class="status-badge status-done">✅ 완료</span>';
     return '<span class="status-badge status-wait">⏳ 대기중</span>';
   };
+  const myName  = S.user?.name;
+  const isAdmin = lsGet('admin_ok') === true;
   el.innerHTML = ms.map(m => {
     const done = m.sd && Object.keys(m.sd).length > 0;
     const ts = done ? calcTotalSettle(m) : {};
     const top = Object.entries(ts).sort((a,b)=>b[1]-a[1])[0];
+    // 권한 판별
+    const isCreator = m.by === myName || isAdmin;
+    const isMember  = m.players?.includes(myName);
+    const canView   = isCreator || isMember; // 점수·정산 열람
     return `<div class="match-card">
       <div class="mc-hd">
         <div>
@@ -1677,6 +1776,7 @@ function renderMatches() {
           <div style="display:flex;align-items:center;gap:6px;margin-top:3px">
             ${statusHtml(m.status||'wait')}
             <span class="mc-code">${m.code}</span>
+            ${isCreator ? '<span style="font-size:10px;background:var(--g4);color:var(--g1);border-radius:6px;padding:1px 6px">내 경기</span>' : ''}
           </div>
         </div>
         <div class="mc-date">${m.date}</div>
@@ -1688,10 +1788,10 @@ function renderMatches() {
         ${top&&top[1]>0?`<span class="mc-tag" style="background:var(--gold2);color:var(--gold)">🏆${top[0]} +${fa(top[1])}</span>`:''}
       </div>
       <div class="mc-foot">
-        <button class="mc-btn mc-btn-g" onclick="openScore('${m.id}')">📊 점수</button>
-        <button class="mc-btn mc-btn-b" onclick="openResult('${m.id}')">💰 정산</button>
+        ${canView ? `<button class="mc-btn mc-btn-g" onclick="openScore('${m.id}')">📊 점수</button>` : ''}
+        ${canView ? `<button class="mc-btn mc-btn-b" onclick="openResult('${m.id}')">💰 정산</button>` : ''}
         <button class="mc-btn mc-btn-share" onclick="shareMatch('${m.id}')">💬 공유</button>
-        <button class="mc-btn mc-btn-r" onclick="delMatch('${m.id}')" style="flex:.4">🗑️</button>
+        ${isCreator ? `<button class="mc-btn mc-btn-r" onclick="delMatch('${m.id}')" style="flex:.4">🗑️</button>` : ''}
       </div>
     </div>`;
   }).join('');
@@ -1703,7 +1803,29 @@ function shareMatch(id) {
   navigator.clipboard?.writeText(txt).then(()=>toast('💬 복사됐어요! 카톡에 붙여넣으세요')).catch(()=>fbCopy(txt));
   if(!navigator.clipboard)fbCopy(txt);
 }
-function delMatch(id){if(!confirm('삭제할까요?'))return;delete S.matches[id];saveMatches();renderMatches();toast('🗑️ 삭제됐어요');}
+async function delMatch(id) {
+  const m = S.matches[id];
+  if (!m) return;
+  // 권한 체크: 생성자 또는 관리자만 삭제 가능
+  const isCreator = m.by === S.user?.name;
+  const isAdmin   = lsGet('admin_ok') === true;
+  if (!isCreator && !isAdmin) {
+    toast('❌ 경기 생성자만 삭제할 수 있어요');
+    return;
+  }
+  if (!confirm(`"${m.title}" 경기를 삭제할까요?\n삭제하면 점수·정산 기록이 모두 사라집니다.`)) return;
+  delete S.matches[id];
+  // Supabase에서도 삭제 (null 저장 = 삭제 처리)
+  try { await dbSave('match_' + m.code, null); } catch(e) {}
+  // 내 목록에서도 제거
+  const myKey = 'my_' + (S.user?.phone || 'guest');
+  let myList = lsGet(myKey) || [];
+  myList = myList.filter(c => c !== m.code);
+  lsSet(myKey, myList);
+  try { await dbSave(myKey, myList); } catch(e) {}
+  renderMatches();
+  toast('🗑️ 삭제됐어요');
+}
 
 /* ══ 랭킹 ══ */
 function renderRanking() {
@@ -1834,16 +1956,26 @@ function renderAdmin(){
 }
 async function adminDelMatch(id){
   if(!confirm('이 경기를 삭제할까요?'))return;
+  const m = S.matches[id];
+  if (m) await dbSave('match_' + m.code, null); // Supabase에서 삭제
   delete S.matches[id];
-  await saveMatches();
+  // 내 목록에서도 제거
+  const myKey = 'my_' + (S.user?.phone || 'guest');
+  let myList = lsGet(myKey) || [];
+  if (m) myList = myList.filter(c => c !== m.code);
+  lsSet(myKey, myList);
+  await dbSave(myKey, myList);
   toast('🗑️ 삭제됐어요');
   renderAdmin();
   renderHome();
 }
 async function adminDeleteAll(){
   if(!confirm('⚠️ 전체 경기를 모두 삭제할까요?\n이 작업은 되돌릴 수 없습니다.'))return;
+  // 내 목록 초기화
+  const myKey = 'my_' + (S.user?.phone || 'guest');
+  lsSet(myKey, []);
+  await dbSave(myKey, []);
   S.matches = {};
-  await saveMatches();
   toast('🗑️ 전체 삭제 완료');
   renderAdmin();
   renderHome();
@@ -2218,7 +2350,58 @@ function renderHalfTabs(holes) {
   S.ch = 0;
 }
 
-async function saveMatches(){await dbSave('matches',S.matches);}
+/* ══ 경기 저장/로드 (코드별 개별 저장) ══ */
+
+
+async function loadMyMatches() {
+  const matches = {};
+
+  // 구버전 호환: 'matches' 키에 전체가 저장된 경우 (v5-2 이하)
+  const legacy = await dbLoad('matches', null);
+  if (legacy && typeof legacy === 'object' && !Array.isArray(legacy)) {
+    Object.assign(matches, legacy);
+  }
+
+  // 신버전: my_전화번호 목록으로 match_코드별 로드
+  const myKey = 'my_' + (S.user?.phone || 'guest');
+  let myList = await dbLoad(myKey, []);
+  if (!myList) myList = [];
+  lsSet(myKey, myList);
+  for (const code of myList) {
+    const m = await dbLoad('match_' + code, null);
+    if (m) matches[m.id] = m;
+  }
+
+  // 로컬스토리지 구버전도 병합
+  const lsOld = lsGet('matches');
+  if (lsOld && typeof lsOld === 'object') {
+    Object.keys(lsOld).forEach(id => { if (!matches[id]) matches[id] = lsOld[id]; });
+  }
+
+  S.matches = matches;
+}
+
+async function loadMatchByCode(code) {
+  // 코드로 단일 경기 조회 (조원 참가용)
+  return await dbLoad('match_' + code, null);
+}
+
+async function saveMatch(m) {
+  // 단일 경기 저장
+  S.matches[m.id] = m;
+  await dbSave('match_' + m.code, m);
+}
+
+async function addToMyList(code) {
+  // 내 경기 목록에 코드 추가 (참가한 경기)
+  const myKey = 'my_' + (S.user?.phone || 'guest');
+  let myList = lsGet(myKey) || [];
+  if (!myList.includes(code)) {
+    myList.push(code);
+    lsSet(myKey, myList);
+    await dbSave(myKey, myList);
+  }
+}
 function copyShare(){const t=document.getElementById('share-box').textContent;navigator.clipboard?.writeText(t).then(()=>toast('📋 복사됐어요!')).catch(()=>fbCopy(t));if(!navigator.clipboard)fbCopy(t);}
 function fbCopy(t){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');document.body.removeChild(a);}
 function V(id){return document.getElementById(id)?.value||'';}
