@@ -867,9 +867,9 @@ select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg
    SB_KEY = 'eyJ...'
 ══════════════════════════════════════ */
 const SB_URL = 'https://szoxnkarkdxirbyxmzgr.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6b3hua2Fya2R4aXJieXhtemdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNDc5NDQsImV4cCI6MjA5MTcyMzk0NH0.Rm3y9LQT7rKASC3Cro2TDFG_b-VkH4HWAci3yURkZes';
+const SB_KEY = 'sb_publishable_ePI5UTO6VfhUCWFF5a6wgw_J4ZWx5BG';
 const SB_T   = 'parkda_store';
-const SB_OK  = () => SB_URL !== 'YOUR_SUPABASE_URL' && location.protocol !== 'file:';
+const SB_OK  = () => false; // Supabase 연결 임시 비활성화 — localStorage 모드
 
 /* ── DB 레이어 (로컬스토리지 ↔ Supabase 자동 전환) ── */
 async function dbLoad(key, def = null) {
@@ -1053,6 +1053,14 @@ async function init() {
   }
 
   // 로그인 상태 확인
+  // 백업 데이터 주입 (Supabase 연결 전까지 localStorage에 보존)
+  if (!lsGet('matches') || Object.keys(lsGet('matches')||{}).length === 0) {
+    try {
+      const backup = {"MMO5JH8MT": {"by": "윤무효", "gs": 4, "id": "MMO5JH8MT", "sd": {"유재찬": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "윤무효": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "정순애": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "최진태": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, "par": [4, 3, 4, 3, 4, 3, 4, 3, 4, 4, 3, 4, 3, 4, 3, 4, 3, 4, 4, 3, 4, 3, 4, 3, 4, 3, 4, 4, 3, 4, 3, 4, 3, 4, 3, 4], "code": "79SR", "date": "2026-04-23", "unit": 100, "holes": 36, "title": "4월4주정기모임", "course": "대저 파크골프장2구장A.B.C.D", "groups": [{"no": 1, "leader": "윤무효", "players": ["윤무효", "정순애", "유재찬", "최진태"]}, {"no": 2, "leader": "박문옥", "players": ["박문옥", "박복례", "양봉태", "김태선"]}, {"no": 3, "leader": "임해수", "players": ["임해수", "공연이", "신규선", "주우길"]}, {"no": 4, "leader": "김해균", "players": ["김해균", "윤은숙", "최재숙", "신상수"]}, {"no": 5, "leader": "김영애", "players": ["김영애", "강자야", "이정희", "성낙한"]}, {"no": 6, "leader": "전덕남", "players": ["전덕남"]}], "status": "done", "players": ["윤무효", "신규선", "김해균", "주우길", "성낙한", "박문옥", "최진태", "유재찬", "임해수", "신상수", "양봉태", "전덕남", "공연이", "정순애", "강자야", "윤은숙", "최재숙", "김영애", "이정희", "박복례", "김태선"], "createdAt": "2026-04-19T09:03:54.102Z", "manualLogs": []}};
+      lsSet('matches', backup);
+    } catch(e) {}
+  }
+
   const u = lsGet('user');
   if (u && u.name && u.phone) {
     // ✅ 저장된 사용자 있으면 바로 자동 로그인 (재방문자 바로시작)
