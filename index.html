@@ -1240,6 +1240,7 @@ async function createMatch() {
   };
   S.mid = id;
   await saveMatch(S.matches[id]); // 개별 저장
+  await addToMyList(code);         // 내 경기 목록에 등록 (기기간 동기화)
   renderGroupsPage();
   go('pg-groups');
 }
@@ -2373,27 +2374,54 @@ function renderHalfTabs(holes) {
 
 async function loadMyMatches() {
   const matches = {};
+  const myName  = S.user?.name;
+  const myPhone = S.user?.phone || 'guest';
+  const myKey   = 'my_' + myPhone;
 
-  // 구버전 호환: 'matches' 키에 전체가 저장된 경우 (v5-2 이하)
+  // ① Supabase 'matches' 구버전 키 → 내 경기만 필터
   const legacy = await dbLoad('matches', null);
   if (legacy && typeof legacy === 'object' && !Array.isArray(legacy)) {
-    Object.assign(matches, legacy);
+    Object.values(legacy).forEach(m => {
+      // 내가 만든 경기 OR 내가 참가한 경기
+      if (m.by === myName || (m.players && m.players.includes(myName))) {
+        matches[m.id] = m;
+      }
+    });
   }
 
-  // 신버전: my_전화번호 목록으로 match_코드별 로드
-  const myKey = 'my_' + (S.user?.phone || 'guest');
+  // ② 신버전: my_전화번호 목록으로 match_코드별 로드
   let myList = await dbLoad(myKey, []);
-  if (!myList) myList = [];
-  lsSet(myKey, myList);
+  if (!Array.isArray(myList)) myList = [];
   for (const code of myList) {
     const m = await dbLoad('match_' + code, null);
-    if (m) matches[m.id] = m;
+    if (m && !matches[m.id]) matches[m.id] = m;
   }
 
-  // 로컬스토리지 구버전도 병합
+  // ③ 로컬스토리지 구버전도 병합 (내 경기만)
   const lsOld = lsGet('matches');
   if (lsOld && typeof lsOld === 'object') {
-    Object.keys(lsOld).forEach(id => { if (!matches[id]) matches[id] = lsOld[id]; });
+    Object.values(lsOld).forEach(m => {
+      if (!matches[m?.id] && m?.id &&
+          (m.by === myName || (m.players && m.players.includes(myName)))) {
+        matches[m.id] = m;
+      }
+    });
+  }
+
+  // ④ 불러온 경기들을 신버전 구조로 자동 마이그레이션 저장
+  const newCodes = [];
+  for (const m of Object.values(matches)) {
+    if (m?.code && m?.id) {
+      newCodes.push(m.code);
+      // match_코드 키로 없으면 저장
+      const existing = await dbLoad('match_' + m.code, null);
+      if (!existing) await dbSave('match_' + m.code, m);
+    }
+  }
+  if (newCodes.length) {
+    const saved = await dbLoad(myKey, []);
+    const merged = [...new Set([...(Array.isArray(saved) ? saved : []), ...newCodes])];
+    await dbSave(myKey, merged);
   }
 
   S.matches = matches;
