@@ -1054,30 +1054,23 @@ async function init() {
 
   // 로그인 상태 확인
   const u = lsGet('user');
-  if (u) {
+  if (u && u.name && u.phone) {
+    // ✅ 저장된 사용자 있으면 바로 자동 로그인 (재방문자 바로시작)
     S.user = u;
-    // 로그인된 경우에만 경기 로드
     try {
       await loadMyMatches();
     } catch(e) {
-      console.warn('경기 로드 실패 (로컬 모드):', e.message);
-      // 로컬스토리지에서 기존 데이터 복구 시도
       const oldMatches = lsGet('matches');
       S.matches = oldMatches || {};
     }
     showHome();
+    toast(`👋 ${u.name}님, 반갑습니다!`);
     // URL 게임코드로 자동 참가
     if (urlCode && /^[A-Z0-9]{4}$/i.test(urlCode)) {
       setTimeout(async () => { await joinGame(); }, 500);
     }
   } else {
-    // 비로그인: 재방문 배너 표시 (카카오 redirect 콜백 처리 포함)
-    const urlParams = new URLSearchParams(location.search);
-    const kakaoCode = urlParams.get('code'); // 카카오 redirect 후 code 파라미터
-    if (kakaoCode && window.Kakao) {
-      // 카카오 리다이렉트 복귀 시 자동 처리
-      try { await handleKakaoAuth(); } catch(e) {}
-    }
+    // 비로그인: 로그인 화면 표시 + 배너
     checkReturningUser();
   }
 
@@ -1129,12 +1122,23 @@ function doLogin() {
   const phone = V('l-phone').trim();
   if (!name)  { toast('이름을 입력해 주세요 👤'); return; }
   if (!phone.startsWith('010') || phone.length < 10) { toast('전화번호를 확인해 주세요 📱'); return; }
-  S.user = { name, phone, club: V('l-club').trim(), region: V('l-region'),
-    role: document.querySelector('input[name="role"]:checked')?.value || '일반회원',
-    joinedAt: new Date().toISOString() };
+  const existing = lsGet('user');
+  // 같은 전화번호면 기존 role·joinedAt 유지 (실수로 역할 바꿔 덮어쓰는 것 방지)
+  const isSamePerson = existing && existing.phone === phone;
+  S.user = {
+    name,
+    phone,
+    club:     V('l-club').trim() || existing?.club || '',
+    region:   V('l-region') || existing?.region || '',
+    role:     isSamePerson ? (existing.role || '일반회원')
+                           : (document.querySelector('input[name="role"]:checked')?.value || '일반회원'),
+    joinedAt: existing?.joinedAt || new Date().toISOString(),
+    privacyAgreed: true
+  };
   lsSet('user', S.user);
   saveMeta();
   showHome();
+  toast(`✅ ${name}님, PARKDA에 오신 걸 환영해요!`);
 }
 async function saveMeta() {
   if (!S.user?.club) return;
@@ -1339,8 +1343,17 @@ function goScore() { openScore(S.mid); }
 function openScore(mid) {
   S.mid = mid; S.cg = 0; S.ch = 0;
   const m = S.matches[mid]; if (!m) return;
-  // 상태 업데이트
-  if (m.status === 'wait') { m.status = 'play'; saveMatch(m); }
+  // 접근 권한 체크: 생성자, 참가자, 관리자만
+  const myName  = S.user?.name;
+  const isAdmin   = lsGet('admin_ok') === true;
+  const isCreator = m.by === myName;
+  const isMember  = m.players?.includes(myName);
+  if (!isAdmin && !isCreator && !isMember) {
+    toast('❌ 이 경기의 참가자만 점수를 볼 수 있어요');
+    return;
+  }
+  // 상태 업데이트 (생성자만 play로 변경 가능)
+  if (m.status === 'wait' && (isCreator || isAdmin)) { m.status = 'play'; saveMatch(m); }
   document.getElementById('score-bar-title').textContent = `📊 ${m.title}`;
   document.getElementById('score-bar-sub').textContent = `코드: ${m.code}`;
   document.getElementById('half-tab-wrap').style.display = m.holes >= 18 ? 'block' : 'none';
@@ -1377,16 +1390,21 @@ function switchHalf(h) {
 }
 function canEdit() {
   const m = S.matches[S.mid], g = m?.groups[S.cg];
-  return g?.leader === S.user?.name || S.user?.role === '총무/회장';
+  const isAdmin   = lsGet('admin_ok') === true;
+  const isCreator = m?.by === S.user?.name; // 경기 생성자
+  const isLeader  = g?.leader === S.user?.name; // 해당 조 조장
+  return isAdmin || isCreator || isLeader;
 }
 function renderAuthBox() {
   const m = S.matches[S.mid], g = m?.groups[S.cg];
   const ok = canEdit();
+  const isCreator = m?.by === S.user?.name;
+  const label = isCreator ? '생성자(총무)' : `${g?.no||''}조 조장`;
   document.getElementById('score-auth-box').innerHTML = ok ? '' :
-    `<div class="auth-box">🔒 이 조의 점수는 조장 <b>${g?.leader||''}</b> 님만 입력할 수 있어요.</div>`;
+    `<div class="auth-box">🔒 이 조의 점수는 <b>${g?.leader||''}</b> 조장님만 입력할 수 있어요.</div>`;
   document.getElementById('score-help').textContent = ok
-    ? `${g?.no}조 조장 입력 모드 · 단가 ${m?.unit}P/타`
-    : `조장 또는 총무/회장만 입력 가능합니다.`;
+    ? `${g?.no}조 ${label} 입력 모드 · 단가 ${m?.unit}P/타`
+    : `조장만 점수를 입력할 수 있습니다.`;
 }
 
 /* ══ 점수 화면 PAR 편집 ══ */
