@@ -367,9 +367,26 @@ select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg
           <select class="fi" id="l-region"><option value="">-- 선택 --</option><option>서울</option><option>경기</option><option>인천</option><option>부산</option><option>대구</option><option>광주</option><option>대전</option><option>울산</option><option>세종</option><option>경남</option><option>경북</option><option>전남</option><option>전북</option><option>충남</option><option>충북</option><option>강원</option><option>제주</option></select>
         </div>
         <div class="fg"><label class="fl">역할</label>
-          <div class="rg">
-            <label class="rb"><input type="radio" name="role" value="총무/회장" checked><div class="rbi"><span class="ri">👑</span>총무/회장</div></label>
-            <label class="rb"><input type="radio" name="role" value="일반회원"><div class="rbi"><span class="ri">🙋</span>일반회원</div></label>
+          <!-- 1단계: 클럽 여부 -->
+          <div class="rg" style="margin-bottom:10px">
+            <label class="rb"><input type="radio" name="membership" value="클럽" onclick="onMembershipChange('클럽')"><div class="rbi"><span class="ri">🏌️</span>클럽 회원</div></label>
+            <label class="rb"><input type="radio" name="membership" value="비클럽" onclick="onMembershipChange('비클럽')"><div class="rbi"><span class="ri">🚶</span>개인 (비클럽)</div></label>
+          </div>
+          <!-- 2단계: 클럽 내 역할 (클럽 선택 시만 표시) -->
+          <div id="role-club-wrap" style="display:none">
+            <div style="font-size:12px;color:var(--gray3);margin-bottom:6px">클럽 내 역할</div>
+            <div class="rg3">
+              <label class="rb"><input type="radio" name="role" value="총무/회장" checked><div class="rbi"><span class="ri">👑</span>총무/회장</div></label>
+              <label class="rb"><input type="radio" name="role" value="일반회원"><div class="rbi"><span class="ri">🙋</span>일반회원</div></label>
+              <label class="rb"><input type="radio" name="role" value="준회원"><div class="rbi"><span class="ri">🌱</span>준회원</div></label>
+            </div>
+          </div>
+          <!-- 비클럽 선택 시 안내 -->
+          <div id="role-solo-wrap" style="display:none">
+            <div style="background:var(--b5);border-radius:10px;padding:9px 12px;font-size:12px;color:var(--b2);line-height:1.6">
+              💡 클럽 없이 개인으로 경기를 만들고 관리할 수 있어요.
+            </div>
+            <input type="hidden" name="role" value="개인">
           </div>
         </div>
       </div>
@@ -629,8 +646,8 @@ select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg
   <div id="result-manual-area"></div>
   <div id="podium-area"></div>
   <div class="card"><div class="card-hd" style="display:flex;align-items:center;justify-content:space-between"><span>📋 전체 순위</span><button onclick="toggleTip('tip-rank')" style="background:none;border:1px solid var(--g3);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--g2);cursor:pointer">? 설명</button></div><div id="tip-rank" style="display:none;background:var(--g5);border-radius:10px;padding:10px 12px;margin:6px 0;font-size:13px;color:var(--g2);line-height:1.6">전체 참가자의 최종 순위와 총 타수, PAR 대비 성적, 포인트 합산 결과를 보여줍니다.</div><div style="overflow-x:auto"><table class="rtbl" id="result-tbl"></table></div></div>
-  <div class="card"><div class="card-hd" style="display:flex;align-items:center;justify-content:space-between"><span>📱 카카오톡 공유</span><button onclick="toggleTip('tip-share')" style="background:none;border:1px solid var(--b3);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--b2);cursor:pointer">? 설명</button></div><div id="tip-share" style="display:none;background:var(--b5);border-radius:10px;padding:10px 12px;margin:6px 0;font-size:13px;color:var(--b1);line-height:1.6">순위와 포인트 정산 결과를 텍스트로 자동 생성합니다. 복사 버튼을 눌러 카카오톡에 붙여넣기 하세요!</div><div class="card-bd"><div class="share-box" id="share-box"></div><div style="margin-top:9px"><button class="btn btn-orange btn-sm" onclick="copyShare()">📋 &nbsp;복사하기</button></div></div></div>
-  <div class="btn-wrap"><button class="btn btn-gray btn-sm" onclick="go('pg-score')">✏️ 점수 수정</button></div>
+  <div class="card" id="result-share-card"><div class="card-hd" style="display:flex;align-items:center;justify-content:space-between"><span>📱 카카오톡 공유</span><button onclick="toggleTip('tip-share')" style="background:none;border:1px solid var(--b3);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--b2);cursor:pointer">? 설명</button></div><div id="tip-share" style="display:none;background:var(--b5);border-radius:10px;padding:10px 12px;margin:6px 0;font-size:13px;color:var(--b1);line-height:1.6">순위와 포인트 정산 결과를 텍스트로 자동 생성합니다. 복사 버튼을 눌러 카카오톡에 붙여넣기 하세요!</div><div class="card-bd"><div class="share-box" id="share-box"></div><div style="margin-top:9px" id="result-copy-btn-wrap"></div></div></div>
+  <div class="btn-wrap" id="result-edit-btn-wrap"></div>
 </div>
 
 <!-- ══ 랭킹 ══ -->
@@ -947,29 +964,39 @@ function kakaoInit() {
 
 async function kakaoLogin() {
   await kakaoInit();
-  if (!window.Kakao) {
-    toast('카카오 SDK를 불러오지 못했어요. 잠시 후 다시 시도해주세요.');
+  if (!window.Kakao || !Kakao.isInitialized()) {
+    _showKakaoFallback('카카오 앱 설정이 필요해요. 아래에 직접 입력해 주세요 👇');
     return;
   }
   try {
-    // 팝업 방식 우선 시도 (Railway/일반 호스팅 환경에서 더 안정적)
     Kakao.Auth.login({
       success: function(auth) { handleKakaoAuth(); },
       fail: function(e) {
-        // 팝업 실패시 리다이렉트 방식 시도
         try {
           Kakao.Auth.authorize({
             redirectUri: location.origin + location.pathname,
             prompt: 'select_account'
           });
         } catch(e2) {
-          toast('카카오 로그인 오류: 개발자센터에서 플랫폼 도메인을 등록해주세요');
+          _showKakaoFallback('카카오 도메인 설정이 필요해요. 아래에 직접 입력해 주세요 👇');
         }
       }
     });
   } catch(e) {
-    toast('카카오 로그인을 사용할 수 없어요. 이름으로 직접 입력해주세요.');
+    _showKakaoFallback('카카오 로그인을 사용할 수 없어요. 아래에 직접 입력해 주세요 👇');
   }
+}
+
+function _showKakaoFallback(msg) {
+  toast(msg);
+  // 직접 입력 폼으로 스크롤 + 이름 필드 포커스
+  setTimeout(() => {
+    const nameEl = document.getElementById('l-name');
+    if (nameEl) {
+      nameEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      nameEl.focus();
+    }
+  }, 400);
 }
 
 // 카카오 인증 후 사용자 정보 처리
@@ -1004,31 +1031,52 @@ async function handleKakaoAuth() {
 }
 
 /* ══ 재방문자 자동 로그인 안내 ══ */
+let _autoLoginTimer = null;
+
 function checkReturningUser() {
   const u = lsGet('user');
   if (!u) return false;
-  // 저장된 사용자 있으면 로그인 화면에 이름 표시
   const loginPage = document.getElementById('pg-login');
   if (!loginPage) return false;
-  // 재방문 배너 삽입
+  if (loginPage.querySelector('#returning-banner')) return true; // 중복 방지
+
   const banner = document.createElement('div');
-  banner.style.cssText = 'background:var(--g5);border:1.5px solid var(--g3);border-radius:12px;padding:12px 16px;margin-bottom:12px;cursor:pointer';
+  banner.id = 'returning-banner';
+  banner.style.cssText = 'background:linear-gradient(135deg,#e8f5e9,#f1f8e9);border:2px solid var(--g3);border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 2px 10px rgba(46,125,50,.15)';
+
+  // 자동 이동 카운트다운 (재방문자만)
+  let countdown = 3;
+  const timerHtml = (n) => `<span id="rb-count" style="font-size:11px;color:var(--gray3);margin-left:6px">${n}초 후 자동 이동...</span>`;
+
   banner.innerHTML = `
-    <div style="font-size:13px;color:var(--gray3);margin-bottom:4px">최근 접속</div>
-    <div style="display:flex;align-items:center;justify-content:space-between">
-      <div>
-        <span style="font-size:16px;font-weight:900;color:var(--g1)">${u.name}</span>
-        <span style="font-size:12px;color:var(--gray3);margin-left:6px">${u.club||''} ${u.region||''}</span>
+    <div style="font-size:11px;color:var(--g2);font-weight:700;margin-bottom:6px;letter-spacing:.05em">👋 최근 접속 계정</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+      <div style="min-width:0">
+        <span style="font-size:17px;font-weight:900;color:var(--g1)">${u.name}</span>
+        ${u.club ? `<span style="font-size:12px;color:var(--gray3);margin-left:6px">${u.club}${u.region?' · '+u.region:''}</span>` : ''}
+        <br>${timerHtml(countdown)}
       </div>
-      <button onclick="quickLogin()" style="background:var(--g2);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif">바로 시작 ›</button>
+      <button onclick="quickLoginNow()" style="background:var(--g2);color:#fff;border:none;border-radius:10px;padding:11px 18px;font-size:15px;font-weight:900;cursor:pointer;font-family:'Noto Sans KR',sans-serif;white-space:nowrap;box-shadow:0 2px 8px rgba(46,125,50,.3);flex-shrink:0">바로 시작 ›</button>
     </div>`;
-  // 카카오 버튼 앞에 삽입
+
   const kakaoBtn = loginPage.querySelector('button[onclick="kakaoLogin()"]');
   if (kakaoBtn) kakaoBtn.parentNode.insertBefore(banner, kakaoBtn);
+
+  // 카운트다운 tick
+  _autoLoginTimer = setInterval(() => {
+    countdown--;
+    const el = document.getElementById('rb-count');
+    if (el) el.textContent = countdown > 0 ? `${countdown}초 후 자동 이동...` : '이동 중...';
+    if (countdown <= 0) {
+      clearInterval(_autoLoginTimer);
+    }
+  }, 1000);
+
   return true;
 }
 
-async function quickLogin() {
+async function quickLoginNow() {
+  if (_autoLoginTimer) clearInterval(_autoLoginTimer);
   const u = lsGet('user');
   if (!u) return;
   S.user = u;
@@ -1063,22 +1111,25 @@ async function init() {
 
   const u = lsGet('user');
   if (u && u.name && u.phone) {
-    // ✅ 저장된 사용자 있으면 바로 자동 로그인 (재방문자 바로시작)
-    S.user = u;
-    try {
-      await loadMyMatches();
-    } catch(e) {
-      const oldMatches = lsGet('matches');
-      S.matches = oldMatches || {};
-    }
-    showHome();
-    toast(`👋 ${u.name}님, 반갑습니다!`);
-    // URL 게임코드로 자동 참가
-    if (urlCode && /^[A-Z0-9]{4}$/i.test(urlCode)) {
-      setTimeout(async () => { await joinGame(); }, 500);
-    }
+    // ✅ 재방문자: 로그인 페이지에 바로시작 배너 표시 후 1.2초 뒤 자동 이동
+    checkReturningUser();
+    setTimeout(async () => {
+      S.user = u;
+      try {
+        await loadMyMatches();
+      } catch(e) {
+        const oldMatches = lsGet('matches');
+        S.matches = oldMatches || {};
+      }
+      showHome();
+      toast(`👋 ${u.name}님, 반갑습니다!`);
+      // URL 게임코드로 자동 참가
+      if (urlCode && /^[A-Z0-9]{4}$/i.test(urlCode)) {
+        setTimeout(async () => { await joinGame(); }, 500);
+      }
+    }, 1200);
   } else {
-    // 비로그인: 로그인 화면 표시 + 배너
+    // 비로그인: 로그인 화면 표시
     checkReturningUser();
   }
 
@@ -1121,6 +1172,25 @@ function agreeAndClose() {
   toast('✅ 개인정보 수집에 동의했습니다');
 }
 
+/* ══ 회원 유형 선택 ══ */
+function onMembershipChange(type) {
+  const clubWrap = document.getElementById('role-club-wrap');
+  const soloWrap = document.getElementById('role-solo-wrap');
+  const clubInput = document.getElementById('l-club');
+  const clubCard  = clubInput?.closest('.card');
+  if (type === '클럽') {
+    clubWrap.style.display = 'block';
+    soloWrap.style.display = 'none';
+    // 클럽 입력 카드 강조
+    if (clubCard) clubCard.style.outline = '2px solid var(--g3)';
+    if (clubInput) clubInput.focus();
+  } else {
+    clubWrap.style.display = 'none';
+    soloWrap.style.display = 'block';
+    if (clubCard) clubCard.style.outline = '';
+  }
+}
+
 /* ══ 로그인 ══ */
 function doLogin() {
   if (!document.getElementById('privacy-agree').checked) {
@@ -1133,13 +1203,23 @@ function doLogin() {
   const existing = lsGet('user');
   // 같은 전화번호면 기존 role·joinedAt 유지 (실수로 역할 바꿔 덮어쓰는 것 방지)
   const isSamePerson = existing && existing.phone === phone;
+
+  // 역할 결정: 비클럽이면 '개인', 클럽이면 클럽 내 역할 라디오 읽기
+  const membership = document.querySelector('input[name="membership"]:checked')?.value;
+  let roleVal;
+  if (isSamePerson) {
+    roleVal = existing.role || '일반회원';
+  } else if (membership === '비클럽') {
+    roleVal = '개인';
+  } else {
+    roleVal = document.querySelector('input[name="role"]:checked')?.value || '일반회원';
+  }
   S.user = {
     name,
     phone,
     club:     V('l-club').trim() || existing?.club || '',
     region:   V('l-region') || existing?.region || '',
-    role:     isSamePerson ? (existing.role || '일반회원')
-                           : (document.querySelector('input[name="role"]:checked')?.value || '일반회원'),
+    role:     roleVal,
     joinedAt: existing?.joinedAt || new Date().toISOString(),
     privacyAgreed: true
   };
@@ -1644,6 +1724,15 @@ function fa(v) { const a = Math.abs(v); return a >= 10000 ? `${(a/10000).toFixed
 function openResult(mid) {
   S.mid = mid;
   const m = S.matches[mid]; if (!m) return;
+  // 권한 체크: 생성자 또는 참가자만 정산 결과 열람 가능
+  const myName  = S.user?.name;
+  const isAdmin = lsGet('admin_ok') === true;
+  const isCreator = m.by === myName;
+  const isMember  = m.players?.includes(myName);
+  if (!isAdmin && !isCreator && !isMember) {
+    toast('❌ 이 경기의 참가자만 정산 결과를 볼 수 있어요');
+    return;
+  }
   m.status = 'done'; saveMatch(S.matches[S.mid]);
   document.getElementById('result-title').textContent = `🏆 ${m.title} 포인트 결과`;
   const H = m.holes, par = m.par, parT = par.slice(0, H).reduce((a,b)=>a+b,0), unit = m.unit||100;
@@ -1759,8 +1848,46 @@ function openResult(mid) {
     ...allRows.map(r=>`  ${r.rank===1?'🥇':r.rank===2?'🥈':r.rank===3?'🥉':r.rank+'.'} ${r.p.padEnd(4)} ${r.tot>0?r.tot+'타':'—'}`),
     ``,`🔑 게임코드: ${m.code}`,`📱 PARKDA 앱으로 확인`,`⛳ ━━━━━━━━━━━━━━`];
   document.getElementById('share-box').textContent = lines.join('\n');
+
+  // ── 공유 복사 버튼: 생성자만 ──
+  const copyBtnWrap = document.getElementById('result-copy-btn-wrap');
+  if (copyBtnWrap) {
+    copyBtnWrap.innerHTML = (isCreator || isAdmin)
+      ? `<button class="btn btn-orange btn-sm" onclick="copyShare()">📋 &nbsp;복사하기</button>`
+      : `<div style="font-size:12px;color:var(--gray3);text-align:center;padding:4px 0">🔒 결과 공유는 경기 생성자만 할 수 있어요</div>`;
+  }
+
+  // ── 점수 수정 버튼 (생성자 또는 조장만) ──
+  const isMyLeader = m.groups?.some(g => g.leader === myName);
+  const canEditResult = isAdmin || isCreator || isMyLeader;
+  const editBtnWrap = document.getElementById('result-edit-btn-wrap');
+  if (editBtnWrap) {
+    editBtnWrap.innerHTML = canEditResult
+      ? `<button class="btn btn-gray btn-sm" onclick="go('pg-score')">✏️ 점수 수정</button>`
+      : `<div style="text-align:center;font-size:12px;color:var(--gray3);padding:6px 0">🔒 점수 수정은 경기 생성자 또는 조장만 가능해요</div>`;
+  }
+
+  // ── 수동 정산 영역: 생성자만 ──
+  const manualArea = document.getElementById('result-manual-area');
+  if (manualArea) {
+    if (isCreator || isAdmin) {
+      const logs = m.manualLogs || [];
+      manualArea.innerHTML = `
+        <div class="manual-box">
+          <div class="mb-title">💸 추가 포인트 조정</div>
+          <div class="mb-row"><div class="mb-lbl">보내는 분</div><select class="mb-sel" id="mb-from">${m.players.map(p=>`<option>${p}</option>`).join('')}</select></div>
+          <div class="mb-row"><div class="mb-lbl">받는 분</div><select class="mb-sel" id="mb-to">${m.players.map(p=>`<option>${p}</option>`).join('')}</select></div>
+          <div class="mb-row"><div class="mb-lbl">포인트</div><input class="mb-amt" id="mb-amt" type="number" min="100" placeholder="100"><button class="mb-btn" onclick="doManual()">전송 💸</button></div>
+          ${logs.length?`<div class="mb-logs">${logs.map((l,i)=>`<div class="mb-log"><span>${l.from} → ${l.to} <b>${fa(l.amt)}</b></span><span class="mb-del" onclick="delManual(${i})">✕</span></div>`).join('')}</div>`:''}
+        </div>`;
+    } else {
+      manualArea.innerHTML = ''; // 비생성자는 수동 정산 UI 숨김
+    }
+  }
+
   go('pg-result');
 }
+
 async function doManual() {
   const from=document.getElementById('mb-from')?.value, to=document.getElementById('mb-to')?.value, amt=+document.getElementById('mb-amt')?.value;
   if (!from||!to||from===to){toast('보내는 분과 받는 분이 달라야 해요');return;}
@@ -1775,35 +1902,54 @@ async function delManual(i){const m=S.matches[S.mid];m.manualLogs.splice(i,1);aw
 
 /* ══ 경기 목록 ══ */
 function renderMatches() {
-  const ms = Object.values(S.matches).reverse();
-  const el = document.getElementById('matches-area');
+  const allMs   = Object.values(S.matches).reverse();
+  const el      = document.getElementById('matches-area');
+  const myName  = S.user?.name;
+  const isAdmin = lsGet('admin_ok') === true;
+
+  // 내 경기 = 내가 만든 경기 + 내가 참가자로 등록된 경기만
+  const ms = allMs.filter(m => {
+    if (isAdmin) return true;
+    const isCreator = m.by === myName;
+    const isMember  = m.players?.includes(myName);
+    return isCreator || isMember;
+  });
+
   if (!ms.length) {
-    el.innerHTML=`<div class="empty"><div class="empty-ico">📋</div><div class="empty-t">경기가 없어요</div><div class="empty-s">홈에서 새 경기를 만들어보세요!</div></div>`;
+    el.innerHTML=`<div class="empty"><div class="empty-ico">📋</div><div class="empty-t">내 경기가 없어요</div><div class="empty-s">홈에서 새 경기를 만들거나,<br>총무/회장에게 게임 코드를 받아 참가하세요!</div></div>`;
     return;
   }
+
   const statusHtml = s => {
     if (s==='play') return '<span class="status-badge status-play">🟢 진행중</span>';
     if (s==='done') return '<span class="status-badge status-done">✅ 완료</span>';
     return '<span class="status-badge status-wait">⏳ 대기중</span>';
   };
-  const myName  = S.user?.name;
-  const isAdmin = lsGet('admin_ok') === true;
-  el.innerHTML = ms.map(m => {
-    const done = m.sd && Object.keys(m.sd).length > 0;
-    const ts = done ? calcTotalSettle(m) : {};
-    const top = Object.entries(ts).sort((a,b)=>b[1]-a[1])[0];
-    // 권한 판별
+
+  // 내가 만든 경기 / 참가한 경기 그룹 분리
+  const myCreated  = ms.filter(m => m.by === myName || isAdmin);
+  const myJoined   = ms.filter(m => m.by !== myName && m.players?.includes(myName));
+
+  const renderCard = (m) => {
+    const done      = m.sd && Object.keys(m.sd).length > 0;
+    const ts        = done ? calcTotalSettle(m) : {};
+    const top       = Object.entries(ts).sort((a,b)=>b[1]-a[1])[0];
     const isCreator = m.by === myName || isAdmin;
     const isMember  = m.players?.includes(myName);
-    const canView   = isCreator || isMember; // 점수·정산 열람
+    const isLeader  = m.groups?.some(g => g.leader === myName);
+    // 점수 입력 권한: 생성자 또는 해당 조 조장
+    const canScore  = isCreator || isLeader;
+    // 정산 열람: 생성자 또는 참가자
+    const canResult = isCreator || isMember;
+
     return `<div class="match-card">
       <div class="mc-hd">
         <div>
           <div class="mc-title">${m.title}</div>
-          <div style="display:flex;align-items:center;gap:6px;margin-top:3px">
+          <div style="display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap">
             ${statusHtml(m.status||'wait')}
             <span class="mc-code">${m.code}</span>
-            ${isCreator ? '<span style="font-size:10px;background:var(--g4);color:var(--g1);border-radius:6px;padding:1px 6px">내 경기</span>' : ''}
+            ${isCreator ? '<span style="font-size:10px;background:var(--g4);color:var(--g1);border-radius:6px;padding:1px 6px">📝 내 경기</span>' : '<span style="font-size:10px;background:var(--b5);color:var(--b2);border-radius:6px;padding:1px 6px">🙋 참가중</span>'}
           </div>
         </div>
         <div class="mc-date">${m.date}</div>
@@ -1815,13 +1961,26 @@ function renderMatches() {
         ${top&&top[1]>0?`<span class="mc-tag" style="background:var(--gold2);color:var(--gold)">🏆${top[0]} +${fa(top[1])}</span>`:''}
       </div>
       <div class="mc-foot">
-        ${canView ? `<button class="mc-btn mc-btn-g" onclick="openScore('${m.id}')">📊 점수</button>` : ''}
-        ${canView ? `<button class="mc-btn mc-btn-b" onclick="openResult('${m.id}')">💰 정산</button>` : ''}
-        <button class="mc-btn mc-btn-share" onclick="shareMatch('${m.id}')">💬 공유</button>
+        <button class="mc-btn mc-btn-g" onclick="openScore('${m.id}')">📊 점수</button>
+        ${canResult ? `<button class="mc-btn mc-btn-b" onclick="openResult('${m.id}')">💰 정산</button>` : ''}
+        ${isCreator ? `<button class="mc-btn mc-btn-share" onclick="shareMatch('${m.id}')">💬 공유</button>` : ''}
         ${isCreator ? `<button class="mc-btn mc-btn-r" onclick="delMatch('${m.id}')" style="flex:.4">🗑️</button>` : ''}
       </div>
     </div>`;
-  }).join('');
+  };
+
+  let html = '';
+
+  if (myCreated.length) {
+    html += `<div style="padding:10px 16px 4px;font-size:11px;font-weight:700;color:var(--gray3);letter-spacing:.08em;text-transform:uppercase">📝 내가 만든 경기 (${myCreated.length})</div>`;
+    html += myCreated.map(renderCard).join('');
+  }
+  if (myJoined.length) {
+    html += `<div style="padding:14px 16px 4px;font-size:11px;font-weight:700;color:var(--gray3);letter-spacing:.08em;text-transform:uppercase">🙋 참가한 경기 (${myJoined.length})</div>`;
+    html += myJoined.map(renderCard).join('');
+  }
+
+  el.innerHTML = html;
 }
 function shareMatch(id) {
   const m = S.matches[id]; if (!m) return;
