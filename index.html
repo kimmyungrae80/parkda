@@ -459,16 +459,45 @@ select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg
   <div class="sec">🤝 파트너 매칭</div>
   <button class="mbtn mbtn-orange" onclick="go('pg-matching')"><span class="mbtn-ico">🤝</span><span class="mbtn-info"><span class="mbtn-label">파트너 찾기</span><span class="mbtn-desc">혼자·둘이 왔어요 · 같이 칠 분 구해요</span></span><span class="mbtn-arr">›</span></button>
 
-  <div class="sec">📊 통계 · 순위</div>
-  <button class="mbtn mbtn-teal" onclick="go('pg-ranking')"><span class="mbtn-ico">🏅</span><span class="mbtn-info"><span class="mbtn-label">누적 랭킹 · 포인트</span><span class="mbtn-desc">평균 타수 · 누적 포인트 순위</span></span><span class="mbtn-arr">›</span></button>
-  <button class="mbtn mbtn-gray mbtn-lock" onclick="showPro()"><span class="mbtn-ico">📈</span><span class="mbtn-info"><span class="mbtn-label" style="color:var(--gray4)">상세 통계 · KPI</span><span class="mbtn-desc">월별 추이 · 구장 분석</span></span></button>
-  <button class="mbtn mbtn-gray mbtn-lock" onclick="showPro()"><span class="mbtn-ico">📸</span><span class="mbtn-info"><span class="mbtn-label" style="color:var(--gray4)">경기 사진 갤러리</span><span class="mbtn-desc">사진 저장 · 앨범</span></span></button>
+  <!-- ══ 내 랭킹 현황 ══ -->
+  <div class="sec">🏅 내 랭킹 현황</div>
+  <div id="home-my-rank" style="margin:0 14px 10px"></div>
+  <button class="mbtn mbtn-teal" onclick="go('pg-ranking')" style="margin-bottom:12px"><span class="mbtn-ico">📊</span><span class="mbtn-info"><span class="mbtn-label">전체 랭킹 보기</span><span class="mbtn-desc">참가자 전체 평균 타수 · 포인트 순위</span></span><span class="mbtn-arr">›</span></button>
 
-  <div style="margin:0 14px 12px;border-radius:14px;background:linear-gradient(135deg,#1a237e,#283593);border:1px solid #3949ab;padding:14px 16px;display:flex;align-items:center;gap:12px;color:var(--white);cursor:pointer;box-shadow:var(--sh)" onclick="showPro()">
-    <div style="font-size:28px">💎</div>
-    <div style="flex:1"><div style="font-size:14px;font-weight:900;margin-bottom:2px">Pro 플랜 준비 중</div><div style="font-size:11px;opacity:.8">무제한 · 사진 · 통계 · 얼리어답터 6개월 무료</div></div>
-    <div style="background:#ffd54f;color:#3b1d1d;font-size:10px;font-weight:900;padding:4px 9px;border-radius:99px">신청</div>
+  <!-- ══ 파크골프 뉴스 ══ -->
+  <div class="sec">📰 파크골프 소식</div>
+  <div id="home-news" style="margin:0 14px 10px;background:var(--white);border-radius:14px;box-shadow:var(--shs);overflow:hidden;border:1px solid var(--gray2)">
+    <div style="padding:12px 15px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--gray1)">
+      <span style="font-size:13px;font-weight:700;color:var(--text)">🏆 대회 · 뉴스</span>
+      <button onclick="loadParkgolfNews(true)" style="background:none;border:1px solid var(--g3);border-radius:20px;padding:2px 10px;font-size:11px;color:var(--g2);cursor:pointer;font-family:'Noto Sans KR',sans-serif">새로고침</button>
+    </div>
+    <div id="news-body" style="padding:12px 15px;font-size:13px;color:var(--gray3);text-align:center">불러오는 중...</div>
   </div>
+
+  <!-- ══ 파크골프 유튜브 ══ -->
+  <div class="sec">▶ 파크골프 유튜브</div>
+  <div id="home-youtube" style="margin:0 14px 10px;background:var(--white);border-radius:14px;box-shadow:var(--shs);overflow:hidden;border:1px solid var(--gray2)">
+    <div style="padding:12px 15px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--gray1)">
+      <span style="font-size:13px;font-weight:700;color:var(--text)">🎬 추천 영상</span>
+      <div style="display:flex;gap:6px">
+        <button onclick="loadYoutubeVideos('파크골프 대회',true)" style="background:none;border:1px solid var(--red);border-radius:20px;padding:2px 8px;font-size:10px;color:var(--red);cursor:pointer;font-family:'Noto Sans KR',sans-serif">대회</button>
+        <button onclick="loadYoutubeVideos('파크골프 레슨',true)" style="background:none;border:1px solid var(--g2);border-radius:20px;padding:2px 8px;font-size:10px;color:var(--g2);cursor:pointer;font-family:'Noto Sans KR',sans-serif">레슨</button>
+        <button onclick="loadYoutubeVideos('파크골프 장비',true)" style="background:none;border:1px solid var(--b2);border-radius:20px;padding:2px 8px;font-size:10px;color:var(--b2);cursor:pointer;font-family:'Noto Sans KR',sans-serif">장비</button>
+      </div>
+    </div>
+    <div id="youtube-body" style="padding:10px 14px;font-size:13px;color:var(--gray3);text-align:center">불러오는 중...</div>
+  </div>
+
+  <!-- ══ 주변 맛집 ══ -->
+  <div class="sec">🍽️ 구장 주변 맛집</div>
+  <div id="home-food" style="margin:0 14px 10px;background:var(--white);border-radius:14px;box-shadow:var(--shs);overflow:hidden;border:1px solid var(--gray2)">
+    <div style="padding:12px 15px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--gray1)">
+      <span style="font-size:13px;font-weight:700;color:var(--text)" id="food-location-label">📍 내 위치 주변</span>
+      <button onclick="loadNearbyFood()" style="background:none;border:1px solid var(--o2);border-radius:20px;padding:2px 10px;font-size:11px;color:var(--o2);cursor:pointer;font-family:'Noto Sans KR',sans-serif">위치 새로고침</button>
+    </div>
+    <div id="food-body" style="padding:12px 15px;font-size:13px;color:var(--gray3);text-align:center">위치 확인 중...</div>
+  </div>
+
   <div style="height:8px"></div>
   <!-- 관리자 진입 (하단 작게) -->
   <div style="text-align:center;padding:0 0 16px">
@@ -1364,9 +1393,241 @@ function renderHome() {
     <div class="kpi"><div class="kpi-n">${ms.length}</div><div class="kpi-l">전체 경기</div></div>
     <div class="kpi"><div class="kpi-n">${tp}</div><div class="kpi-l">누적 참가자</div></div>
     <div class="kpi"><div class="kpi-n">${done}</div><div class="kpi-l">완료 경기</div></div>`;
+  renderMyRankCard();
+  loadParkgolfNews();
+  loadYoutubeVideos('파크골프');
+  loadNearbyFood();
 }
 
-/* ══ 경기 만들기 ══ */
+/* ══ 내 랭킹 카드 ══ */
+function renderMyRankCard() {
+  const el = document.getElementById('home-my-rank');
+  if (!el || !S.user) return;
+  const myName = S.user.name;
+  const ms = Object.values(S.matches);
+
+  // 내가 참가한 경기에서 통계 계산
+  let totalGames = 0, totalStrokes = 0, totalMoney = 0;
+  ms.forEach(m => {
+    if (!m.players?.includes(myName)) return;
+    const sd = m.sd || {};
+    const sc = (sd[myName] || []).slice(0, m.holes);
+    const tot = sc.reduce((a, b) => a + b, 0);
+    if (tot > 0) { totalGames++; totalStrokes += tot; }
+    const ts = calcTotalSettle(m);
+    totalMoney += (ts[myName] || 0);
+  });
+
+  // 전체 순위 계산
+  const stats = {};
+  ms.forEach(m => {
+    const sd = m.sd || {};
+    m.players?.forEach(p => {
+      const sc = (sd[p] || []).slice(0, m.holes);
+      const tot = sc.reduce((a, b) => a + b, 0);
+      if (!stats[p]) stats[p] = { n: 0, sum: 0 };
+      if (tot > 0) { stats[p].n++; stats[p].sum += tot; }
+    });
+  });
+  const sorted = Object.entries(stats)
+    .filter(([, s]) => s.n > 0)
+    .map(([p, s]) => ({ p, avg: s.sum / s.n }))
+    .sort((a, b) => a.avg - b.avg);
+  const myRank = sorted.findIndex(r => r.p === myName) + 1;
+  const avgScore = totalGames > 0 ? (totalStrokes / totalGames).toFixed(1) : '-';
+  const rankLabel = myRank > 0 ? `전체 ${myRank}위` : '순위 없음';
+  const moneyColor = totalMoney > 0 ? 'var(--g2)' : totalMoney < 0 ? 'var(--red)' : 'var(--gray3)';
+  const moneyStr = totalMoney > 0 ? `+${fa(totalMoney)}` : totalMoney < 0 ? `-${fa(Math.abs(totalMoney))}` : '±0';
+
+  if (totalGames === 0) {
+    el.innerHTML = `<div style="background:var(--g5);border-radius:14px;padding:16px;border:1.5px solid var(--g4);text-align:center">
+      <div style="font-size:14px;color:var(--g2);font-weight:700;margin-bottom:4px">아직 기록이 없어요</div>
+      <div style="font-size:12px;color:var(--gray3)">경기에 참가하면 내 랭킹이 여기 표시돼요</div>
+    </div>`;
+    return;
+  }
+
+  // 달성률 바 (최고점 대비 내 평균)
+  const bestAvg = sorted[0]?.avg || 1;
+  const pct = Math.max(10, Math.min(100, Math.round((bestAvg / (parseFloat(avgScore) || bestAvg)) * 100)));
+
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#1b5e20,#2e7d32);border-radius:14px;padding:15px 16px;color:#fff;box-shadow:var(--sh)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-size:16px;font-weight:900">${myName} 님</div>
+        <div style="background:rgba(255,255,255,.18);border-radius:99px;padding:4px 11px;font-size:11px;font-weight:700">🏆 ${rankLabel}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
+        <div style="background:rgba(255,255,255,.12);border-radius:10px;padding:9px;text-align:center">
+          <div style="font-size:20px;font-weight:900;font-family:'Bebas Neue',sans-serif">${avgScore}</div>
+          <div style="font-size:9px;opacity:.8;margin-top:2px">평균 타수</div>
+        </div>
+        <div style="background:rgba(255,255,255,.12);border-radius:10px;padding:9px;text-align:center">
+          <div style="font-size:16px;font-weight:900;color:${moneyColor === 'var(--g2)' ? '#a5d6a7' : moneyColor === 'var(--red)' ? '#ef9a9a' : '#ccc'}">${moneyStr}</div>
+          <div style="font-size:9px;opacity:.8;margin-top:2px">누적 포인트</div>
+        </div>
+        <div style="background:rgba(255,255,255,.12);border-radius:10px;padding:9px;text-align:center">
+          <div style="font-size:20px;font-weight:900;font-family:'Bebas Neue',sans-serif">${totalGames}</div>
+          <div style="font-size:9px;opacity:.8;margin-top:2px">참가 경기</div>
+        </div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;opacity:.8;margin-bottom:4px">
+          <span>베스트 대비 내 위치</span><span>${pct}%</span>
+        </div>
+        <div style="height:6px;background:rgba(255,255,255,.2);border-radius:99px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:#ffd54f;border-radius:99px;transition:width .6s ease"></div>
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ══ 유튜브 영상 (YouTube Data API v3) ══ */
+let _ytLoaded = false;
+async function loadYoutubeVideos(query = '파크골프', force = false) {
+  if (_ytLoaded && !force) return;
+  const body = document.getElementById('youtube-body');
+  if (!body) return;
+  body.innerHTML = '<div style="padding:8px 0;color:var(--gray3);font-size:13px;text-align:center">⏳ 영상 검색 중...</div>';
+  try {
+    // 할당량 절약: search.list(100) 대신 캐싱된 재생목록 우선, 없으면 search
+    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=6&order=relevance&relevanceLanguage=ko&key=${YOUTUBE_KEY}`;
+    const r = await fetch(url);
+    const d = await r.json();
+    if (!d.items?.length) {
+      body.innerHTML = '<div style="padding:10px;color:var(--gray3);font-size:13px;text-align:center">영상을 찾지 못했어요</div>';
+      return;
+    }
+    _ytLoaded = true;
+    // 가로 스크롤 카드
+    body.innerHTML = `<div style="display:flex;gap:10px;overflow-x:auto;padding:2px 0 6px;-webkit-overflow-scrolling:touch;scrollbar-width:none">
+      ${d.items.map(v => {
+        const vid   = v.id.videoId;
+        const title = v.snippet.title.replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&amp;/g,'&');
+        const ch    = v.snippet.channelTitle;
+        const thumb = v.snippet.thumbnails?.medium?.url || v.snippet.thumbnails?.default?.url || '';
+        const date  = new Date(v.snippet.publishedAt).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
+        return `<div style="flex-shrink:0;width:150px;cursor:pointer" onclick="window.open('https://www.youtube.com/watch?v=${vid}','_blank')">
+          <div style="position:relative;width:150px;height:84px;border-radius:8px;overflow:hidden;background:#000">
+            <img src="${thumb}" style="width:100%;height:100%;object-fit:cover" loading="lazy">
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+              <div style="width:30px;height:30px;background:rgba(255,0,0,.85);border-radius:50%;display:flex;align-items:center;justify-content:center">
+                <div style="width:0;height:0;border-top:6px solid transparent;border-bottom:6px solid transparent;border-left:10px solid #fff;margin-left:2px"></div>
+              </div>
+            </div>
+          </div>
+          <div style="font-size:11px;font-weight:700;color:var(--text);margin-top:5px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${title}</div>
+          <div style="font-size:10px;color:var(--gray3);margin-top:2px">${ch} · ${date}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  } catch(e) {
+    body.innerHTML = '<div style="padding:10px;color:var(--gray3);font-size:13px;text-align:center">영상을 불러오지 못했어요</div>';
+  }
+}
+
+/* ══ 파크골프 뉴스 (Claude AI) ══ */
+let _newsLoaded = false;
+async function loadParkgolfNews(force = false) {
+  if (_newsLoaded && !force) return;
+  const body = document.getElementById('news-body');
+  if (!body) return;
+  body.innerHTML = '<div style="padding:8px 0;color:var(--gray3);font-size:13px;text-align:center">⏳ AI가 최신 소식을 검색 중...</div>';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+        messages: [{
+          role: 'user',
+          content: '한국 파크골프 최신 대회 일정, 뉴스, 행사 정보 3가지를 검색해서 아래 JSON 형식으로만 답해줘. 다른 말은 하지 말고 JSON만 출력해:\n[{"title":"제목","source":"출처","date":"날짜(예:오늘,어제,3일전)","url":"링크(없으면 빈문자열)"}]'
+        }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.filter(c => c.type === 'text').map(c => c.text).join('') || '';
+    const clean = text.replace(/```json|```/g, '').trim();
+    const news = JSON.parse(clean);
+    _newsLoaded = true;
+    body.innerHTML = news.map(n => `
+      <div style="display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--gray1);align-items:flex-start" class="${n.url ? 'node' : ''}" ${n.url ? `onclick="window.open('${n.url}','_blank')"` : ''}>
+        <div style="width:6px;height:6px;border-radius:50%;background:var(--g3);margin-top:5px;flex-shrink:0"></div>
+        <div style="flex:1">
+          <div style="font-size:13px;color:var(--text);line-height:1.5;font-weight:${n.url ? '700' : '400'}">${n.title}</div>
+          <div style="font-size:11px;color:var(--gray3);margin-top:2px">${n.source} · ${n.date}</div>
+        </div>
+        ${n.url ? '<div style="font-size:16px;color:var(--gray3);flex-shrink:0">›</div>' : ''}
+      </div>`).join('') + '<div style="height:4px"></div>';
+  } catch(e) {
+    body.innerHTML = `<div style="padding:10px 0;color:var(--gray3);font-size:13px;text-align:center">소식을 불러오지 못했어요<br><span style="font-size:11px">새로고침 버튼을 눌러 다시 시도해보세요</span></div>`;
+  }
+}
+
+/* ══ 주변 맛집 (카카오 로컬 API) ══ */
+const KAKAO_REST_KEY = '059a7981fef454926dd389d3994627d8';
+const YOUTUBE_KEY    = 'AIzaSyDsgn4InY8HjHk1FTSw2Pen-wz1OXMvQq4';
+let _foodLoaded = false;
+
+async function loadNearbyFood(force = false) {
+  if (_foodLoaded && !force) return;
+  const body = document.getElementById('food-body');
+  if (!body) return;
+  body.innerHTML = '<div style="padding:8px 0;color:var(--gray3);font-size:13px;text-align:center">📍 위치 확인 중...</div>';
+
+  if (!navigator.geolocation) {
+    body.innerHTML = '<div style="padding:10px;color:var(--gray3);font-size:13px;text-align:center">위치 서비스를 지원하지 않아요</div>';
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    async (pos) => {
+      const { latitude: lat, longitude: lng } = pos.coords;
+      // 카카오 로컬 - 반경 1km 음식점 카테고리 검색 (FD6 = 음식점)
+      try {
+        const r = await fetch(
+          `https://dapi.kakao.com/v2/local/search/category.json?category_group_code=FD6&x=${lng}&y=${lat}&radius=1000&sort=popularity&size=5`,
+          { headers: { Authorization: `KakaoAK ${KAKAO_REST_KEY}` } }
+        );
+        const d = await r.json();
+        if (!d.documents?.length) {
+          body.innerHTML = '<div style="padding:10px;color:var(--gray3);font-size:13px;text-align:center">주변 맛집 정보가 없어요</div>';
+          return;
+        }
+        _foodLoaded = true;
+        // 위치 라벨 업데이트
+        const labelEl = document.getElementById('food-location-label');
+        if (labelEl) labelEl.textContent = `📍 현재 위치 반경 1km`;
+
+        body.innerHTML = d.documents.map((p, i) => {
+          const dist = p.distance >= 1000
+            ? `${(p.distance / 1000).toFixed(1)}km`
+            : `${p.distance}m`;
+          const cat = p.category_name?.split('>').pop()?.trim() || '';
+          return `<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--gray1);cursor:pointer" onclick="window.open('${p.place_url}','_blank')">
+            <div style="width:22px;height:22px;border-radius:50%;background:var(--o5);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:var(--o2);flex-shrink:0">${i + 1}</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.place_name}</div>
+              <div style="font-size:11px;color:var(--gray3);margin-top:1px">${cat}${p.phone ? ' · ' + p.phone : ''}</div>
+            </div>
+            <div style="font-size:12px;color:var(--b2);font-weight:700;flex-shrink:0">${dist}</div>
+          </div>`;
+        }).join('') + '<div style="padding:8px 0 2px;font-size:11px;color:var(--gray3);text-align:center">카카오맵 기준 인기순</div>';
+      } catch(e) {
+        body.innerHTML = '<div style="padding:10px;color:var(--gray3);font-size:13px;text-align:center">맛집 정보를 불러오지 못했어요</div>';
+      }
+    },
+    () => {
+      body.innerHTML = `<div style="padding:12px;text-align:center">
+        <div style="font-size:13px;color:var(--gray3);margin-bottom:8px">위치 권한이 필요해요</div>
+        <div style="font-size:11px;color:var(--gray3)">브라우저에서 위치 접근을 허용해 주세요</div>
+      </div>`;
+    },
+    { timeout: 8000, maximumAge: 300000 }
+  );
+}
 async function createMatch() {
   const title  = V('c-title').trim();
   const date   = V('c-date');
