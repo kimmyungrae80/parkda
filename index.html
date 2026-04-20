@@ -884,35 +884,100 @@ select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg
    SB_KEY = 'eyJ...'
 ══════════════════════════════════════ */
 const SB_URL = 'https://szoxnkarkdxirbyxmzgr.supabase.co';
-const SB_KEY = 'sb_publishable_ePI5UTO6VfhUCWFF5a6wgw_J4ZWx5BG';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6b3hua2Fya2R4aXJieXhtemdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNDc5NDQsImV4cCI6MjA5MTcyMzk0NH0.Rm3y9LQT7rKASC3Cro2TDFG_b-VkH4HWAci3yURkZes';
 const SB_T   = 'parkda_store';
-const SB_OK  = () => false; // Supabase 연결 임시 비활성화 — localStorage 모드
+const SB_OK  = () => true; // ✅ Supabase 활성화
 
-/* ── DB 레이어 (로컬스토리지 ↔ Supabase 자동 전환) ── */
+/* ── DB 레이어 (localStorage ↔ Supabase 자동 전환 + 폴백) ── */
+let _sbOnline = null; // null=미확인, true=연결됨, false=오프라인
+
+function _sbHeaders(extra = {}) {
+  return { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, ...extra };
+}
+
+async function _sbFetch(url, opts = {}, timeout = 5000) {
+  const ctrl = new AbortController();
+  const tid = setTimeout(() => ctrl.abort(), timeout);
+  try {
+    const r = await fetch(url, { ...opts, signal: ctrl.signal });
+    clearTimeout(tid);
+    return r;
+  } catch(e) {
+    clearTimeout(tid);
+    throw e;
+  }
+}
+
 async function dbLoad(key, def = null) {
   const local = lsGet(key);
   if (!SB_OK()) return local ?? def;
   try {
-    const r = await fetch(`${SB_URL}/rest/v1/${SB_T}?key=eq.${key}&select=value`,
-      { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` } });
-    if (!r.ok) return local ?? def;
+    const r = await _sbFetch(
+      `${SB_URL}/rest/v1/${SB_T}?key=eq.${encodeURIComponent(key)}&select=value`,
+      { headers: _sbHeaders() }
+    );
+    if (!r.ok) { _sbOnline = false; return local ?? def; }
     const d = await r.json();
-    if (d && d[0]) { lsSet(key, d[0].value); return d[0].value; }
+    _sbOnline = true;
+    _updateSyncBadge(true);
+    if (d && d[0] && d[0].value !== undefined) {
+      lsSet(key, d[0].value); // 로컬에도 캐시
+      return d[0].value;
+    }
     return local ?? def;
-  } catch(e) { return local ?? def; }
+  } catch(e) {
+    _sbOnline = false;
+    _updateSyncBadge(false);
+    return local ?? def; // 네트워크 실패 → 로컬 폴백
+  }
 }
+
 async function dbSave(key, data) {
-  lsSet(key, data);
+  lsSet(key, data); // 로컬 우선 저장 (항상)
   if (!SB_OK()) return;
   try {
-    await fetch(`${SB_URL}/rest/v1/${SB_T}`, {
-      method: 'POST',
-      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`,
-        'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates,return=minimal' },
-      body: JSON.stringify({ key, value: data, updated_at: new Date().toISOString() })
-    });
-  } catch {}
+    const r = await _sbFetch(
+      `${SB_URL}/rest/v1/${SB_T}`,
+      {
+        method: 'POST',
+        headers: _sbHeaders({
+          'Content-Type': 'application/json',
+          Prefer: 'resolution=merge-duplicates,return=minimal'
+        }),
+        body: JSON.stringify({ key, value: data, updated_at: new Date().toISOString() })
+      }
+    );
+    if (r.ok) { _sbOnline = true; _updateSyncBadge(true); }
+    else { _sbOnline = false; _updateSyncBadge(false); }
+  } catch(e) {
+    _sbOnline = false;
+    _updateSyncBadge(false);
+  }
 }
+
+/* ── 동기화 상태 배지 (홈 화면 우측 상단 작게 표시) ── */
+function _updateSyncBadge(ok) {
+  let el = document.getElementById('sync-badge');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'sync-badge';
+    el.style.cssText = 'position:fixed;bottom:80px;right:12px;font-size:10px;padding:3px 8px;border-radius:99px;z-index:200;pointer-events:none;transition:opacity .3s';
+    document.body.appendChild(el);
+  }
+  if (ok) {
+    el.textContent = '☁️ 동기화됨';
+    el.style.background = 'rgba(46,125,50,.12)';
+    el.style.color = '#2e7d32';
+    el.style.opacity = '1';
+    setTimeout(() => { el.style.opacity = '0'; }, 2500);
+  } else {
+    el.textContent = '⚠️ 오프라인';
+    el.style.background = 'rgba(198,40,40,.10)';
+    el.style.color = '#c62828';
+    el.style.opacity = '1';
+  }
+}
+
 function lsGet(k) { try { return JSON.parse(localStorage.getItem('pd_' + k)); } catch { return null; } }
 function lsSet(k, v) { try { localStorage.setItem('pd_' + k, JSON.stringify(v)); } catch {} }
 
@@ -2181,20 +2246,26 @@ let MT = { venues: [], myRequest: null, selectedMatch: null };
 async function sbGet(table, params = '') {
   if (!SB_OK()) return [];
   try {
-    const r = await fetch(`${SB_URL}/rest/v1/${table}?${params}`,
-      { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` } });
+    const r = await _sbFetch(
+      `${SB_URL}/rest/v1/${table}?${params}`,
+      { headers: _sbHeaders() }
+    );
+    if (!r.ok) return [];
     return await r.json();
   } catch { return []; }
 }
 async function sbPost(table, data) {
   if (!SB_OK()) return null;
   try {
-    const r = await fetch(`${SB_URL}/rest/v1/${table}`, {
-      method: 'POST',
-      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`,
-        'Content-Type': 'application/json', Prefer: 'return=representation' },
-      body: JSON.stringify(data)
-    });
+    const r = await _sbFetch(
+      `${SB_URL}/rest/v1/${table}`,
+      {
+        method: 'POST',
+        headers: _sbHeaders({ 'Content-Type': 'application/json', Prefer: 'return=representation' }),
+        body: JSON.stringify(data)
+      }
+    );
+    if (!r.ok) return null;
     const d = await r.json();
     return Array.isArray(d) ? d[0] : d;
   } catch { return null; }
@@ -2202,12 +2273,14 @@ async function sbPost(table, data) {
 async function sbPatch(table, id, data) {
   if (!SB_OK()) return;
   try {
-    await fetch(`${SB_URL}/rest/v1/${table}?id=eq.${id}`, {
-      method: 'PATCH',
-      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`,
-        'Content-Type': 'application/json', Prefer: 'return=minimal' },
-      body: JSON.stringify(data)
-    });
+    await _sbFetch(
+      `${SB_URL}/rest/v1/${table}?id=eq.${id}`,
+      {
+        method: 'PATCH',
+        headers: _sbHeaders({ 'Content-Type': 'application/json', Prefer: 'return=minimal' }),
+        body: JSON.stringify(data)
+      }
+    );
   } catch {}
 }
 
