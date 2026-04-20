@@ -1526,59 +1526,70 @@ async function loadYoutubeVideos(query = '파크골프', force = false) {
   }
 }
 
-/* ══ 파크골프 뉴스 (Claude AI) ══ */
+/* ══ 파크골프 뉴스 (네이버 검색 RSS - CORS 우회) ══ */
 let _newsLoaded = false;
 async function loadParkgolfNews(force = false) {
   if (_newsLoaded && !force) return;
   const body = document.getElementById('news-body');
   if (!body) return;
-  body.innerHTML = '<div style="padding:8px 0;color:var(--gray3);font-size:13px;text-align:center">⏳ AI가 최신 소식을 검색 중...</div>';
+  body.innerHTML = '<div style="padding:8px 0;color:var(--gray3);font-size:13px;text-align:center">⏳ 소식 검색 중...</div>';
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'anthropic-dangerous-request-allow': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-        messages: [{
-          role: 'user',
-          content: '한국 파크골프 최신 대회 일정, 뉴스, 행사 정보 3가지를 검색해서 아래 JSON 형식으로만 답해줘. 다른 말은 하지 말고 JSON만 출력해:\n[{"title":"제목","source":"출처","date":"날짜(예:오늘,어제,3일전)","url":"링크(없으면 빈문자열)"}]'
-        }]
-      })
-    });
-    const data = await res.json();
-    // text 타입 블록만 모아서 JSON 파싱
-    const text = (data.content || [])
-      .filter(c => c.type === 'text')
-      .map(c => c.text)
-      .join('');
-    // ```json ... ``` 또는 [ ... ] 추출
-    const match = text.match(/\[[\s\S]*\]/);
-    if (!match) throw new Error('no json');
-    const news = JSON.parse(match[0]);
+    // allorigins.win 프록시로 네이버 뉴스 RSS CORS 우회
+    const query = encodeURIComponent('파크골프 대회');
+    const rssUrl = `https://search.naver.com/search.naver?where=news&query=${query}&sm=tab_opt&sort=1&output=rss`;
+    const proxy  = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
+    const r = await fetch(proxy, { signal: AbortSignal.timeout(8000) });
+    const d = await r.json();
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(d.contents, 'text/xml');
+    const items = [...xml.querySelectorAll('item')].slice(0, 4);
+    if (!items.length) throw new Error('empty');
     _newsLoaded = true;
-    body.innerHTML = news.map(n => `
-      <div style="display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--gray1);align-items:flex-start" class="${n.url ? 'node' : ''}" ${n.url ? `onclick="window.open('${n.url}','_blank')"` : ''}>
-        <div style="width:6px;height:6px;border-radius:50%;background:var(--g3);margin-top:5px;flex-shrink:0"></div>
-        <div style="flex:1">
-          <div style="font-size:13px;color:var(--text);line-height:1.5;font-weight:${n.url ? '700' : '400'}">${n.title}</div>
-          <div style="font-size:11px;color:var(--gray3);margin-top:2px">${n.source} · ${n.date}</div>
+    body.innerHTML = items.map(item => {
+      const title = item.querySelector('title')?.textContent?.replace(/<[^>]+>/g,'').trim() || '';
+      const link  = item.querySelector('link')?.textContent?.trim() || item.querySelector('originallink')?.textContent?.trim() || '';
+      const pub   = item.querySelector('pubDate')?.textContent?.trim() || '';
+      const src   = item.querySelector('source')?.textContent?.trim() || '네이버뉴스';
+      const dateStr = pub ? new Date(pub).toLocaleDateString('ko-KR',{month:'short',day:'numeric'}) : '';
+      return `<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--gray1);align-items:flex-start;cursor:pointer" onclick="window.open('${link}','_blank')">
+        <div style="width:6px;height:6px;border-radius:50%;background:var(--g3);margin-top:6px;flex-shrink:0"></div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;color:var(--text);line-height:1.5;font-weight:700;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${title}</div>
+          <div style="font-size:11px;color:var(--gray3);margin-top:3px">${src}${dateStr ? ' · ' + dateStr : ''}</div>
         </div>
-        ${n.url ? '<div style="font-size:16px;color:var(--gray3);flex-shrink:0">›</div>' : ''}
-      </div>`).join('') + '<div style="height:4px"></div>';
+        <div style="font-size:16px;color:var(--gray3);flex-shrink:0">›</div>
+      </div>`;
+    }).join('') + '<div style="height:4px"></div>';
   } catch(e) {
-    body.innerHTML = `<div style="padding:10px 0;color:var(--gray3);font-size:13px;text-align:center">소식을 불러오지 못했어요<br><span style="font-size:11px">새로고침 버튼을 눌러 다시 시도해보세요</span></div>`;
+    // RSS 실패 시 고정 링크 fallback
+    body.innerHTML = `
+      <div style="padding:10px 0;border-bottom:1px solid var(--gray1);cursor:pointer" onclick="window.open('https://search.naver.com/search.naver?where=news&query=파크골프+대회&sort=1','_blank')">
+        <div style="font-size:13px;font-weight:700;color:var(--b2)">🔍 네이버에서 파크골프 대회 뉴스 보기 ›</div>
+      </div>
+      <div style="padding:10px 0;cursor:pointer" onclick="window.open('https://search.naver.com/search.naver?where=news&query=파크골프+행사&sort=1','_blank')">
+        <div style="font-size:13px;font-weight:700;color:var(--b2)">🔍 네이버에서 파크골프 행사 정보 보기 ›</div>
+      </div>`;
+    _newsLoaded = true;
   }
 }
 
-/* ══ 주변 맛집 (카카오 로컬 API) ══ */
+/* ══ 주변 맛집 (카카오맵 JS SDK - CORS 없음) ══ */
 const KAKAO_REST_KEY = '059a7981fef454926dd389d3994627d8';
+const KAKAO_JS_KEY   = '1f61ed2143bb0567405d3c00a520cfce'; // JS 키 (플랫폼 키 화면에서 확인한 값)
 const YOUTUBE_KEY    = 'AIzaSyDsgn4InY8HjHk1FTSw2Pen-wz1OXMvQq4';
 let _foodLoaded = false;
+let _kakaoSdkReady = false;
+
+function loadKakaoSdk() {
+  return new Promise((resolve) => {
+    if (window.kakao && window.kakao.maps) { resolve(); return; }
+    const s = document.createElement('script');
+    s.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_JS_KEY}&libraries=services&autoload=false`;
+    s.onload = () => { kakao.maps.load(() => { _kakaoSdkReady = true; resolve(); }); };
+    s.onerror = () => resolve();
+    document.head.appendChild(s);
+  });
+}
 
 async function loadNearbyFood(force = false) {
   if (_foodLoaded && !force) return;
@@ -1594,44 +1605,45 @@ async function loadNearbyFood(force = false) {
   navigator.geolocation.getCurrentPosition(
     async (pos) => {
       const { latitude: lat, longitude: lng } = pos.coords;
-      // 카카오 로컬 - 반경 1km 음식점 카테고리 검색 (FD6 = 음식점)
+      body.innerHTML = '<div style="padding:8px 0;color:var(--gray3);font-size:13px;text-align:center">🍽️ 맛집 검색 중...</div>';
       try {
-        const r = await fetch(
-          `https://dapi.kakao.com/v2/local/search/category.json?category_group_code=FD6&x=${lng}&y=${lat}&radius=1000&sort=popularity&size=5`,
-          { headers: { Authorization: `KakaoAK ${KAKAO_REST_KEY}` } }
+        await loadKakaoSdk();
+        if (!_kakaoSdkReady) throw new Error('sdk fail');
+        const ps = new kakao.maps.services.Places();
+        ps.categorySearch('FD6',
+          (data, status) => {
+            if (status !== kakao.maps.services.Status.OK || !data.length) {
+              body.innerHTML = '<div style="padding:10px;color:var(--gray3);font-size:13px;text-align:center">주변 맛집 정보가 없어요</div>';
+              return;
+            }
+            _foodLoaded = true;
+            const labelEl = document.getElementById('food-location-label');
+            if (labelEl) labelEl.textContent = '📍 현재 위치 반경 1km';
+            body.innerHTML = data.slice(0,5).map((p, i) => {
+              const dist = +p.distance >= 1000
+                ? `${(+p.distance/1000).toFixed(1)}km`
+                : `${p.distance}m`;
+              const cat = p.category_name?.split('>').pop()?.trim() || '';
+              return `<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--gray1);cursor:pointer" onclick="window.open('${p.place_url}','_blank')">
+                <div style="width:22px;height:22px;border-radius:50%;background:var(--o5);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:var(--o2);flex-shrink:0">${i+1}</div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.place_name}</div>
+                  <div style="font-size:11px;color:var(--gray3);margin-top:1px">${cat}${p.phone?' · '+p.phone:''}</div>
+                </div>
+                <div style="font-size:12px;color:var(--b2);font-weight:700;flex-shrink:0">${dist}</div>
+              </div>`;
+            }).join('') + '<div style="padding:6px 0 2px;font-size:11px;color:var(--gray3);text-align:center">카카오맵 기준 인기순</div>';
+          },
+          { location: new kakao.maps.LatLng(lat, lng), radius: 1000, sort: kakao.maps.services.SortBy.POPULARITY }
         );
-        const d = await r.json();
-        if (!d.documents?.length) {
-          body.innerHTML = '<div style="padding:10px;color:var(--gray3);font-size:13px;text-align:center">주변 맛집 정보가 없어요</div>';
-          return;
-        }
-        _foodLoaded = true;
-        // 위치 라벨 업데이트
-        const labelEl = document.getElementById('food-location-label');
-        if (labelEl) labelEl.textContent = `📍 현재 위치 반경 1km`;
-
-        body.innerHTML = d.documents.map((p, i) => {
-          const dist = p.distance >= 1000
-            ? `${(p.distance / 1000).toFixed(1)}km`
-            : `${p.distance}m`;
-          const cat = p.category_name?.split('>').pop()?.trim() || '';
-          return `<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--gray1);cursor:pointer" onclick="window.open('${p.place_url}','_blank')">
-            <div style="width:22px;height:22px;border-radius:50%;background:var(--o5);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:var(--o2);flex-shrink:0">${i + 1}</div>
-            <div style="flex:1;min-width:0">
-              <div style="font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.place_name}</div>
-              <div style="font-size:11px;color:var(--gray3);margin-top:1px">${cat}${p.phone ? ' · ' + p.phone : ''}</div>
-            </div>
-            <div style="font-size:12px;color:var(--b2);font-weight:700;flex-shrink:0">${dist}</div>
-          </div>`;
-        }).join('') + '<div style="padding:8px 0 2px;font-size:11px;color:var(--gray3);text-align:center">카카오맵 기준 인기순</div>';
       } catch(e) {
         body.innerHTML = '<div style="padding:10px;color:var(--gray3);font-size:13px;text-align:center">맛집 정보를 불러오지 못했어요</div>';
       }
     },
     () => {
       body.innerHTML = `<div style="padding:12px;text-align:center">
-        <div style="font-size:13px;color:var(--gray3);margin-bottom:8px">위치 권한이 필요해요</div>
-        <div style="font-size:11px;color:var(--gray3)">브라우저에서 위치 접근을 허용해 주세요</div>
+        <div style="font-size:13px;color:var(--gray3);margin-bottom:6px">위치 권한이 필요해요</div>
+        <div style="font-size:11px;color:var(--gray3)">브라우저 설정에서 위치 접근을 허용해 주세요</div>
       </div>`;
     },
     { timeout: 8000, maximumAge: 300000 }
