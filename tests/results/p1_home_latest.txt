@@ -1,4 +1,4 @@
-2026-10-27T10:12:09 P1 PASS 36/36
+2026-10-27T14:07:04 P1 PASS 39/39
 PASS 비회원 첫 화면은 홈(로그인 강제 없음) 
 PASS 메인 서비스 순서 (구장→함께→대회→경기관리→유튜브→맛집→Club Pro) 전국 파크골프장 찾기 / 함께 칠 사람 찾기 / 전국 파크골프 대회 정보 / 자동 조편성 및 경기관리 / 파크골프 유튜브 / 구장 주변 맛집 / 동호회 운영자 Club Pro
 PASS 상단 메뉴·통합검색 존재 
@@ -17,11 +17,14 @@ PASS 유튜브 영상 목록 표시 (비회원) 가상 파크골프 영상
 가상채널
 299일 전
 PASS 유튜브 탭 전환: 선택 상태 표시 
+PASS 대회 정보: 외부 검색 링크 3개 (https, noopener, 새 창) count=3
+PASS 외부 뉴스 프록시 요청 없음 (allorigins) 
 PASS Club Pro 알림: 개인정보를 저장하지 않고 준비 중 안내만 
 PASS 로그인 후 홈 회원 영역 표시 
 PASS 상단 메뉴가 '내 경기'로 바뀜 
 PASS 회원: 경기관리 페이지 진입 
 PASS 회원: 새 경기 만들기 화면 진입 (기존 기능) 
+PASS 서비스워커 캐시: 외부 URL 없음 caches=['parkda-v2'] external=0
 PASS 미리보기(?local=1): Supabase 호출 0건 calls=0
 PASS 기존 게임 링크(?game=) 재방문 자동 참가 S.mid=TEST_PRESERVE_0001
 PASS 반응형 360px: 가로 스크롤 없음 scrollWidth=360
@@ -36,4 +39,4 @@ PASS 접근성: 모든 버튼·링크·입력에 이름 있음
 PASS 접근성: html lang=ko 
 PASS JavaScript 오류 없음 
 PASS 예기치 않은 대화상자 없음 
-PASS 외부 요청은 스텁/차단으로만 처리 (Supabase 실제 호출 없음) 차단된 외부 요청 24건
+PASS 외부 요청은 스텁/차단으로만 처리 (Supabase 실제 호출 없음) 차단된 외부 요청 26건

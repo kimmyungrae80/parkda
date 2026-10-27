@@ -336,6 +336,10 @@ select.fi{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg
 .hub-brand{font-size:22px;font-weight:900;letter-spacing:-.02em;color:var(--hub-green);text-decoration:none}
 body.hub-wide #app,body.hub-wide .tabbar{max-width:1100px}
 @media (min-width:1101px){body.hub-wide #app{box-shadow:0 0 0 1px var(--hub-line)}}
+.hub-ext{display:flex;justify-content:space-between;align-items:center;min-height:56px;padding:14px 18px;margin-top:10px;font-size:17px;font-weight:700;color:var(--hub-green);background:#fff;border:1.5px solid var(--hub-green);border-radius:14px;text-decoration:none}
+.hub-ext:hover{background:#eaf2eb}
+body.hub-wide .tab-ico{font-size:24px}
+body.hub-wide .tab-lbl{font-size:14px;font-weight:700}
 .hub-logo{height:36px;width:auto;vertical-align:middle;margin-right:8px}
 .hub-brand{display:inline-flex;align-items:center;gap:0}
 .hub-wm{font-family:'Bebas Neue','Noto Sans KR',sans-serif;font-size:26px;letter-spacing:.02em;color:var(--hub-green);margin-right:4px}
@@ -575,7 +579,7 @@ select.hub-input{flex:0 1 150px}
       <button class="hub-btn" type="submit">검색</button>
     </form>
     <p class="hub-note">구장 정보는 카카오 지도 검색 결과입니다. 방문 전 운영 여부를 꼭 확인하세요. 한 번에 최대 15곳을 보여드려요.</p>
-    <div id="venue-list" class="hub-list" aria-live="polite"></div>
+    <div id="venue-list" class="hub-list" aria-live="polite"><p class="hub-msg">지역을 고르거나 구장 이름을 입력한 뒤 검색 버튼을 누르세요.</p></div>
   </div>
 </div>
 
@@ -584,7 +588,7 @@ select.hub-input{flex:0 1 150px}
   <div class="hub-pad">
     <p class="hub-note">대회 소식과 뉴스를 모아 보여드려요. 일정과 참가 신청은 반드시 주최 측 공지에서 확인하세요.</p>
     <div class="hub-box">
-      <div class="hub-box-h"><h3>대회 · 뉴스</h3><button class="hub-btn-ghost" onclick="_newsLoaded=false;loadParkgolfNews(true)">새로고침</button></div>
+      <div class="hub-box-h"><h3>대회 · 뉴스</h3></div>
       <div id="news-body" class="hub-list"></div>
     </div>
   </div>
@@ -1835,7 +1839,7 @@ async function loadYoutubeVideos(query = '파크골프 대회', force = false) {
   }
 }
 
-/* ══ 파크골프 뉴스 (네이버 RSS + allorigins) ══ */
+/* ══ 파크골프 대회·뉴스 (외부 검색 링크) ══ */
 let _newsLoaded = false;
 
 function _relativeDate(d) {
@@ -1847,65 +1851,19 @@ function _relativeDate(d) {
 }
 
 async function loadParkgolfNews(force = false) {
-  if (_newsLoaded && !force) return;
+  // 제3자 CORS 프록시를 쓰지 않는다. 검색은 사용자가 직접 여는 외부 링크로만 제공한다.
   const body = document.getElementById('news-body');
-  if (!body) return;
-  _newsLoaded = false;
-  body.innerHTML = '<div style="padding:20px 0;color:var(--gray3);font-size:13px;text-align:center">⏳ 최신 소식 검색 중...</div>';
-
-  const queries = ['파크골프+대회', '파크골프+행사+일정'];
-  let allItems = [];
-
-  for (const q of queries) {
-    try {
-      const rssUrl = `https://search.naver.com/search.naver?where=news&query=${q}&sm=tab_opt&sort=1&output=rss`;
-      const proxy  = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
-      const r = await fetch(proxy, { signal: AbortSignal.timeout(7000) });
-      const d = await r.json();
-      const xml = new DOMParser().parseFromString(d.contents, 'text/xml');
-      [...xml.querySelectorAll('item')].slice(0, 3).forEach(item => {
-        const title = item.querySelector('title')?.textContent?.replace(/<[^>]+>/g,'').trim() || '';
-        const link  = item.querySelector('originallink')?.textContent?.trim() || item.querySelector('link')?.textContent?.trim() || '';
-        const pub   = item.querySelector('pubDate')?.textContent?.trim() || '';
-        const src   = item.querySelector('source')?.textContent?.trim() || '네이버뉴스';
-        const desc  = item.querySelector('description')?.textContent?.replace(/<[^>]+>/g,'').trim().slice(0,60) || '';
-        const dateStr = pub ? _relativeDate(new Date(pub)) : '';
-        if (title && link) allItems.push({ title, link, src, dateStr, desc });
-      });
-    } catch(e) {}
-  }
-
-  const seen = new Set();
-  allItems = allItems.filter(n => { if (seen.has(n.title)) return false; seen.add(n.title); return true; }).slice(0, 5);
+  if (!body || (_newsLoaded && !force)) return;
   _newsLoaded = true;
-
-  if (allItems.length) {
-    body.innerHTML = allItems.map((n, i) => `
-      <div onclick="window.open('${safeUrl(n.link)}','_blank')" style="display:flex;gap:12px;padding:14px 0;border-bottom:${i < allItems.length-1 ? '1px solid var(--gray1)' : 'none'};cursor:pointer;align-items:flex-start">
-        <div style="width:34px;height:34px;border-radius:8px;background:var(--g5);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">📰</div>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:14px;font-weight:700;color:var(--text);line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${escHtml(n.title)}</div>
-          ${n.desc ? `<div style="font-size:12px;color:var(--gray3);margin-top:3px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden">${escHtml(n.desc)}...</div>` : ''}
-          <div style="font-size:11px;color:var(--gray3);margin-top:5px;display:flex;gap:5px;align-items:center">
-            <span style="background:var(--g5);color:var(--g2);border-radius:4px;padding:1px 7px;font-weight:700;font-size:10px">${n.src}</span>
-            <span>${n.dateStr}</span>
-          </div>
-        </div>
-        <div style="color:var(--gray3);font-size:20px;flex-shrink:0;margin-top:2px">›</div>
-      </div>`).join('');
-  } else {
-    body.innerHTML = `
-      <div onclick="window.open('https://search.naver.com/search.naver?where=news&query=파크골프+대회&sort=1','_blank')" style="display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--gray1);cursor:pointer">
-        <div style="width:34px;height:34px;border-radius:8px;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🏆</div>
-        <div style="flex:1"><div style="font-size:14px;font-weight:700;color:var(--b2)">파크골프 대회 뉴스 검색</div><div style="font-size:12px;color:var(--gray3);margin-top:2px">네이버 뉴스에서 최신 대회 정보 보기</div></div>
-        <div style="color:var(--gray3);font-size:20px">›</div>
-      </div>
-      <div onclick="window.open('https://search.naver.com/search.naver?where=news&query=파크골프+행사&sort=1','_blank')" style="display:flex;align-items:center;gap:12px;padding:14px 0;cursor:pointer">
-        <div style="width:34px;height:34px;border-radius:8px;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📅</div>
-        <div style="flex:1"><div style="font-size:14px;font-weight:700;color:var(--b2)">파크골프 행사 일정 검색</div><div style="font-size:12px;color:var(--gray3);margin-top:2px">네이버 뉴스에서 행사 정보 보기</div></div>
-        <div style="color:var(--gray3);font-size:20px">›</div>
-      </div>`;
-  }
+  const q = encodeURIComponent('파크골프 대회');
+  const links = [
+    ['네이버 뉴스', 'https://search.naver.com/search.naver?where=news&query=' + q + '&sort=1'],
+    ['구글 뉴스', 'https://news.google.com/search?q=' + q + '&hl=ko&gl=KR'],
+    ['유튜브 대회 영상', 'https://www.youtube.com/results?search_query=' + q],
+  ];
+  body.innerHTML = links.map(([label, url]) =>
+    `<a class="hub-ext" href="${escHtml(safeUrl(url))}" target="_blank" rel="noopener noreferrer">${escHtml(label)}에서 “파크골프 대회” 보기 <span aria-hidden="true">↗</span><span class="hub-sr">(외부 사이트로 이동)</span></a>`
+  ).join('');
 }
 
 /* ══ 주변 맛집 (카카오맵 JS SDK) ══ */

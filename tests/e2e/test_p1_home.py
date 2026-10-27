@@ -119,6 +119,13 @@ def main():
             pg.click("#ytab-레슨"); time.sleep(0.3)
             check("유튜브 탭 전환: 선택 상태 표시", pg.get_attribute("#ytab-레슨", "class").find("on") >= 0)
 
+            # ── E2. 대회 정보: 외부 검색 링크 (프록시 없음) ──
+            pg.evaluate("go('pg-tournaments')"); time.sleep(0.3)
+            links = pg.eval_on_selector_all("#news-body a.hub-ext", "els => els.map(e => [e.getAttribute('href'), e.getAttribute('rel'), e.getAttribute('target')])")
+            check("대회 정보: 외부 검색 링크 3개 (https, noopener, 새 창)",
+                  len(links) == 3 and all(h.startswith("https://") and "noopener" in r and t == "_blank" for h, r, t in links), f"count={len(links)}")
+            check("외부 뉴스 프록시 요청 없음 (allorigins)", not any("allorigins" in u for u in blocked), "")
+
             # ── F. Club Pro: 비회원은 로그인 안내 ──
             pg.evaluate("go('pg-club')"); pg.click("#pg-club .hub-btn-big")
             time.sleep(0.3)
@@ -138,6 +145,21 @@ def main():
             check("회원: 경기관리 페이지 진입", pg.evaluate("document.getElementById('pg-mgmt').classList.contains('on')"))
             pg.click("button.hub-act-big >> nth=0"); time.sleep(0.3)
             check("회원: 새 경기 만들기 화면 진입 (기존 기능)", pg.evaluate("document.getElementById('pg-create').classList.contains('on')"))
+            ctx.close()
+
+            # ── K. 서비스워커 캐시에 외부 응답이 없는지 (브라우저 실측) ──
+            ctx, pg = new_page(390, 844)
+            pg.goto(BASE); time.sleep(0.5)
+            pg.evaluate("go('pg-video')"); time.sleep(1.0)
+            pg.evaluate("go('pg-venues')"); time.sleep(0.5)
+            cache_info = pg.evaluate("""async () => {
+                if (!('caches' in window)) return {supported: false, keys: [], external: []};
+                const keys = await caches.keys(); const external = [];
+                for (const k of keys) { const c = await caches.open(k); for (const r of await c.keys()) if (!r.url.startsWith(location.origin)) external.push(r.url); }
+                return {supported: true, keys, external};
+            }""")
+            check("서비스워커 캐시: 외부 URL 없음", cache_info["supported"] and not cache_info["external"],
+                  f"caches={cache_info['keys']} external={len(cache_info['external'])}")
             ctx.close()
 
             # ── J. 미리보기 모드(?local=1): 운영 Supabase 호출 없음 ──

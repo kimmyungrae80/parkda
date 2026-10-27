@@ -108,8 +108,12 @@ def main():
             check("결과 표 생성", len(page.inner_text("#result-tbl")) > 0 or len(page.inner_text("#result-total-area")) > 0)
 
             # ── 7. 결과 공유 (텍스트 생성, 예외 없음) ──
+            page.evaluate("""() => { window.__shared = null;
+                navigator.clipboard.writeText = (t) => { window.__shared = t; return Promise.resolve(); }; }""")
             page.evaluate("shareKakao()"); time.sleep(0.3)
-            check("카카오 공유 텍스트 생성 오류 없음", True)
+            shared = page.evaluate("window.__shared") or ""
+            check("결과 공유: 게임코드·경기명·참가 링크 포함", code in shared and FIX["match"]["title"] in shared and "?game=" in shared,
+                  f"len={len(shared)}")
 
             # ── 8. 게임코드 참여 (같은 기기 로컬 검색) ──
             page.evaluate("c => { document.getElementById('join-code').value = c; }", code)
