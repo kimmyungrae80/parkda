@@ -1195,13 +1195,7 @@ async function init() {
   }
 
   // 로그인 상태 확인
-  // 백업 데이터 주입 (Supabase 연결 전까지 localStorage에 보존)
-  if (!lsGet('matches') || Object.keys(lsGet('matches')||{}).length === 0) {
-    try {
-      const backup = {"MMO5JH8MT": {"by": "윤무효", "gs": 4, "id": "MMO5JH8MT", "sd": {"유재찬": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "윤무효": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "정순애": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "최진태": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, "par": [4, 3, 4, 3, 4, 3, 4, 3, 4, 4, 3, 4, 3, 4, 3, 4, 3, 4, 4, 3, 4, 3, 4, 3, 4, 3, 4, 4, 3, 4, 3, 4, 3, 4, 3, 4], "code": "79SR", "date": "2026-04-23", "unit": 100, "holes": 36, "title": "4월4주정기모임", "course": "대저 파크골프장2구장A.B.C.D", "groups": [{"no": 1, "leader": "윤무효", "players": ["윤무효", "정순애", "유재찬", "최진태"]}, {"no": 2, "leader": "박문옥", "players": ["박문옥", "박복례", "양봉태", "김태선"]}, {"no": 3, "leader": "임해수", "players": ["임해수", "공연이", "신규선", "주우길"]}, {"no": 4, "leader": "김해균", "players": ["김해균", "윤은숙", "최재숙", "신상수"]}, {"no": 5, "leader": "김영애", "players": ["김영애", "강자야", "이정희", "성낙한"]}, {"no": 6, "leader": "전덕남", "players": ["전덕남"]}], "status": "done", "players": ["윤무효", "신규선", "김해균", "주우길", "성낙한", "박문옥", "최진태", "유재찬", "임해수", "신상수", "양봉태", "전덕남", "공연이", "정순애", "강자야", "윤은숙", "최재숙", "김영애", "이정희", "박복례", "김태선"], "createdAt": "2026-04-19T09:03:54.102Z", "manualLogs": []}};
-      lsSet('matches', backup);
-    } catch(e) {}
-  }
+  // 샘플 경기 데이터 자동 주입 제거 (실명·경기 기록 포함, 개인정보 보호)
 
   const u = lsGet('user');
   if (u && u.name && u.phone) {
@@ -1993,7 +1987,8 @@ function onSI(el) {
   if (!canEdit()) { el.value = ''; toast('조장만 입력할 수 있어요 🔒'); return; }
   const v = +el.value, par = S.matches[S.mid].par[+el.dataset.h];
   el.className = 'sinp';
-  if (v > 0) el.classList.add(v < par ? 'un' : v > par ? 'ov' : '');
+  const cls = v < par ? 'un' : v > par ? 'ov' : '';
+  if (v > 0 && cls) el.classList.add(cls); // 파(par)와 같으면 클래스 없음 (빈 토큰 add 오류 방지)
   updLive();
 }
 function updLive() {
