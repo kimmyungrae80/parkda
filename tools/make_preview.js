@@ -14,7 +14,7 @@ const rules = [
   [/const SB_URL = '[^']*';/, "const SB_URL = '';"],
   [/const KAKAO_KEY = '[^']*';/, "const KAKAO_KEY = ''; // 미리보기: 카카오 로그인 키 제거"],
   [/const SB_KEY = '[^']*';/, "const SB_KEY = '';"],
-  [/const SB_OK  = \(\) => !new URLSearchParams\(location\.search\)\.has\('local'\);[^\n]*/, "const SB_OK  = () => false; // 미리보기: 운영 DB 연결 없음"],
+  [/const SB_OK\s*= \(\) => [^\n]*/, "const SB_OK  = () => false; // 미리보기: 운영 DB 연결 없음"],
   [/const ADMIN_PW = '[^']*';/, "const ADMIN_PW = null; // 미리보기: 관리자 로그인 불가"],
 ];
 for (const [re, rep] of rules) {

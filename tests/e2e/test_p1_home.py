@@ -89,12 +89,12 @@ def main():
             check("비회원 첫 화면은 홈(로그인 강제 없음)", pg.evaluate("document.getElementById('pg-home').classList.contains('on')"))
             titles = pg.eval_on_selector_all(".hub-grid .hub-card .hub-t", "els => els.map(e => e.textContent.trim())")
             expected = ["전국 파크골프장 찾기", "함께 칠 사람 찾기", "전국 파크골프 대회 정보",
-                        "자동 조편성 및 경기관리", "파크골프 유튜브", "구장 주변 맛집", "동호회 운영자 Club Pro"]
+                        "자동 조편성 및 경기관리", "파크골프 유튜브", "구장 주변 맛집", "동호회", "동호회 운영자 Club Pro"]
             check("메인 서비스 순서 (구장→함께→대회→경기관리→유튜브→맛집→Club Pro)", titles == expected, " / ".join(titles))
             check("상단 메뉴·통합검색 존재", pg.locator(".hub-nav").count() == 1 and pg.locator("#hub-q").count() == 1 and pg.locator("#hub-region").count() == 1)
             check("지역 선택 목록 채워짐", pg.locator("#hub-region option").count() >= 18, f"options={pg.locator('#hub-region option').count()}")
             lock_count = pg.locator(".hub-lock").count()
-            check("회원 전용 항목에만 로그인 표시", lock_count == 2, f"locks={lock_count}")
+            check("회원 전용 항목에만 로그인 표시 (경기관리)", lock_count == 1, f"locks={lock_count}")
             check("로고 이미지 포함", pg.locator(".hub-logo").count() == 1)
 
             # ── B. 비회원: 회원 전용 기능은 로그인으로 안내 ──
