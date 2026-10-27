@@ -1,0 +1,14 @@
+{
+  "id": "3068008",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 충청남도 서산시_공공체육시설_20260120",
+  "source_url": "https://www.data.go.kr/data/3068008/fileData.do",
+  "publisher": "충청남도 서산시",
+  "dataset_updated": "2026-01-20",
+  "collected_at": "2026-10-27T07:47:17+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/3068008.csv",
+  "sha256": "4f1118b6b7a106de2a348cbde78f83055f9b9a3154d0781bba90597fc91f2133",
+  "bytes": 3815
+}

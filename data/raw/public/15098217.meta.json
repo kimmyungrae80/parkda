@@ -1,0 +1,14 @@
+{
+  "id": "15098217",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 전북특별자치도 정읍시_체육시설 대관요금 목록_20240701",
+  "source_url": "https://www.data.go.kr/data/15098217/fileData.do",
+  "publisher": "전북특별자치도 정읍시",
+  "dataset_updated": "2026-01-13",
+  "collected_at": "2026-10-27T07:44:57+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15098217.csv",
+  "sha256": "0af7e47e30bd238afe018074b516784c0ed1c8422fe6f8dcd3fa4f8cc47ed784",
+  "bytes": 1405
+}

@@ -1,0 +1,14 @@
+{
+  "id": "15061935",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 대전광역시_민간체육시설 현황_20220830",
+  "source_url": "https://www.data.go.kr/data/15061935/fileData.do",
+  "publisher": "대전광역시",
+  "dataset_updated": "2023-03-20",
+  "collected_at": "2026-10-27T07:45:23+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15061935.csv",
+  "sha256": "0d02b10bc266fd09f230fbb34eb40791b81d9059571027f613fb43b9260846b4",
+  "bytes": 39345
+}

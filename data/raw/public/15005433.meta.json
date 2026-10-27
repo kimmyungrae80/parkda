@@ -1,0 +1,14 @@
+{
+  "id": "15005433",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 서울특별시 송파구_체육시설_20240630",
+  "source_url": "https://www.data.go.kr/data/15005433/fileData.do",
+  "publisher": "서울특별시 송파구",
+  "dataset_updated": "2026-10-24",
+  "collected_at": "2026-10-27T07:43:03+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15005433.csv",
+  "sha256": "45f9d7b4945cc76070250a161f4578b9f83ea1d4e3d6ed02e5607cd43f5aaf1b",
+  "bytes": 63206
+}

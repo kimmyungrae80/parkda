@@ -1,0 +1,14 @@
+{
+  "id": "15005028",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 문경관광진흥공단 체육시설 현황(2015)",
+  "source_url": "https://www.data.go.kr/data/15005028/fileData.do",
+  "publisher": "문경관광진흥공단",
+  "dataset_updated": "2016-06-24",
+  "collected_at": "2026-10-27T07:46:20+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15005028.csv",
+  "sha256": "2c652edfc78ab4f47e066fbba47fc7668d7c1a1efb0c74de50007932278d5f4a",
+  "bytes": 6735
+}

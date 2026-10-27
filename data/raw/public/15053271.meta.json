@@ -1,0 +1,14 @@
+{
+  "id": "15053271",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 대구광역시 달서구_생활체육시설 현황_20260508",
+  "source_url": "https://www.data.go.kr/data/15053271/fileData.do",
+  "publisher": "대구광역시 달서구",
+  "dataset_updated": "2026-05-13",
+  "collected_at": "2026-10-27T07:47:06+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15053271.csv",
+  "sha256": "0abd7e8b10513458a8331b84068df20793c2d242e7f317e190f303b901e621dd",
+  "bytes": 44886
+}

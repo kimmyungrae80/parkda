@@ -108,17 +108,29 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--keyword", default="파크골프")
     ap.add_argument("--max-pages", type=int, default=3)
+    ap.add_argument("--force", action="store_true", help="이미 끝난 데이터셋도 다시 받는다")
     args = ap.parse_args()
     ids = discover(args.keyword, args.max_pages)
     print(f"후보 데이터셋 {len(ids)}개")
+    RAW.mkdir(parents=True, exist_ok=True)
+    progress_path = RAW / "_progress.json"  # 중단돼도 이어서 실행: 끝난 데이터셋은 건너뜀
+    progress = json.loads(progress_path.read_text(encoding="utf-8")) if progress_path.exists() else {}
+    DONE = {"ok", "no_file", "excluded_topic", "captcha_or_login_required"}
     results = []
     for dsid in ids:
+        if not args.force and progress.get(dsid) in DONE and (RAW / f"{dsid}.meta.json").exists():
+            results.append(json.loads((RAW / f"{dsid}.meta.json").read_text(encoding="utf-8")))
+            continue
         try:
             rec = collect_one(dsid)
         except Exception as e:  # 한 건 실패가 전체를 멈추지 않도록
             rec = {"id": dsid, "status": "error", "error": str(e)[:200]}
         results.append(rec)
-        print(f"  {dsid}: {rec['status']} {rec.get('publisher') or ''} {rec.get('bytes', '')}")
+        if rec["status"] != "ok":  # 실패·제외도 사유를 남긴다 (분류 보고서용)
+            (RAW / f"{dsid}.meta.json").write_text(json.dumps(rec, ensure_ascii=False, indent=2), encoding="utf-8")
+        progress[dsid] = rec["status"]
+        progress_path.write_text(json.dumps(progress, ensure_ascii=False, indent=1), encoding="utf-8")
+        print(f"  {dsid}: {rec['status']} {rec.get('publisher') or ''} {rec.get('bytes', '')}", flush=True)
     RAW.mkdir(parents=True, exist_ok=True)
     summary = RAW / "_collect_summary.json"
     summary.write_text(json.dumps({"keyword": args.keyword, "run_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),

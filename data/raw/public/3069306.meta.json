@@ -1,0 +1,14 @@
+{
+  "id": "3069306",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 부산광역시 북구 체육시설 현황_20260714",
+  "source_url": "https://www.data.go.kr/data/3069306/fileData.do",
+  "publisher": "부산광역시 북구",
+  "dataset_updated": "2026-07-14",
+  "collected_at": "2026-10-27T07:42:51+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/3069306.csv",
+  "sha256": "5c41c2d1b9a99e06a717a37ee48dfeb599e36f3448b801aa767a8bb2b8c4e1fd",
+  "bytes": 24507
+}

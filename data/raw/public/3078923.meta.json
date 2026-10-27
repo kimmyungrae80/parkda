@@ -1,0 +1,14 @@
+{
+  "id": "3078923",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 부산광역시_동래구_체육시설현황_20260914",
+  "source_url": "https://www.data.go.kr/data/3078923/fileData.do",
+  "publisher": "부산광역시 동래구",
+  "dataset_updated": "2026-09-14",
+  "collected_at": "2026-10-27T07:47:28+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/3078923.csv",
+  "sha256": "cd9f7f004cb19f692e820136f77d9d76cea616b5b3a54404eed325c1615a8c55",
+  "bytes": 2623
+}

@@ -1,0 +1,14 @@
+{
+  "id": "15075286",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 동해시시설관리공단_체육시설 예약정보_20201201",
+  "source_url": "https://www.data.go.kr/data/15075286/fileData.do",
+  "publisher": "동해시시설관리공단",
+  "dataset_updated": "2022-01-18",
+  "collected_at": "2026-10-27T07:48:31+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15075286.csv",
+  "sha256": "1b5a2a525154fc86bfba1e08e09df6ef9bcbc231c553439395a0ebd2d2809e93",
+  "bytes": 217
+}

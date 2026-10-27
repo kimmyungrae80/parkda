@@ -1,0 +1,14 @@
+{
+  "id": "3045764",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 부산광역시_사하구_체육시설업 신고 현황_20260910",
+  "source_url": "https://www.data.go.kr/data/3045764/fileData.do",
+  "publisher": "부산광역시 사하구",
+  "dataset_updated": "2026-09-10",
+  "collected_at": "2026-10-27T07:48:11+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/3045764.csv",
+  "sha256": "bd7b1777d7f70f9fd565e3df9d458a51073d3eeb64461fec0070c6e02dae72e4",
+  "bytes": 45163
+}

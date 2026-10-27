@@ -358,6 +358,7 @@ a.hub-act,a.hub-act-g{display:inline-flex;align-items:center;justify-content:cen
 .hub-fav.on{border-color:#b8860b}
 .hub-badge{display:inline-block;margin:6px 0 10px;padding:4px 10px;font-size:14px;font-weight:700;color:var(--hub-green);background:#eaf2eb;border-radius:99px}
 .hub-pending{color:var(--hub-mute);font-style:italic}
+.hub-badge-warn{color:#8a5a00;background:#fff4dc}
 .hub-sub{font-size:18px;font-weight:800;margin:18px 0 6px}
 .hub-toggle{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
 .hub-check{display:inline-flex;align-items:center;gap:8px;min-height:44px;font-size:16px;margin-left:auto}
@@ -1527,8 +1528,8 @@ async function filterVenues() {
     (!region || c.region === region) &&
     (!favOnly || fav.includes(c.id)) &&
     words.every(w => ((c.name || '') + ' ' + (c.address || '') + ' ' + (c.city || '') + ' ' + (c.region || '')).toLowerCase().includes(w)));
-  const withCoord = _shown.filter(c => c.latitude != null && c.longitude != null).length;
-  const summary = `<p class="hub-note">공식 자료에 있는 구장 ${_shown.length}곳 (전체 ${courses.length}곳). 좌표가 있는 곳 ${withCoord}곳. 전국 전체 구장이 아니며, 지역을 순차적으로 넓혀 가고 있어요.</p>`;
+  const withCoord = _shown.filter(c => c.map_visible).length;
+  const summary = `<p class="hub-note">검색 결과 ${_shown.length}곳 · 지도에 표시 가능 ${withCoord}곳 (전체 ${courses.length}곳). 좌표가 없는 구장도 목록에서 볼 수 있어요. 전국 전체 구장이 아니며 지역을 넓혀 가고 있어요.</p>`;
   if (!_shown.length) {
     list.innerHTML = summary + hubMsg(courses.length ? '조건에 맞는 구장이 없어요. 지역이나 검색어를 바꿔 보세요.' : '아직 등록된 구장이 없어요.');
     return;
@@ -1544,6 +1545,7 @@ function venueCardHtml(c, i, isFav) {
     </div>
     <p class="hub-vs">${val(c.address)}</p>
     <p class="hub-vs">${val(c.holes, '홀')} · 이용료 ${val(c.fee)}</p>
+    ${(c.flags || []).includes('closed_suspected') ? '<p class="hub-badge hub-badge-warn">폐쇄·휴장 가능성 (확인 필요)</p>' : ''}
     <p class="hub-badge">${escHtml(STATUS_LABEL[c.verification_status] || '')}</p>
     <div class="hub-acts"><a class="hub-act hub-act-g" href="#/course/${escHtml(c.id)}">상세 보기</a></div>
   </article>`;
@@ -1575,11 +1577,11 @@ function loadLeaflet() {
 async function renderVenueMap() {
   const wrap = document.getElementById('venue-map');
   if (!wrap) return;
-  const pts = _shown.filter(c => c.latitude != null && c.longitude != null);
+  const pts = _shown.filter(c => c.map_visible && c.latitude != null && c.longitude != null);  // 약한 일치 좌표는 표시하지 않음
   try { await loadLeaflet(); } catch (e) { wrap.innerHTML = hubMsg('지도를 불러오지 못했어요. 목록 보기를 이용해 주세요.'); return; }
   if (_mapInstance) { _mapInstance.remove(); _mapInstance = null; }
   wrap.innerHTML = '';
-  if (!pts.length) { wrap.innerHTML = hubMsg('이 조건에서 좌표가 있는 구장이 없어요.'); return; }
+  if (!pts.length) { wrap.innerHTML = hubMsg('이 조건에서 지도에 표시할 수 있는 검증된 좌표가 없어요. 목록에서 확인해 주세요.'); return; }
   const map = L.map(wrap).setView([pts[0].latitude, pts[0].longitude], 10);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 18, attribution: '© OpenStreetMap contributors',
@@ -1587,7 +1589,7 @@ async function renderVenueMap() {
   const bounds = [];
   pts.forEach(c => {
     const m = L.marker([c.latitude, c.longitude]).addTo(map);
-    const note = c.coordinate_source === 'osm_nominatim' ? '<br><small>주소 기반 자동 좌표 (실제와 차이 가능)</small>' : '';
+    const note = c.coordinate_match === 'official_coord' ? '<br><small>공공데이터 좌표</small>' : '<br><small>주소 기반 자동 좌표 (실제와 차이 가능)</small>';
     m.bindPopup(`<strong>${escHtml(c.name)}</strong><br>${escHtml(c.address || '')}${note}<br><a href="#/course/${escHtml(c.id)}">상세 보기</a>`);
     bounds.push([c.latitude, c.longitude]);
   });
@@ -1610,15 +1612,17 @@ async function openCourseFromHash() {
 }
 function renderCourse(c) {
   const body = document.getElementById('course-body');
-  const hasCoord = c.latitude != null && c.longitude != null;
+  const hasCoord = !!c.map_visible && c.latitude != null && c.longitude != null;  // 검증된 좌표만 위치로 사용
   const isFav = favIds().includes(c.id);
   const directions = hasCoord
     ? `https://map.kakao.com/link/to/${encodeURIComponent(c.name)},${c.latitude},${c.longitude}`
     : `https://map.kakao.com/?q=${encodeURIComponent(c.address || c.name)}`;
   const phone = c.phone ? `<a href="tel:${escHtml(String(c.phone).replace(/[^0-9+]/g, ''))}">${escHtml(c.phone)}</a>` : `<span class="hub-pending">${PENDING}</span>`;
-  const coordNote = c.coordinate_source === 'osm_nominatim'
-    ? `<p class="hub-vs">좌표: 주소 기반 자동 지오코딩. 실제 위치와 차이가 있을 수 있어요. © OpenStreetMap contributors</p>`
-    : (hasCoord ? `<p class="hub-vs">좌표: 공공데이터 제공값</p>` : `<p class="hub-vs">좌표: <span class="hub-pending">${PENDING}</span></p>`);
+  const coordNote = c.coordinate_match === 'official_coord'
+    ? `<p class="hub-vs">위치: 공공데이터 제공 좌표</p>`
+    : (hasCoord
+        ? `<p class="hub-vs">위치: 주소 기반 자동 좌표 (실제 위치와 차이 가능). © OpenStreetMap contributors</p>`
+        : `<p class="hub-vs">위치: <span class="hub-pending">위치 확인 중</span> — 지도에 표시하지 않고 주소 검색 링크를 제공합니다.</p>`);
   const sources = (c.sources || []).map(s => `<li><a href="${escHtml(safeUrl(s.source_url))}" target="_blank" rel="noopener noreferrer">${escHtml(s.source_name)}</a> · 수집 ${escHtml(s.collected_at)}${s.dataset_updated ? ' · 자료 수정일 ' + escHtml(s.dataset_updated) : ''}</li>`).join('');
   body.innerHTML = `
     <article class="hub-course">
@@ -1694,8 +1698,8 @@ async function loadFood() {
   const list = document.getElementById('food-list');
   const c = window._course;
   if (!list || !c) return;
-  if (c.latitude == null || c.longitude == null) {
-    list.innerHTML = hubMsg('이 구장은 좌표가 아직 없어 주변 검색을 할 수 없어요.');
+  if (!c.map_visible || c.latitude == null || c.longitude == null) {
+    list.innerHTML = hubMsg('이 구장은 위치가 아직 확인되지 않아 주변 검색을 할 수 없어요.');
     return;
   }
   list.innerHTML = hubMsg('검색하고 있어요...');

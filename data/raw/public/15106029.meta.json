@@ -1,0 +1,14 @@
+{
+  "id": "15106029",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 경상남도 밀양시_체육시설 현황_20240522",
+  "source_url": "https://www.data.go.kr/data/15106029/fileData.do",
+  "publisher": "경상남도 밀양시",
+  "dataset_updated": "2024-05-23",
+  "collected_at": "2026-10-27T07:46:25+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15106029.csv",
+  "sha256": "40446d7543f36ab4d97cf2ffdabaee02d35a6887fe82919f9181b038dbf772f0",
+  "bytes": 6180
+}

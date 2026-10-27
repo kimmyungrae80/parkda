@@ -1,0 +1,14 @@
+{
+  "id": "15015172",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 광주광역시도시공사 체육시설 현황_20260630",
+  "source_url": "https://www.data.go.kr/data/15015172/fileData.do",
+  "publisher": "광주광역시도시공사",
+  "dataset_updated": "2026-07-29",
+  "collected_at": "2026-10-27T07:44:03+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15015172.csv",
+  "sha256": "035b1ed314e64f729ff05867ed9ad0f21f789e2389d1e1899d544ac98ad7a8ec",
+  "bytes": 1154
+}

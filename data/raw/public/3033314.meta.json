@@ -1,0 +1,14 @@
+{
+  "id": "3033314",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 전남광주통합특별시 장성군_체육시설현황_20240609",
+  "source_url": "https://www.data.go.kr/data/3033314/fileData.do",
+  "publisher": "전남광주통합특별시 장성군",
+  "dataset_updated": "2024-07-23",
+  "collected_at": "2026-10-27T07:46:40+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/3033314.csv",
+  "sha256": "dd72d3fc09249fbca01538507b457ed83a5c17674fe52bb7590d54f0e5fabdca",
+  "bytes": 2089
+}

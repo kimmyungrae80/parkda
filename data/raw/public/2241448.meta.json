@@ -1,0 +1,14 @@
+{
+  "id": "2241448",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 경기도 안산시_공공체육시설정보_20260116",
+  "source_url": "https://www.data.go.kr/data/2241448/fileData.do",
+  "publisher": "경기도 안산시",
+  "dataset_updated": "2026-01-16",
+  "collected_at": "2026-10-27T07:46:14+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/2241448.csv",
+  "sha256": "e084a0510ef66ff53c6dc875041646cf27aa80042dadd1bfe108239aea7a3ea7",
+  "bytes": 12907
+}

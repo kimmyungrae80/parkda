@@ -1,0 +1,14 @@
+{
+  "id": "15037511",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 대전광역시 서구_체육시설 현황_20260205",
+  "source_url": "https://www.data.go.kr/data/15037511/fileData.do",
+  "publisher": "대전광역시 서구",
+  "dataset_updated": "2026-02-05",
+  "collected_at": "2026-10-27T07:43:12+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15037511.csv",
+  "sha256": "c1f791fcc0025df21b927e1665bb58d54fc8975c54a5d5131d496898e1d79cc0",
+  "bytes": 1940
+}

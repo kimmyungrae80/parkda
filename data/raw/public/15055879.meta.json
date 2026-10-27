@@ -1,0 +1,14 @@
+{
+  "id": "15055879",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 인천광역시_등록신고 체육시설 현황_20231231",
+  "source_url": "https://www.data.go.kr/data/15055879/fileData.do",
+  "publisher": "인천광역시",
+  "dataset_updated": "2026-02-20",
+  "collected_at": "2026-10-27T07:43:06+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15055879.csv",
+  "sha256": "b775bf49bdd44c34e10146a653e5ec2e8942ec10da6a9e77d7e8c017dcf568c3",
+  "bytes": 1028
+}

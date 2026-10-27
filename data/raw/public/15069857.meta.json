@@ -1,0 +1,14 @@
+{
+  "id": "15069857",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 한국수력원자력(주)_홈페이지 체육시설 신청정보_20260911",
+  "source_url": "https://www.data.go.kr/data/15069857/fileData.do",
+  "publisher": "한국수력원자력(주)",
+  "dataset_updated": "2026-09-11",
+  "collected_at": "2026-10-27T07:43:35+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15069857.csv",
+  "sha256": "5a5548f37b281bf9b0d755d9f51a0d0d636af9c37bc058f689ab92682f7e32d0",
+  "bytes": 38411
+}

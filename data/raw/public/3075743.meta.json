@@ -1,0 +1,14 @@
+{
+  "id": "3075743",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 부산광역시 해운대구_공공체육시설 현황_20260918",
+  "source_url": "https://www.data.go.kr/data/3075743/fileData.do",
+  "publisher": "부산광역시 해운대구",
+  "dataset_updated": "2026-09-18",
+  "collected_at": "2026-10-27T07:43:30+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/3075743.csv",
+  "sha256": "2b3c3b9fec5ffa8a22e14768d7d2d7f03856281e8faa6ca27328d2bf0ddc19c1",
+  "bytes": 2529
+}

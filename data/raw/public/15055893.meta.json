@@ -1,0 +1,14 @@
+{
+  "id": "15055893",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 제주특별자치도_공공체육시설현황_20251231",
+  "source_url": "https://www.data.go.kr/data/15055893/fileData.do",
+  "publisher": "제주특별자치도",
+  "dataset_updated": "2026-09-21",
+  "collected_at": "2026-10-27T07:45:17+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15055893.csv",
+  "sha256": "1fe6658e3eae0f0b2c94fe849b4f63065f8540b88362afad5e6e635734b96561",
+  "bytes": 12771
+}

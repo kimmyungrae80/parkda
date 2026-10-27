@@ -1,0 +1,14 @@
+{
+  "id": "15015554",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 서울특별시 광진구_체육시설_20260820",
+  "source_url": "https://www.data.go.kr/data/15015554/fileData.do",
+  "publisher": "서울특별시 광진구",
+  "dataset_updated": "2026-08-20",
+  "collected_at": "2026-10-27T07:42:28+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15015554.csv",
+  "sha256": "70863b93d77a775c52aac20ae7b21077f9f486b11c4db4df7a6739abc67a0b00",
+  "bytes": 518
+}

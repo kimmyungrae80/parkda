@@ -1,0 +1,14 @@
+{
+  "id": "15074359",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 양주시시설관리공단_체육시설 대관현황(상시)_20201102",
+  "source_url": "https://www.data.go.kr/data/15074359/fileData.do",
+  "publisher": "양주도시공사",
+  "dataset_updated": "2020-12-08",
+  "collected_at": "2026-10-27T07:46:32+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15074359.csv",
+  "sha256": "7f89d2af28dd35f38c49fba0cf5174e586803ee61e11ddda69ba5a3bef8eecf8",
+  "bytes": 472215
+}

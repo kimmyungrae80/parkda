@@ -1,0 +1,14 @@
+{
+  "id": "15055919",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 전남광주통합특별시_광산구_체육시설 현황_20260423",
+  "source_url": "https://www.data.go.kr/data/15055919/fileData.do",
+  "publisher": "전남광주통합특별시 광산구",
+  "dataset_updated": "2026-04-23",
+  "collected_at": "2026-10-27T07:42:39+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15055919.csv",
+  "sha256": "527b1c94ffd9d5b1835b6330a2eb21ecdf07aaea4d656f37f0b73ee6039e1b01",
+  "bytes": 36050
+}

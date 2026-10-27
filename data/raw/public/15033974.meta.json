@@ -1,0 +1,14 @@
+{
+  "id": "15033974",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 대전광역시 중구_체육시설_현황_20250924",
+  "source_url": "https://www.data.go.kr/data/15033974/fileData.do",
+  "publisher": "대전광역시 중구",
+  "dataset_updated": "2025-11-10",
+  "collected_at": "2026-10-27T07:44:15+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15033974.csv",
+  "sha256": "6d0721a9114ed474b683a7d2d4cf6ae841afd2e0eab50205f19374547b997256",
+  "bytes": 7425
+}

@@ -1,0 +1,14 @@
+{
+  "id": "15037803",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 서울특별시 도봉구 소규모 체육시설 야외운동기구 현황_20210401",
+  "source_url": "https://www.data.go.kr/data/15037803/fileData.do",
+  "publisher": "서울특별시 도봉구",
+  "dataset_updated": "2021-04-01",
+  "collected_at": "2026-10-27T07:45:20+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15037803.csv",
+  "sha256": "83c929e9e526667172eac12577ab8c4f44cfb5c99a80c7be36e7f67cf15ddcf4",
+  "bytes": 27838
+}

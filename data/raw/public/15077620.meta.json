@@ -1,0 +1,14 @@
+{
+  "id": "15077620",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 전남광주통합특별시 구례군_헬스장(체육시설) 현황_20240228",
+  "source_url": "https://www.data.go.kr/data/15077620/fileData.do",
+  "publisher": "전남광주통합특별시 구례군",
+  "dataset_updated": "2024-03-15",
+  "collected_at": "2026-10-27T07:44:18+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15077620.csv",
+  "sha256": "588cf978940f7ffc3778850417f077c60b0d0a131f34ad6d07119fe9516666a8",
+  "bytes": 453
+}

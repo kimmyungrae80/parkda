@@ -1,0 +1,14 @@
+{
+  "id": "15003202",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 전주시시설관리공단_체육시설 현황_20260206",
+  "source_url": "https://www.data.go.kr/data/15003202/fileData.do",
+  "publisher": "전주시시설관리공단",
+  "dataset_updated": "2026-02-06",
+  "collected_at": "2026-10-27T07:43:09+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15003202.csv",
+  "sha256": "9046f1f9a57557af7f43c597e64c122b62eb4598f89ad6de1ca77b9b955a00a6",
+  "bytes": 11988
+}

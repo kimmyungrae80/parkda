@@ -78,6 +78,8 @@ def main():
             pg.click("#venue-view-list")
 
             # 4. 즐겨찾기: 누르면 ★, 새로고침 후에도 유지
+            pg.evaluate("go('pg-venues')"); pg.click("#pg-venues .hub-search .hub-btn")
+            pg.wait_for_function("document.querySelectorAll('#venue-list .hub-venue').length > 0", timeout=8000)
             pg.click("#venue-list .hub-venue >> nth=0 >> .hub-fav"); time.sleep(0.2)
             fav_on = pg.locator("#venue-list .hub-venue >> nth=0 >> .hub-fav").inner_text().strip()
             pg.reload(); time.sleep(0.5)
@@ -98,14 +100,14 @@ def main():
             check("상세 페이지: 출처 링크 포함", len(src_links) >= 1, str(len(src_links)))
 
             # 6. 주소 기반 자동 좌표: 출처 표기 (OSM 저작자 표시)
-            osm = next((c for c in COURSES if c.get("coordinate_source") == "osm_nominatim"), None)
+            osm = next((c for c in COURSES if c.get("coordinate_match") == "name_match" and c.get("map_visible")), None)
             if osm:
                 pg.evaluate("(id) => { location.hash = '#/course/' + id; }", osm["id"])
                 pg.wait_for_selector("#course-body h2", timeout=8000)
-                check("자동 좌표: 주소 기반 안내와 OpenStreetMap 표기", "주소 기반 자동 지오코딩" in pg.inner_text("#course-body") and "OpenStreetMap" in pg.inner_text("#course-body"))
+                check("자동 좌표: 주소 기반 좌표 안내와 OpenStreetMap 표기", "주소 기반 자동 좌표" in pg.inner_text("#course-body") and "OpenStreetMap" in pg.inner_text("#course-body"))
 
             # 7. 주변 맛집·카페: 반경·카테고리 전달
-            with_coord = next(c for c in COURSES if c.get("latitude") is not None)
+            with_coord = next(c for c in COURSES if c.get("map_visible"))
             pg.evaluate("(id) => { location.hash = '#/course/' + id; }", with_coord["id"])
             pg.wait_for_selector("#food-list .hub-venue", timeout=8000)
             pg.click("#food-r-3000"); time.sleep(0.2)
@@ -115,10 +117,10 @@ def main():
             check("주변 검색: 결과 표시 (광고·제휴 구분 문구 포함)", "가상카페" in pg.inner_text("#food-list") and "광고·제휴" in pg.inner_text("#food-list"))
 
             # 8. 좌표 없는 구장: 주변 검색 안내
-            no_coord = next(c for c in COURSES if c.get("latitude") is None)
+            no_coord = next(c for c in COURSES if not c.get("map_visible"))
             pg.evaluate("(id) => { location.hash = '#/course/' + id; }", no_coord["id"])
             pg.wait_for_selector("#course-body h2", timeout=8000)
-            check("좌표 없는 구장: 주변 검색 대신 안내", "좌표가 아직 없어" in pg.inner_text("#food-list"))
+            check("위치 미확인 구장: 주변 검색 대신 안내", "위치가 아직 확인되지 않아" in pg.inner_text("#food-list"))
 
             # 9. 관련 대회 (지역 기준, 공식 자료)
             tour_region = next((c for c in COURSES if c.get("region") == "경북"), None)

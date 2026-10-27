@@ -1,0 +1,14 @@
+{
+  "id": "15030307",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 경상북도_포항시_체육시설현황_20261016",
+  "source_url": "https://www.data.go.kr/data/15030307/fileData.do",
+  "publisher": "경상북도 포항시",
+  "dataset_updated": "2026-10-16",
+  "collected_at": "2026-10-27T07:47:40+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15030307.csv",
+  "sha256": "65e7e2bb78227880f7ce8990b193cf0a6e56bffa331b105e99d2ebc83b5407fb",
+  "bytes": 8265
+}

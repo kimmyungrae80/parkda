@@ -1,0 +1,14 @@
+{
+  "id": "15027201",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 경기도 의정부시_체육시설현황_20260715",
+  "source_url": "https://www.data.go.kr/data/15027201/fileData.do",
+  "publisher": "경기도 의정부시",
+  "dataset_updated": "2026-08-19",
+  "collected_at": "2026-10-27T07:47:59+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15027201.csv",
+  "sha256": "71e2cada6ff3c0ab06a9aea6bd5d664cf70f8d18f60c02274f1d78586436d2c6",
+  "bytes": 14968
+}

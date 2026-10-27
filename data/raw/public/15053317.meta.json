@@ -1,0 +1,14 @@
+{
+  "id": "15053317",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 부산광역시 영도구_동네체육시설 현황_20260702",
+  "source_url": "https://www.data.go.kr/data/15053317/fileData.do",
+  "publisher": "부산광역시 영도구",
+  "dataset_updated": "2026-07-02",
+  "collected_at": "2026-10-27T07:47:32+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15053317.csv",
+  "sha256": "c64ece168abec97505022ff5bd7e110b8270eaf08c95ba37e52e889e2bdc58ed",
+  "bytes": 6931
+}

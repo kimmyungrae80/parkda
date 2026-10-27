@@ -1,0 +1,14 @@
+{
+  "id": "15060645",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 양산시시설관리공단_체육시설_웅상문화체육센터_이용현황_20210228",
+  "source_url": "https://www.data.go.kr/data/15060645/fileData.do",
+  "publisher": "양산시시설관리공단",
+  "dataset_updated": "2021-03-22",
+  "collected_at": "2026-10-27T07:45:45+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15060645.csv",
+  "sha256": "dd206e99bbd2652f956309b77e89e9f27248509373d069be3630c276696e44b6",
+  "bytes": 454
+}

@@ -1,0 +1,14 @@
+{
+  "id": "15044513",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 양주시시설관리공단_체육시설(축구장 및 야구장) 시설물 현황 정보_20151230",
+  "source_url": "https://www.data.go.kr/data/15044513/fileData.do",
+  "publisher": "양주도시공사",
+  "dataset_updated": "2020-12-23",
+  "collected_at": "2026-10-27T07:45:04+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15044513.csv",
+  "sha256": "28dcb4801b1dbfcd5d09c097585cc10c7ebb62aa107c5b452558fbd8ba472e31",
+  "bytes": 972
+}

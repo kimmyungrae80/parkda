@@ -20,6 +20,8 @@ REPORT = ROOT / "data" / "verified" / "quality_report.json"
 CAND = ROOT / "data" / "processed" / "candidates_internal.json"  # 공개하지 않음 (검토 대기)
 DOC = ROOT / "docs" / "DATA_QUALITY_REPORT.md"
 TODAY = date(2026, 10, 27).isoformat()
+REGION_ORDER = ["서울", "부산", "대구", "인천", "광주", "대전", "울산", "세종", "경기", "강원", "충북", "충남",
+                "전북", "전남", "경북", "경남", "제주"]  # 전국 17개 시도
 
 
 def stable_id(r):
@@ -30,25 +32,42 @@ def stable_id(r):
 GEOCACHE = ROOT / "data" / "processed" / "geocode_cache.json"
 
 
+MAP_OK = ("official_coord", "name_match", "address_match")
+
+
 def coord_fields(r, geo):
-    """공식 좌표를 우선한다. 없으면 지오코딩 결과를 쓰고 출처를 따로 표시한다."""
+    """좌표와 검증 등급을 정한다.
+    official_coord : 공공데이터·공식 페이지의 좌표 (지역 범위 검사 통과 시)
+    name_match     : 주소 질의로 찾은 결과의 이름이 구장 이름과 일치
+    address_match  : 결과 주소에 구장의 지번·도로번호가 일치
+    weak_match     : 지역만 맞음 → 지도에 표시하지 않음
+    none           : 좌표 없음 → 목록에는 표시, 지도에는 표시하지 않음
+    """
+    flags = set(r.get("flags", []))
     if r.get("latitude") is not None and r.get("longitude") is not None:
-        return r["latitude"], r["longitude"], "official_dataset", None
+        if flags & {"coords_out_of_korea", "coords_region_mismatch"}:
+            return r["latitude"], r["longitude"], "official_dataset", "좌표가 지역 범위와 맞지 않아 지도에서 제외", "failed_check"
+        return r["latitude"], r["longitude"], "official_dataset", None, "official_coord"
     k = f"{r.get('region')}|{r['name']}|{r.get('address')}"
     g = geo.get(k)
     if g and g.get("status") == "ok":
-        return g["lat"], g["lng"], "osm_nominatim", "주소 기반 자동 지오코딩 (OpenStreetMap). 실제 위치와 차이가 있을 수 있음. © OpenStreetMap contributors"
-    return None, None, None, None
+        level = g.get("match_level", "weak_match")
+        note = "주소 기반 자동 좌표 (OpenStreetMap). © OpenStreetMap contributors"
+        if level == "weak_match":
+            note += " · 지역만 일치해 지도에 표시하지 않음"
+        return g["lat"], g["lng"], "osm_nominatim", note, level
+    return None, None, None, None, "none"
 
 
 def public_row(r, geo=None):
     primary = r["sources"][0]
     official = [s for s in r["sources"] if s["source_type"] in ("public", "official_page")]
-    lat, lng, csrc, cnote = coord_fields(r, geo or {})
+    lat, lng, csrc, cnote, cmatch = coord_fields(r, geo or {})
     return {
         "id": stable_id(r), "name": r["name"], "region": r.get("region"), "city": r.get("city"),
         "district": r.get("district"), "address": r.get("address"), "road_address": r.get("road_address"),
         "latitude": lat, "longitude": lng, "coordinate_source": csrc, "coordinate_note": cnote,
+        "coordinate_match": cmatch, "map_visible": bool(lat is not None and cmatch in MAP_OK),
         "holes": r.get("holes"),
         "course_count": r.get("course_count"), "fee": r.get("fee"), "opening_hours": r.get("opening_hours"),
         "closed_days": r.get("closed_days"), "reservation_method": r.get("reservation_method"),
@@ -93,8 +112,12 @@ def main():
     flags = Counter(f for r in rows for f in r["flags"])
     by_region = Counter(r["region"] or "미상" for r in rows)
     srcs = Counter(s["source_type"] for r in rows for s in r["sources"])
+    raw_n = sum(1 for x in (ROOT / "data/processed/courses_normalized.jsonl").read_text(encoding="utf-8").splitlines() if '"source_type": "public"' in x or '"source_type": "official_page"' in x)
     report = {
         "generated_for_date": TODAY, "total_venues": len(rows), "by_status": dict(status),
+        "unknown_region": sum(1 for r in rows if not r["region"]),
+        "raw_public_rows": sum(1 for x in (ROOT / "data/processed/courses_normalized.jsonl").read_text(encoding="utf-8").splitlines() if '"public"' in x or '"official_page"' in x),
+        "duplicates_removed": max(0, raw_n - len(rows)),
         "by_region": dict(by_region.most_common()), "quality_flags": dict(flags.most_common()),
         "source_records": dict(srcs), "review_items": len(data.get("review", [])),
         "internal_not_public": len(internal), "internal_by_status": dict(Counter(r["verification_status"] for r in internal)),
@@ -102,8 +125,17 @@ def main():
         "possible_duplicates": sum(1 for r in rows if "possible_duplicate" in r["flags"]),
         "with_coordinates": sum(1 for r in rows if r["latitude"] is not None and r["longitude"] is not None),
         "coordinate_sources": dict(Counter(r["coordinate_source"] for r in rows if r["coordinate_source"])),
+        "coordinate_match": dict(Counter(r["coordinate_match"] for r in rows)),
+        "map_visible": sum(1 for r in rows if r["map_visible"]),
         "with_phone": sum(1 for r in rows if r["phone"]), "with_fee": sum(1 for r in rows if r["fee"]),
         "with_hours": sum(1 for r in rows if r["opening_hours"]),
+        "by_region_detail": {reg: {
+            "venues": sum(1 for r in rows if r["region"] == reg),
+            "map_visible": sum(1 for r in rows if r["region"] == reg and r["map_visible"]),
+            "with_hours": sum(1 for r in rows if r["region"] == reg and r["opening_hours"]),
+            "with_fee": sum(1 for r in rows if r["region"] == reg and r["fee"]),
+            "with_phone": sum(1 for r in rows if r["region"] == reg and r["phone"]),
+        } for reg in REGION_ORDER},
     }
     REPORT.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     DOC.parent.mkdir(parents=True, exist_ok=True)
@@ -123,7 +155,8 @@ def render_doc(rep, review):
         f"- 공공데이터포털 공개 자료 기준: **{s.get('official_dataset', 0)}곳** (기관이 공개한 자료, 현장 확인 전)",
         f"- 공개하지 않은 내부 후보: **{rep['internal_not_public']}건** (parkda.v2 Excel 기반 미검증 후보 등, 출처 확인 전까지 비공개)",
         f"- 병합 검토 목록: {rep['review_items']}건",
-        f"- 좌표 있음: {rep['with_coordinates']}곳 (출처별: {rep['coordinate_sources']}) · 전화번호 있음: {rep['with_phone']}곳 · 이용료 있음: {rep['with_fee']}곳 · 운영시간 있음: {rep['with_hours']}곳",
+        f"- 좌표 있음: {rep['with_coordinates']}곳 (좌표 등급: {rep['coordinate_match']}) · 전화번호: {rep['with_phone']}곳 · 이용료: {rep['with_fee']}곳 · 운영시간: {rep['with_hours']}곳",
+        f"- 지도에 표시 가능한 구장 (검증된 좌표): **{rep['map_visible']}곳** / 목록에 보이는 전체: **{rep['total_venues']}곳**",
         f"- 같은 이름이지만 병합하지 않은 중복 가능 구장: {rep['possible_duplicates']}곳 (정보 부족, 검토 필요)", "",
         "## 지역별 구장 수", "",
         "| 지역 | 구장 수 |", "|---|---|",
@@ -141,6 +174,18 @@ def render_doc(rep, review):
         lines.append(f"| {k} | {v} | {meaning.get(k, '')} |")
     lines += ["", "## 출처별 기록 수", "", "| 출처 유형 | 기록 수 |", "|---|---|"]
     lines += [f"| {k} | {v} |" for k, v in rep["source_records"].items()]
+    tot = rep["total_venues"] or 1
+    lines += ["", "## 확보율", "",
+              f"- 좌표 확보율: {rep['with_coordinates']}/{tot} ({rep['with_coordinates']*100//tot}%) · 지도 표시 가능: {rep['map_visible']}곳 ({rep['map_visible']*100//tot}%)",
+              f"- 운영시간 확보율: {rep['with_hours']}/{tot} ({rep['with_hours']*100//tot}%)",
+              f"- 이용료 확보율: {rep['with_fee']}/{tot} ({rep['with_fee']*100//tot}%)",
+              f"- 전화번호 확보율: {rep['with_phone']}/{tot} ({rep['with_phone']*100//tot}%)",
+              f"- 중복 제거: 원본 {rep['raw_public_rows']}행 → {rep['total_venues']}곳 (중복 {rep['duplicates_removed']}건 병합)",
+              "", "## 시도별 구장 수와 확보 현황", "",
+              "| 시도 | 구장 | 지도 표시 | 운영시간 | 이용료 | 전화 |", "|---|---|---|---|---|---|"]
+    for reg, v in rep["by_region_detail"].items():
+        lines.append(f"| {reg} | {v['venues']} | {v['map_visible']} | {v['with_hours']} | {v['with_fee']} | {v['with_phone']} |")
+    lines += ["", f"- 지역 정보가 없는 구장: {rep['unknown_region']}곳", ""]
     lines += ["", "## 병합 검토", "", f"- 같은 이름이지만 위치·주소가 달라 병합하지 않은 항목: {len(review)}건 (세부 목록은 내부 파일에만 있음)"]
     lines += ["", "## 한계", "",
               "- 공공데이터의 운영시간·이용료·전화번호는 해당 기관이 공개한 값이며, 최신 여부는 방문 전 확인이 필요합니다.",

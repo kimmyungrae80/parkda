@@ -1,0 +1,14 @@
+{
+  "id": "15066203",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 인천광역시_우선 확충되어야 하는 문화 및 체육시설_20251231",
+  "source_url": "https://www.data.go.kr/data/15066203/fileData.do",
+  "publisher": "인천광역시",
+  "dataset_updated": "2026-02-20",
+  "collected_at": "2026-10-27T07:45:11+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15066203.csv",
+  "sha256": "8eb7ab2bff3f74086bf4339b139af1e3af0e27c20c97a9c571f94b962feb8c55",
+  "bytes": 3937
+}

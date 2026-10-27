@@ -1,0 +1,14 @@
+{
+  "id": "15048742",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 인천광역시_공원내 체육시설 정보제공_20201130",
+  "source_url": "https://www.data.go.kr/data/15048742/fileData.do",
+  "publisher": "인천광역시",
+  "dataset_updated": "2025-12-06",
+  "collected_at": "2026-10-27T07:44:54+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15048742.csv",
+  "sha256": "191b6072b47abf8f8d8b506ef63f453422bb32e619fd2dee8f8bf80b39b0ddd3",
+  "bytes": 108068
+}

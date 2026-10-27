@@ -1,0 +1,14 @@
+{
+  "id": "15004376",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 포천시시설관리공단 체육시설 포천야구장 이용 현황(2014)",
+  "source_url": "https://www.data.go.kr/data/15004376/fileData.do",
+  "publisher": "포천도시공사",
+  "dataset_updated": "2016-01-15",
+  "collected_at": "2026-10-27T07:44:23+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15004376.csv",
+  "sha256": "f8305e5220b8503ad368d8f54e06b12339eecd197a82692dc7411b39f3ce6b9a",
+  "bytes": 656
+}

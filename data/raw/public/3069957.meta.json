@@ -1,0 +1,14 @@
+{
+  "id": "3069957",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 강원도 공공체육시설(골프, 스키장)_20200803",
+  "source_url": "https://www.data.go.kr/data/3069957/fileData.do",
+  "publisher": "강원특별자치도",
+  "dataset_updated": "2025-11-18",
+  "collected_at": "2026-10-27T07:47:43+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/3069957.csv",
+  "sha256": "f1f111faab17a9130d1ea863990cb21dc81fde8a157bb537233fd9a9c0ce8336",
+  "bytes": 5743
+}

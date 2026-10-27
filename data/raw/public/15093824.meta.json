@@ -1,0 +1,14 @@
+{
+  "id": "15093824",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 대전광역시_체육시설 투자정보_20221231",
+  "source_url": "https://www.data.go.kr/data/15093824/fileData.do",
+  "publisher": "대전광역시",
+  "dataset_updated": "2023-05-02",
+  "collected_at": "2026-10-27T07:47:20+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15093824.csv",
+  "sha256": "fc4217ca5786a049336781fac770095c05c86fa8e80f2cfb3bb806f3ab6d1826",
+  "bytes": 382
+}

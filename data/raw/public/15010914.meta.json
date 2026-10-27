@@ -1,0 +1,14 @@
+{
+  "id": "15010914",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 전남광주통합특별시 동구_공공체육시설_20240829",
+  "source_url": "https://www.data.go.kr/data/15010914/fileData.do",
+  "publisher": "전남광주통합특별시 동구",
+  "dataset_updated": "2025-11-26",
+  "collected_at": "2026-10-27T07:47:48+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15010914.csv",
+  "sha256": "a282af6a0896735463b45d6fd11649f217b3898c081db5648a9c3fd465f54590",
+  "bytes": 12472
+}

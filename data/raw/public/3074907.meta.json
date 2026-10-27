@@ -1,0 +1,14 @@
+{
+  "id": "3074907",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 전남광주통합특별시 곡성군_체육시설 현황_20240625",
+  "source_url": "https://www.data.go.kr/data/3074907/fileData.do",
+  "publisher": "전남광주통합특별시 곡성군",
+  "dataset_updated": "2024-07-08",
+  "collected_at": "2026-10-27T07:45:07+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/3074907.csv",
+  "sha256": "cf9d9542d37c80d041e4e78163fe208e72f4bffe02f4c4995830b3f277a874fb",
+  "bytes": 11086
+}

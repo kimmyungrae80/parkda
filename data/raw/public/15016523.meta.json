@@ -1,0 +1,14 @@
+{
+  "id": "15016523",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 서울특별시 동작구_체육시설업 현황_20260528",
+  "source_url": "https://www.data.go.kr/data/15016523/fileData.do",
+  "publisher": "서울특별시 동작구",
+  "dataset_updated": "2026-05-28",
+  "collected_at": "2026-10-27T07:47:37+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15016523.csv",
+  "sha256": "d0d85e2be08fbe17211ffe6528bdab9a76817ba655dedb43657db2cad5531dda",
+  "bytes": 36402
+}

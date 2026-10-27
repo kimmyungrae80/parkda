@@ -1,0 +1,14 @@
+{
+  "id": "15083687",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 인천광역시 부평구_가상체험 체육시설 현황_20260501",
+  "source_url": "https://www.data.go.kr/data/15083687/fileData.do",
+  "publisher": "인천광역시 부평구",
+  "dataset_updated": "2026-05-11",
+  "collected_at": "2026-10-27T07:46:17+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15083687.csv",
+  "sha256": "f49dda7110ba82269efa759e21b12bdb2b10e72fbf9424f6a9cb1c1cd632010d",
+  "bytes": 2918
+}

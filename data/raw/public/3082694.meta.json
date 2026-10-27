@@ -1,0 +1,14 @@
+{
+  "id": "3082694",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 경상남도_등록체육시설 골프장 스키장 현황_20240408",
+  "source_url": "https://www.data.go.kr/data/3082694/fileData.do",
+  "publisher": "경상남도",
+  "dataset_updated": "2024-04-08",
+  "collected_at": "2026-10-27T07:45:41+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/3082694.csv",
+  "sha256": "18372a7589479a55b2f5baaaae6eb141cb08ed814c89455bbea6f16282dd4d66",
+  "bytes": 7497
+}

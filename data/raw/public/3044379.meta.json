@@ -1,0 +1,14 @@
+{
+  "id": "3044379",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 인천광역시 부평구_동네생활체육시설_20250630",
+  "source_url": "https://www.data.go.kr/data/3044379/fileData.do",
+  "publisher": "인천광역시 부평구",
+  "dataset_updated": "2026-07-24",
+  "collected_at": "2026-10-27T07:46:38+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/3044379.csv",
+  "sha256": "5bef3d7de272b340d677f6c32031519b07978ecc9d56c310d3cd082368a62c1d",
+  "bytes": 12962
+}

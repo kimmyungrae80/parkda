@@ -1,0 +1,14 @@
+{
+  "id": "15000788",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 경기도 성남시_학교_체육시설_현황_20260526",
+  "source_url": "https://www.data.go.kr/data/15000788/fileData.do",
+  "publisher": "경기도 성남시",
+  "dataset_updated": "2026-06-08",
+  "collected_at": "2026-10-27T07:42:45+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15000788.csv",
+  "sha256": "32d69838cdfe9ddf6d05d4c2f98af85b151a27c7f30b4bf8fce9edd18cbbbe7d",
+  "bytes": 21648
+}

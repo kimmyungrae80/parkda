@@ -1,0 +1,14 @@
+{
+  "id": "15003731",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 안산도시공사 체육시설현황_20201220",
+  "source_url": "https://www.data.go.kr/data/15003731/fileData.do",
+  "publisher": "안산도시공사",
+  "dataset_updated": "2020-12-21",
+  "collected_at": "2026-10-27T07:44:36+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15003731.csv",
+  "sha256": "65d251c0346be190b5b8ddb97edf90d7c0ff7d703b4afdf68159220e73810b98",
+  "bytes": 36936
+}

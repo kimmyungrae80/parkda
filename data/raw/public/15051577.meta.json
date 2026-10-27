@@ -1,0 +1,14 @@
+{
+  "id": "15051577",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 경기도_수원시_공공체육시설현황_20260320",
+  "source_url": "https://www.data.go.kr/data/15051577/fileData.do",
+  "publisher": "경기도 수원시",
+  "dataset_updated": "2026-03-30",
+  "collected_at": "2026-10-27T07:46:45+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15051577.csv",
+  "sha256": "fbfc969eac5d0511f9857e22e8b2f78717fb1e7ea119f4945c327f2ceec052e8",
+  "bytes": 43737
+}

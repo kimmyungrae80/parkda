@@ -1,0 +1,14 @@
+{
+  "id": "15126951",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 화성도시공사_체육시설 이용현황_20251231",
+  "source_url": "https://www.data.go.kr/data/15126951/fileData.do",
+  "publisher": "화성도시공사",
+  "dataset_updated": "2026-01-27",
+  "collected_at": "2026-10-27T07:45:32+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15126951.csv",
+  "sha256": "02074e4945fe1916f408716fbafb41431f7bb91714a461b44415203b7dbb4ea2",
+  "bytes": 2013573
+}

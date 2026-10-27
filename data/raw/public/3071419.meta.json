@@ -1,0 +1,14 @@
+{
+  "id": "3071419",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 경상북도_구미시_민간체육시설 현황_20260623",
+  "source_url": "https://www.data.go.kr/data/3071419/fileData.do",
+  "publisher": "경상북도 구미시",
+  "dataset_updated": "2026-07-01",
+  "collected_at": "2026-10-27T07:47:08+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/3071419.csv",
+  "sha256": "1da70a494d90f5218f56038538552effe7ea351c1d927c7e1e8a7a5b958951f2",
+  "bytes": 71856
+}

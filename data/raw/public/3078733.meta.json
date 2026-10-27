@@ -1,0 +1,14 @@
+{
+  "id": "3078733",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 부산광역시 사상구_동네체육시설현황_20260306",
+  "source_url": "https://www.data.go.kr/data/3078733/fileData.do",
+  "publisher": "부산광역시 사상구",
+  "dataset_updated": "2026-03-06",
+  "collected_at": "2026-10-27T07:48:17+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/3078733.csv",
+  "sha256": "2648ecb75a088f9bc0ba895a30bf654ac76edafeaee4170d8e2b9951b295d6ea",
+  "bytes": 10506
+}

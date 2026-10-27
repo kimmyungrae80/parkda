@@ -1,0 +1,14 @@
+{
+  "id": "15011684",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 전남광주통합특별시 함평군_체육시설현황_20250701",
+  "source_url": "https://www.data.go.kr/data/15011684/fileData.do",
+  "publisher": "전남광주통합특별시 함평군",
+  "dataset_updated": "2025-07-01",
+  "collected_at": "2026-10-27T07:48:20+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15011684.csv",
+  "sha256": "d7a7a011c8779bc17dde2d0b9df24f51534bfad12655b846e03c67f5a197857e",
+  "bytes": 2407
+}

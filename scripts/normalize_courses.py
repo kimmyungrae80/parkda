@@ -17,8 +17,8 @@ EXCEL = ROOT / "data" / "processed" / "excel_records.json"
 OUT = ROOT / "data" / "processed" / "courses_normalized.jsonl"
 
 ALIASES = {
-    "name": ["파크골프장명", "시설명", "시 설 명", "명칭", "구장명", "장소명", "name"],
-    "address": ["소재지지번주소", "지번 주소", "소재지 지번주소", "소재지도로명주소", "주소", "위치", "address"],
+    "name": ["파크골프장명", "체육시설명", "경기장", "시설명", "시 설 명", "명칭", "구장명", "장소명", "name"],
+    "address": ["소재지지번주소", "지번 주소", "지번주소", "소재지 지번주소", "소재지도로명주소", "도로명주소", "주소", "위치", "address"],
     "road": ["소재지도로명주소", "소재지도로명주소 "],
     "lat": ["위도"], "lng": ["경도"],
     "holes": ["홀수", "홀 수", "규모(홀)", "홀"], "courses": ["코스수"],
@@ -28,21 +28,25 @@ ALIASES = {
     "city": ["시군", "시군구"],
     "closed": ["휴무일", "휴장일"], "fee": ["이용요금", "이용료"],
     "reservation": ["예약방식"], "reservation_url": ["예약페이지 링크"],
-    "sport": ["종목"],
+    "sport": ["종목"], "category": ["구분"],
 }
-EXCLUDE_TITLE = re.compile(r"스크린|골프장_내장객|대회|동호회|강좌|사진DB|이용자")
+# 구장 목록이 아닌 자료: 동호회·클럽·교실·강좌·사업자 현황·대회 유치 등
+EXCLUDE_TITLE = re.compile(r"스크린|골프장_내장객|대회|동호|클럽|교실|강좌|사진DB|이용자|업현황|등록체육|유치|종목별|장애인 생활")
 
 
 def read_csv(path):
     raw = path.read_bytes()
+    text = None
     for enc in ("utf-8-sig", "cp949", "utf-8"):
         try:
             text = raw.decode(enc)
             break
         except UnicodeDecodeError:
             continue
-    rows = list(csv.reader(io.StringIO(text)))
-    return rows[0] if rows else [], rows[1:]
+    if text is None:  # 일부 깨진 바이트가 있어도 가능한 만큼 읽는다
+        text = raw.decode("utf-8", errors="replace")
+    rows = list(csv.reader(io.StringIO(text, newline="")))
+    return (rows[0] if rows else []), rows[1:]
 
 
 def col(header, names):
@@ -106,9 +110,11 @@ def from_public():
             name = g("name")
             if not name:
                 continue
-            if g("sport") and "파크골프" not in g("sport"):
-                continue
-            if "파크골프" not in name and not (idx["sport"] is not None or "파크골프" in title):
+            if g("sport") and "파크골프" not in g("sport") and "파크골프" not in (g("category") or ""):
+                continue  # 종목이 명시된 행인데 파크골프가 아니면 제외
+            # 구장 행: 이름에 '파크골프'가 있거나, 종목이 파크골프인 공원·체육시설 행
+            tag = (g("sport") or "") + (g("category") or "")
+            if "파크골프" not in name and not ("파크골프" in tag and any(w in name for w in ("공원", "구장", "체육", "장"))):
                 continue
             if "스크린" in name:
                 continue

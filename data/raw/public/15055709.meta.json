@@ -1,0 +1,14 @@
+{
+  "id": "15055709",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 전북특별자치도_체육시설 수 현황_20141231",
+  "source_url": "https://www.data.go.kr/data/15055709/fileData.do",
+  "publisher": "전북특별자치도",
+  "dataset_updated": "2025-08-31",
+  "collected_at": "2026-10-27T07:43:42+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15055709.csv",
+  "sha256": "371c4b8a72ca6a7d9c27022c8724e39f90e5b153f26ebf4b85a201aa289e8daa",
+  "bytes": 885
+}

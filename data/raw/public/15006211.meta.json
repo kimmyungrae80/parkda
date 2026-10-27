@@ -1,0 +1,14 @@
+{
+  "id": "15006211",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 대구광역시 달성군_체육시설 현황_20230915",
+  "source_url": "https://www.data.go.kr/data/15006211/fileData.do",
+  "publisher": "대구광역시 달성군",
+  "dataset_updated": "2025-12-12",
+  "collected_at": "2026-10-27T07:43:15+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15006211.csv",
+  "sha256": "78cfe24812f8fd40c20ec43bfb7cb4d6dbdd02b2e3be5879c21793a16c038ec7",
+  "bytes": 2120
+}

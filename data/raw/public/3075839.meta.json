@@ -1,0 +1,14 @@
+{
+  "id": "3075839",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 울산광역시 동구 체육시설 현황_20260306",
+  "source_url": "https://www.data.go.kr/data/3075839/fileData.do",
+  "publisher": "울산광역시 동구",
+  "dataset_updated": "2026-03-10",
+  "collected_at": "2026-10-27T07:43:21+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/3075839.csv",
+  "sha256": "53acb2fb1f3aea76225d011ea7c6256cee6be76a4ac3a8a0c111bc869bae5c3d",
+  "bytes": 2034
+}

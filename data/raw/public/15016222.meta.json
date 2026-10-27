@@ -1,0 +1,14 @@
+{
+  "id": "15016222",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 경기도 군포시_체육시설업 현황_20250623",
+  "source_url": "https://www.data.go.kr/data/15016222/fileData.do",
+  "publisher": "경기도 군포시",
+  "dataset_updated": "2025-06-24",
+  "collected_at": "2026-10-27T07:47:26+00:00",
+  "source_license": "공공저작물 : 출처표시 (제 1유형)",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15016222.csv",
+  "sha256": "1cbb9475b48aed7e76ebde9293ff6c1547024384580fca3549fc21ef21b1f66e",
+  "bytes": 34367
+}

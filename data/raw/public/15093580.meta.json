@@ -1,0 +1,14 @@
+{
+  "id": "15093580",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 대구광역시 북구_체육시설업 현황 헬스장 골프연습장_20251119",
+  "source_url": "https://www.data.go.kr/data/15093580/fileData.do",
+  "publisher": "대구광역시 북구",
+  "dataset_updated": "2025-11-19",
+  "collected_at": "2026-10-27T07:47:11+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15093580.csv",
+  "sha256": "513535573428910c522d6794b3363b8d8e299c6e49f32cb4361eb833c155ac10",
+  "bytes": 23583
+}

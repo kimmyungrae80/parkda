@@ -1,0 +1,14 @@
+{
+  "id": "15005950",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 체육시설 현황_20200914",
+  "source_url": "https://www.data.go.kr/data/15005950/fileData.do",
+  "publisher": "울산광역시중구도시관리공단",
+  "dataset_updated": "2026-08-07",
+  "collected_at": "2026-10-27T07:43:45+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15005950.csv",
+  "sha256": "8945fd98a98c35e50dfd575d070599e62a63e2fd8774ed3fe2acbf196928e055",
+  "bytes": 3130
+}

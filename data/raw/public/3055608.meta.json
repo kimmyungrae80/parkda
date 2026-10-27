@@ -1,0 +1,14 @@
+{
+  "id": "3055608",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 부산광역시 금정구_체육시설업 현황_20260209",
+  "source_url": "https://www.data.go.kr/data/3055608/fileData.do",
+  "publisher": "부산광역시 금정구",
+  "dataset_updated": "2026-02-09",
+  "collected_at": "2026-10-27T07:46:29+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/3055608.csv",
+  "sha256": "875506bb6b072601fa4b5e926a63344c3371ba387b1e4f1ace81a7f1cdacd565",
+  "bytes": 23367
+}

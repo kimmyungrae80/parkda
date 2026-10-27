@@ -1,0 +1,14 @@
+{
+  "id": "3067620",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 제주특별자치도 서귀포시_공공체육시설현황_20261015",
+  "source_url": "https://www.data.go.kr/data/3067620/fileData.do",
+  "publisher": "제주특별자치도 서귀포시",
+  "dataset_updated": "2026-10-15",
+  "collected_at": "2026-10-27T07:48:05+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/3067620.csv",
+  "sha256": "2fc8731c86ba7315b16feeae56d6d37d96c684ec16741a2f3160f1c9bfba8a29",
+  "bytes": 11100
+}

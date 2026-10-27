@@ -1,0 +1,14 @@
+{
+  "id": "15005537",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 의왕도시공사_체육시설 보유 현황_20250502",
+  "source_url": "https://www.data.go.kr/data/15005537/fileData.do",
+  "publisher": "의왕도시공사",
+  "dataset_updated": "2025-05-07",
+  "collected_at": "2026-10-27T07:44:44+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15005537.csv",
+  "sha256": "f867becfbe0ebcdcf7911b34274125d115936650353c53ae45151bb4e5d30f5b",
+  "bytes": 2313
+}

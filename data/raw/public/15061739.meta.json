@@ -1,0 +1,14 @@
+{
+  "id": "15061739",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 양산시시설관리공단_체육시설 황산및가산공원 운영현황_20201031",
+  "source_url": "https://www.data.go.kr/data/15061739/fileData.do",
+  "publisher": "양산시시설관리공단",
+  "dataset_updated": "2020-11-09",
+  "collected_at": "2026-10-27T07:46:06+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15061739.csv",
+  "sha256": "6c6128390348d380d11af8c745efa40bb195af98351bc81beae8b06453e42581",
+  "bytes": 561
+}

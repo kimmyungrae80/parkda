@@ -1,0 +1,14 @@
+{
+  "id": "15025243",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 과천도시공사_공공체육시설_20251124",
+  "source_url": "https://www.data.go.kr/data/15025243/fileData.do",
+  "publisher": "과천도시공사",
+  "dataset_updated": "2025-11-24",
+  "collected_at": "2026-10-27T07:47:00+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15025243.csv",
+  "sha256": "12ee44c63eee4db8471875b24150ffeea6678b4502589a01eb51605b480bb1d4",
+  "bytes": 3969
+}

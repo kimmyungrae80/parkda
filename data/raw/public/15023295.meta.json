@@ -1,0 +1,14 @@
+{
+  "id": "15023295",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 부산광역시_수영구_체육시설업 현황_20260805",
+  "source_url": "https://www.data.go.kr/data/15023295/fileData.do",
+  "publisher": "부산광역시 수영구",
+  "dataset_updated": "2026-08-20",
+  "collected_at": "2026-10-27T07:48:02+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15023295.csv",
+  "sha256": "32ec3000599b179d94dbe1a59bb052e590d02979c03486e523764a42e8971b23",
+  "bytes": 17013
+}

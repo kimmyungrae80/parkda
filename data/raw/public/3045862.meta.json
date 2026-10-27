@@ -1,0 +1,14 @@
+{
+  "id": "3045862",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 부산광역시 강서구_체육시설업현황_20260622",
+  "source_url": "https://www.data.go.kr/data/3045862/fileData.do",
+  "publisher": "부산광역시 강서구",
+  "dataset_updated": "2026-06-22",
+  "collected_at": "2026-10-27T07:48:42+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/3045862.csv",
+  "sha256": "904132de2c8f9edb37ef35967561a42d6eb40f44005c70778bc1d33861e8fbb3",
+  "bytes": 25720
+}

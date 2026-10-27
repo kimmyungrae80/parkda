@@ -1,0 +1,14 @@
+{
+  "id": "15099292",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 충청북도 제천시_체육시설현황_20251230",
+  "source_url": "https://www.data.go.kr/data/15099292/fileData.do",
+  "publisher": "충청북도 제천시",
+  "dataset_updated": "2025-12-30",
+  "collected_at": "2026-10-27T07:48:14+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15099292.csv",
+  "sha256": "3698ed648d7fb5789a8d42951754f39348de970fb71331e1a7df379b6244d346",
+  "bytes": 4854
+}

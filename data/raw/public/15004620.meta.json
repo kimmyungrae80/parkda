@@ -1,0 +1,14 @@
+{
+  "id": "15004620",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 경상북도 영천시_체육시설업 현황_20251118",
+  "source_url": "https://www.data.go.kr/data/15004620/fileData.do",
+  "publisher": "경상북도 영천시",
+  "dataset_updated": "2025-11-18",
+  "collected_at": "2026-10-27T07:47:51+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15004620.csv",
+  "sha256": "526447982b23debe783ccde506dfbf3ec7419dd2eab4a74be34f08107842ea51",
+  "bytes": 15158
+}

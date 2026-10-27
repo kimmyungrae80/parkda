@@ -1,0 +1,14 @@
+{
+  "id": "15064770",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 경기도 포천시_공공체육시설현황_20250601",
+  "source_url": "https://www.data.go.kr/data/15064770/fileData.do",
+  "publisher": "경기도 포천시",
+  "dataset_updated": "2025-07-31",
+  "collected_at": "2026-10-27T07:48:34+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15064770.csv",
+  "sha256": "2936911f48b484a7865e61adf3caf77c4000188445e6c012cd831c1993b8c0c7",
+  "bytes": 13306
+}

@@ -1,0 +1,14 @@
+{
+  "id": "15030629",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 경기도 광주시_체육시설현황_20251119",
+  "source_url": "https://www.data.go.kr/data/15030629/fileData.do",
+  "publisher": "경기도 광주시",
+  "dataset_updated": "2025-11-19",
+  "collected_at": "2026-10-27T07:47:46+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15030629.csv",
+  "sha256": "04e36d9e38ba044c27cde4889a732823040bdabee701ad63057834285557b6ee",
+  "bytes": 5210
+}

@@ -1,0 +1,14 @@
+{
+  "id": "15039794",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 인천광역시남동구도시관리공단_공공체육시설대관정보_20200924",
+  "source_url": "https://www.data.go.kr/data/15039794/fileData.do",
+  "publisher": "인천광역시남동구도시관리공단",
+  "dataset_updated": "2020-09-24",
+  "collected_at": "2026-10-27T07:47:57+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15039794.csv",
+  "sha256": "72112675e71f0f25097e4780637945290e79afed7cbc09acbbf31d2d9fbc61d2",
+  "bytes": 807
+}

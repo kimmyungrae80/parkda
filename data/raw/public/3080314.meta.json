@@ -1,0 +1,14 @@
+{
+  "id": "3080314",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 경기도 양주시_체육시설 현황_20260722",
+  "source_url": "https://www.data.go.kr/data/3080314/fileData.do",
+  "publisher": "경기도 양주시",
+  "dataset_updated": "2026-07-27",
+  "collected_at": "2026-10-27T07:44:39+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/3080314.csv",
+  "sha256": "773a3df1b078ddba048555a1cd5b029b5fe3397eca7cd9c5dbb0a928e0f4227b",
+  "bytes": 24692
+}

@@ -1,0 +1,14 @@
+{
+  "id": "15061519",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 양산시시설관리공단_체육시설 주민편익시설 이용현황_20210630",
+  "source_url": "https://www.data.go.kr/data/15061519/fileData.do",
+  "publisher": "양산시시설관리공단",
+  "dataset_updated": "2021-07-06",
+  "collected_at": "2026-10-27T07:45:58+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15061519.csv",
+  "sha256": "f167e4e0f9205c1adf096685c86085cb7fe78096a967ddda85fac2c3338a5bd3",
+  "bytes": 250
+}

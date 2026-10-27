@@ -23,7 +23,7 @@ def read_text(path):
             return raw.decode(enc)
         except UnicodeDecodeError:
             continue
-    return raw.decode("utf-8", "replace")
+    return raw.decode("utf-8", "replace")  # 깨진 바이트가 있어도 가능한 만큼 읽음
 
 
 def main():
@@ -32,7 +32,7 @@ def main():
         meta = json.loads(meta_path.read_text(encoding="utf-8"))
         if meta.get("status") != "ok":
             continue
-        rows = list(csv.reader(io.StringIO(read_text(ROOT / meta["file"]))))
+        rows = list(csv.reader(io.StringIO(read_text(ROOT / meta["file"]), newline="")))
         if not rows or "대회명" not in rows[0]:
             continue
         h = {x.strip(): i for i, x in enumerate(rows[0])}

@@ -1,0 +1,14 @@
+{
+  "id": "15055872",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 인천광역시_공공체육시설_20221231",
+  "source_url": "https://www.data.go.kr/data/15055872/fileData.do",
+  "publisher": "인천광역시",
+  "dataset_updated": "2026-02-11",
+  "collected_at": "2026-10-27T07:44:09+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15055872.csv",
+  "sha256": "52241cc29aeb9695b1cfa3676450175c2bcb4a325c86cdec1b150a127ace8338",
+  "bytes": 794
+}

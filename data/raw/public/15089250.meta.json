@@ -1,0 +1,14 @@
+{
+  "id": "15089250",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 인천광역시 부평구_동별 체육시설 현황_20261023",
+  "source_url": "https://www.data.go.kr/data/15089250/fileData.do",
+  "publisher": "인천광역시 부평구",
+  "dataset_updated": "2026-10-23",
+  "collected_at": "2026-10-27T07:45:38+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15089250.csv",
+  "sha256": "ec95901d49014e0731128d3fd070ec83e8920eabc91e26722ca5cc9669d0a4f2",
+  "bytes": 15647
+}

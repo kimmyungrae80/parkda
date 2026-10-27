@@ -1,0 +1,14 @@
+{
+  "id": "3075744",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 부산광역시 해운대구_신고체육시설업 현황_20250912",
+  "source_url": "https://www.data.go.kr/data/3075744/fileData.do",
+  "publisher": "부산광역시 해운대구",
+  "dataset_updated": "2025-11-13",
+  "collected_at": "2026-10-27T07:47:34+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/3075744.csv",
+  "sha256": "94ced453c5bd7b13a9487ef1f8083cac4345d39bbbaac04b9f9ba27317936978",
+  "bytes": 82554
+}

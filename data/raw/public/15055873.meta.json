@@ -1,0 +1,14 @@
+{
+  "id": "15055873",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 인천광역시_경기장 및 체육시설 현황_20210421",
+  "source_url": "https://www.data.go.kr/data/15055873/fileData.do",
+  "publisher": "인천광역시",
+  "dataset_updated": "2025-12-04",
+  "collected_at": "2026-10-27T07:42:34+00:00",
+  "source_license": "확인 필요",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15055873.csv",
+  "sha256": "ec3daf2e04500ea61fa85eafd56e6f11361d67a7f7fc60b02d99bf34dd6b5940",
+  "bytes": 4861
+}

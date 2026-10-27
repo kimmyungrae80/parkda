@@ -1,0 +1,14 @@
+{
+  "id": "15054901",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 전북특별자치도 임실군_체육시설_20251117",
+  "source_url": "https://www.data.go.kr/data/15054901/fileData.do",
+  "publisher": "전북특별자치도 임실군",
+  "dataset_updated": "2025-11-17",
+  "collected_at": "2026-10-27T07:43:57+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15054901.csv",
+  "sha256": "7a3eb887f08bd8026cb60b851797fe81e5cfefc1a6be3a6fc9a5056529980f9a",
+  "bytes": 1971
+}

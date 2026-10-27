@@ -1,0 +1,14 @@
+{
+  "id": "3079326",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 경상남도 거제시_체육시설업현황_20260204",
+  "source_url": "https://www.data.go.kr/data/3079326/fileData.do",
+  "publisher": "경상남도 거제시",
+  "dataset_updated": "2026-02-04",
+  "collected_at": "2026-10-27T07:46:09+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/3079326.csv",
+  "sha256": "ca1ea0fac6c4061b93c5a3307574bb2aeeaf6548f5bcc2569b3f57efa3c4256e",
+  "bytes": 39438
+}

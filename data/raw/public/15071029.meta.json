@@ -1,0 +1,14 @@
+{
+  "id": "15071029",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 대한장애인체육회_장애인전용체육시설_20221023",
+  "source_url": "https://www.data.go.kr/data/15071029/fileData.do",
+  "publisher": "대한장애인체육회",
+  "dataset_updated": "2022-12-23",
+  "collected_at": "2026-10-27T07:45:26+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15071029.csv",
+  "sha256": "95bf8dcb321fee4d94df8fc06fa890b9309dc1d5d7d46f58d5ddc68a841f18f3",
+  "bytes": 6488
+}
