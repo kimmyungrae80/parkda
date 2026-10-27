@@ -1518,17 +1518,17 @@ async function loadYoutubeVideos(query = '파크골프 대회', force = false) {
         const ch    = v.snippet.channelTitle;
         const thumb = v.snippet.thumbnails?.medium?.url || v.snippet.thumbnails?.default?.url || '';
         const date  = _relativeDate ? _relativeDate(new Date(v.snippet.publishedAt)) : '';
-        return `<div style="flex-shrink:0;width:160px;cursor:pointer" onclick="window.open('https://www.youtube.com/watch?v=${vid}','_blank')">
+        return `<div style="flex-shrink:0;width:160px;cursor:pointer" onclick="window.open('https://www.youtube.com/watch?v=${safeId(vid)}','_blank')">
           <div style="position:relative;width:160px;height:90px;border-radius:10px;overflow:hidden;background:#111">
-            <img src="${thumb}" style="width:100%;height:100%;object-fit:cover" loading="lazy">
+            <img src="${escHtml(thumb)}" style="width:100%;height:100%;object-fit:cover" loading="lazy">
             <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
               <div style="width:36px;height:36px;background:rgba(220,0,0,.9);border-radius:50%;display:flex;align-items:center;justify-content:center">
                 <div style="width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:13px solid #fff;margin-left:3px"></div>
               </div>
             </div>
           </div>
-          <div style="font-size:12px;font-weight:700;color:var(--text);margin-top:7px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${title}</div>
-          <div style="font-size:11px;color:var(--gray3);margin-top:3px">${ch}</div>
+          <div style="font-size:12px;font-weight:700;color:var(--text);margin-top:7px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${escHtml(title)}</div>
+          <div style="font-size:11px;color:var(--gray3);margin-top:3px">${escHtml(ch)}</div>
           <div style="font-size:10px;color:var(--gray3)">${date}</div>
         </div>`;
       }).join('')}
@@ -1584,11 +1584,11 @@ async function loadParkgolfNews(force = false) {
 
   if (allItems.length) {
     body.innerHTML = allItems.map((n, i) => `
-      <div onclick="window.open('${n.link}','_blank')" style="display:flex;gap:12px;padding:14px 0;border-bottom:${i < allItems.length-1 ? '1px solid var(--gray1)' : 'none'};cursor:pointer;align-items:flex-start">
+      <div onclick="window.open('${safeUrl(n.link)}','_blank')" style="display:flex;gap:12px;padding:14px 0;border-bottom:${i < allItems.length-1 ? '1px solid var(--gray1)' : 'none'};cursor:pointer;align-items:flex-start">
         <div style="width:34px;height:34px;border-radius:8px;background:var(--g5);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">📰</div>
         <div style="flex:1;min-width:0">
-          <div style="font-size:14px;font-weight:700;color:var(--text);line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${n.title}</div>
-          ${n.desc ? `<div style="font-size:12px;color:var(--gray3);margin-top:3px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden">${n.desc}...</div>` : ''}
+          <div style="font-size:14px;font-weight:700;color:var(--text);line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${escHtml(n.title)}</div>
+          ${n.desc ? `<div style="font-size:12px;color:var(--gray3);margin-top:3px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden">${escHtml(n.desc)}...</div>` : ''}
           <div style="font-size:11px;color:var(--gray3);margin-top:5px;display:flex;gap:5px;align-items:center">
             <span style="background:var(--g5);color:var(--g2);border-radius:4px;padding:1px 7px;font-weight:700;font-size:10px">${n.src}</span>
             <span>${n.dateStr}</span>
@@ -1657,11 +1657,11 @@ async function loadNearbyFood(force = false) {
             body.innerHTML = data.slice(0,6).map((p, i) => {
               const dist = +p.distance>=1000?`${(+p.distance/1000).toFixed(1)}km`:`${p.distance}m`;
               const cat  = p.category_name?.split('>').pop()?.trim() || '';
-              return `<div onclick="window.open('${p.place_url}','_blank')" style="display:flex;align-items:center;gap:13px;padding:13px 0;border-bottom:${i<5?'1px solid var(--gray1)':'none'};cursor:pointer">
+              return `<div onclick="window.open('${safeUrl(p.place_url)}','_blank')" style="display:flex;align-items:center;gap:13px;padding:13px 0;border-bottom:${i<5?'1px solid var(--gray1)':'none'};cursor:pointer">
                 <div style="width:38px;height:38px;border-radius:10px;background:var(--o5);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${ico(cat)}</div>
                 <div style="flex:1;min-width:0">
-                  <div style="font-size:15px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.place_name}</div>
-                  <div style="font-size:12px;color:var(--gray3);margin-top:2px">${cat}${p.phone?' · '+p.phone:''}</div>
+                  <div style="font-size:15px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(p.place_name)}</div>
+                  <div style="font-size:12px;color:var(--gray3);margin-top:2px">${escHtml(cat)}${p.phone?' · '+escHtml(p.phone):''}</div>
                 </div>
                 <div style="text-align:right;flex-shrink:0">
                   <div style="font-size:14px;font-weight:900;color:var(--b2)">${dist}</div>
@@ -1984,6 +1984,10 @@ function renderScoreTbl() {
   document.getElementById('score-tbl').innerHTML = head + body;
   updLive();
 }
+/* 외부(유튜브·뉴스·카카오 장소) 데이터를 HTML/속성에 넣기 전 처리 */
+function escHtml(v){ return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
+function safeUrl(v){ const u = String(v ?? ''); const m = {' ':'%20','\'':'%27','"':'%22','<':'%3C','>':'%3E'}; return /^https?:\/\//i.test(u) ? u.replace(/[\s'"<>]/g, c => m[c] || '%20') : '#'; }
+function safeId(v){ const u = String(v ?? ''); return /^[A-Za-z0-9_-]{6,20}$/.test(u) ? u : ''; }
 function esc(s) { return s.replace(/[^가-힣a-zA-Z0-9]/g, '_'); }
 function onSI(el) {
   if (!canEdit()) { el.value = ''; toast('조장만 입력할 수 있어요 🔒'); return; }
