@@ -1,0 +1,14 @@
+{
+  "id": "15142153",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 전남광주통합특별시_파크골프장현황_20260226",
+  "source_url": "https://www.data.go.kr/data/15142153/fileData.do",
+  "publisher": "전남광주통합특별시",
+  "dataset_updated": "2026-02-27",
+  "collected_at": "2026-10-27T07:05:08+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15142153.csv",
+  "sha256": "d81667427262018b9c4ced51ddb7c7464c13bad2b90164dc4830f3889fdf57a1",
+  "bytes": 2608
+}

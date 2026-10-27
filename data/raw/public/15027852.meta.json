@@ -1,0 +1,14 @@
+{
+  "id": "15027852",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 경상북도 울진군 전국대회 유치현황_20260228",
+  "source_url": "https://www.data.go.kr/data/15027852/fileData.do",
+  "publisher": "경상북도 울진군",
+  "dataset_updated": "2026-03-05",
+  "collected_at": "2026-10-27T07:05:36+00:00",
+  "source_license": "공공저작물 : 출처표시 (제 1유형)",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15027852.csv",
+  "sha256": "d53dc92d4a70991081d035c6f2101ca48ae6be69891b341bd0307fc3189677e9",
+  "bytes": 10828
+}

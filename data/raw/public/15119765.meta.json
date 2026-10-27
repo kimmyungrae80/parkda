@@ -1,0 +1,14 @@
+{
+  "id": "15119765",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 대전광역시 중구_생활체육교실 운영현황_20250924",
+  "source_url": "https://www.data.go.kr/data/15119765/fileData.do",
+  "publisher": "대전광역시 중구",
+  "dataset_updated": "2025-11-10",
+  "collected_at": "2026-10-27T07:06:40+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15119765.csv",
+  "sha256": "916ac5cfb7f3e3b9eca218da22f9fbf9990ebfbffc9e6890df316d7bc0d92f40",
+  "bytes": 2546
+}

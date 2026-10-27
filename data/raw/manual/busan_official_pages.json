@@ -1,0 +1,18 @@
+[
+  {"source_type": "official_page", "source_key": "manual:busan-daejeo", "source_name": "부산광역시 낙동강관리본부 공식 안내 페이지 (대저생태공원 파크골프장)",
+   "source_url": "https://www.busan.go.kr/parkgolf/parkgolf03", "publisher": "부산광역시 낙동강관리본부", "dataset_updated": null,
+   "collected_at": "2026-10-27T00:00:00+09:00", "source_license": "공공누리 등 재이용 조건 공식 페이지 확인 필요 (링크로 연결)",
+   "name": "대저생태공원 파크골프장", "address": "부산광역시 강서구 대저1동 1-5 (대저생태공원 내)", "road_address": null, "region": "부산", "city": "강서구",
+   "latitude": null, "longitude": null, "holes": 90, "course_count": null, "area_m2": null,
+   "fee": "무료", "opening_hours": "일출~일몰 (7·8월 폭염 시 11:00~15:00 휴장)", "closed_days": "매주 월요일",
+   "reservation_method": "9홀마다 무료 선착순 대기 입장 (평일 화~금·공휴일은 부산시민 우선, 주말은 누구나)", "reservation_url": null,
+   "phone": "051-310-6052", "operator": "부산광역시 낙동강관리본부 공원관리팀", "parking": null, "restroom": null, "website": "https://www.busan.go.kr/parkgolf/parkgolf03", "kpga_id": null},
+  {"source_type": "official_page", "source_key": "manual:busan-hwamyeong", "source_name": "부산광역시 낙동강관리본부 공식 안내 페이지 (화명생태공원 파크골프장)",
+   "source_url": "https://www.busan.go.kr/parkgolf/parkgolf02", "publisher": "부산광역시 낙동강관리본부", "dataset_updated": null,
+   "collected_at": "2026-10-27T00:00:00+09:00", "source_license": "공공누리 등 재이용 조건 공식 페이지 확인 필요 (링크로 연결)",
+   "name": "화명생태공원 파크골프장", "address": "부산광역시 북구 화명동 1718-11, 1718-14 (화명생태공원 내)", "road_address": null, "region": "부산", "city": "북구",
+   "latitude": null, "longitude": null, "holes": 45, "course_count": 5, "area_m2": null,
+   "fee": "무료", "opening_hours": "일출~일몰 (7·8월 폭염 시 11:00~15:00 휴장)", "closed_days": "매주 월요일",
+   "reservation_method": "9홀(A~E) 단위 무료 선착순 대기 입장 (평일 화~금·공휴일은 부산시민 우선, 주말은 누구나)", "reservation_url": null,
+   "phone": "051-310-6052", "operator": "부산광역시 낙동강관리본부 공원관리팀", "parking": null, "restroom": null, "website": "https://www.busan.go.kr/parkgolf/parkgolf02", "kpga_id": null}
+]

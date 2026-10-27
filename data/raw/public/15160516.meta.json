@@ -1,0 +1,14 @@
+{
+  "id": "15160516",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 이천시시설관리공단_파크골프장 표준데이터_20260724",
+  "source_url": "https://www.data.go.kr/data/15160516/fileData.do",
+  "publisher": "이천시시설관리공단",
+  "dataset_updated": "2026-07-27",
+  "collected_at": "2026-10-27T07:06:56+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15160516.csv",
+  "sha256": "e3490faf11a65721059530d7cd2721744cade93e600530cb21afec0ec2a8b653",
+  "bytes": 767
+}

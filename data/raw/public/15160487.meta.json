@@ -1,0 +1,14 @@
+{
+  "id": "15160487",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 달성군시설관리공단_파크골프장현황_20260715",
+  "source_url": "https://www.data.go.kr/data/15160487/fileData.do",
+  "publisher": "달성군시설관리공단",
+  "dataset_updated": "2026-07-23",
+  "collected_at": "2026-10-27T07:05:45+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15160487.csv",
+  "sha256": "b829cbd6f6d430b8294bd04e896002eac5c17feae11752203f839a5ba2643951",
+  "bytes": 2169
+}

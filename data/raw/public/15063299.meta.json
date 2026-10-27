@@ -1,0 +1,14 @@
+{
+  "id": "15063299",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 천안도시공사_시설현황_20260731",
+  "source_url": "https://www.data.go.kr/data/15063299/fileData.do",
+  "publisher": "천안도시공사",
+  "dataset_updated": "2026-08-03",
+  "collected_at": "2026-10-27T07:05:34+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15063299.csv",
+  "sha256": "f9876ce8bea25096a5d8c9eb8f7a9ea22fa2101d75c8d5df2e0d024b182d8b21",
+  "bytes": 1999
+}

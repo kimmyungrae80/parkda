@@ -7,6 +7,8 @@ const CATEGORY_QUERY = {
   '구장': '파크골프장 소개',
 };
 const TTL_MS = 6 * 60 * 60 * 1000;
+// 구장 이름으로 검색할 때 허용하는 문자 (한글·영문·숫자·공백·일부 기호). 길이 2~40자.
+const SAFE_Q = /^[가-힣A-Za-z0-9 ·\-]{2,40}$/;
 const memo = new Map();
 
 function send(res, status, body, cacheControl) {
@@ -18,9 +20,18 @@ function send(res, status, body, cacheControl) {
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET') return send(res, 405, { error: 'method_not_allowed' });
-  const category = new URL(req.url, 'http://localhost').searchParams.get('category') || '대회';
-  const q = CATEGORY_QUERY[category];
-  if (!q) return send(res, 400, { error: 'unknown_category' });
+  const params = new URL(req.url, 'http://localhost').searchParams;
+  const venueQ = (params.get('q') || '').trim();
+  let category, q;
+  if (venueQ) {
+    if (!SAFE_Q.test(venueQ)) return send(res, 400, { error: 'invalid_query' });
+    category = `q:${venueQ}`;
+    q = `파크골프 ${venueQ}`;
+  } else {
+    category = params.get('category') || '대회';
+    q = CATEGORY_QUERY[category];
+    if (!q) return send(res, 400, { error: 'unknown_category' });
+  }
 
   const key = process.env.YOUTUBE_API_KEY;
   if (!key) return send(res, 503, { error: 'not_configured' });
@@ -28,13 +39,13 @@ module.exports = async function handler(req, res) {
   const hit = memo.get(category);
   if (hit && Date.now() - hit.at < TTL_MS) return send(res, 200, hit.body, 'public, s-maxage=21600');
 
-  const params = new URLSearchParams({
+  const search = new URLSearchParams({
     part: 'snippet', q, type: 'video', maxResults: '6', order: 'relevance',
     relevanceLanguage: 'ko', regionCode: 'KR', key,
   });
   let upstream;
   try {
-    upstream = await fetch(`https://www.googleapis.com/youtube/v3/search?${params}`, { signal: AbortSignal.timeout(7000) });
+    upstream = await fetch(`https://www.googleapis.com/youtube/v3/search?${search}`, { signal: AbortSignal.timeout(7000) });
   } catch (e) {
     return send(res, 502, { error: 'upstream_unreachable' });
   }
@@ -55,7 +66,7 @@ module.exports = async function handler(req, res) {
       url: v.id && v.id.videoId ? `https://www.youtube.com/watch?v=${v.id.videoId}` : null,
     }))
     .filter(i => i.videoId && i.title);
-  const body = { category, items, fetchedAt: new Date().toISOString(), source: 'YouTube Data API v3' };
+  const body = { category, items, fetchedAt: new Date().toISOString(), source: 'YouTube Data API v3 (검색 결과)' };
   memo.set(category, { at: Date.now(), body });
   return send(res, 200, body, 'public, s-maxage=21600');
 };

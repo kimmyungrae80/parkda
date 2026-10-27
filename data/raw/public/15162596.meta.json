@@ -1,0 +1,14 @@
+{
+  "id": "15162596",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 경기도 시흥시_희망공원 파크골프장 이용자 현황_20260823",
+  "source_url": "https://www.data.go.kr/data/15162596/fileData.do",
+  "publisher": "경기도 시흥시",
+  "dataset_updated": "2026-08-31",
+  "collected_at": "2026-10-27T07:06:47+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15162596.csv",
+  "sha256": "4d95034dbded880406ed23c8db55e72187c0e3cb097a776d0db9eb44189807a5",
+  "bytes": 3506
+}

@@ -1,0 +1,14 @@
+{
+  "id": "15166992",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 인천시설공단_파크골프장 운영 현황_20260907",
+  "source_url": "https://www.data.go.kr/data/15166992/fileData.do",
+  "publisher": "인천시설공단",
+  "dataset_updated": "2026-09-30",
+  "collected_at": "2026-10-27T07:07:03+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15166992.csv",
+  "sha256": "dadaf9ddbc31130f345bf620320025bea247209c895e4c89bae7cae0e04b6fcd",
+  "bytes": 1586
+}

@@ -1,1 +1,11 @@
 preview/
+
+# 데이터 파이프라인: 원본 CSV·Excel 과 Excel 기반 내부 후보는 저장소에 올리지 않음
+# (Excel 원본은 출처 라이선스가 없고, 저장소가 공개라 미검증 이름·주소가 노출될 수 있음)
+data/raw/public/*.csv
+data/raw/github/
+data/processed/
+data/verified/courses_checked.json
+data/verified/quality_report.json
+__pycache__/
+*.pyc

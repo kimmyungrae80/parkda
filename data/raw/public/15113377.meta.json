@@ -1,0 +1,14 @@
+{
+  "id": "15113377",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 경상남도 거창군_파크골프장_20260811",
+  "source_url": "https://www.data.go.kr/data/15113377/fileData.do",
+  "publisher": "경상남도 거창군",
+  "dataset_updated": "2026-08-27",
+  "collected_at": "2026-10-27T07:05:22+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15113377.csv",
+  "sha256": "413a274e4f7dca5496fe289a6326148c3d674f5a9a4a5c0d4cbba434a8f03df3",
+  "bytes": 1937
+}

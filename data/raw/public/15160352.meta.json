@@ -1,0 +1,14 @@
+{
+  "id": "15160352",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 연천군시설관리공단_재인폭포파크골프장 표준데이터_20260714",
+  "source_url": "https://www.data.go.kr/data/15160352/fileData.do",
+  "publisher": "연천군시설관리공단",
+  "dataset_updated": "2026-07-14",
+  "collected_at": "2026-10-27T07:06:44+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15160352.csv",
+  "sha256": "b517e1721c68494eded71c05705b656217329977c0ecc33f700094da6590621d",
+  "bytes": 517
+}

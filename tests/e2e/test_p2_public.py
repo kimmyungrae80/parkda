@@ -57,9 +57,11 @@ def main():
 
             # 맛집: 키 미설정 → 안내
             pg.fill("#venue-q", "화명"); pg.click("#pg-venues .hub-search .hub-btn"); time.sleep(0.5)
-            pg.click(".hub-venue >> nth=0 >> .hub-act-g")
-            pg.wait_for_function("document.getElementById('food-body').innerText.indexOf('설정') >= 0", timeout=8000)
-            check("맛집: 서버 키 미설정 시 안내 (비밀키 노출 없음)", "아직 서비스 설정이 끝나지 않았어요" in pg.inner_text("#food-body"))
+            pg.evaluate("""() => fetch('data/verified/courses.json').then(r => r.json()).then(list => {
+                const c = list.find(x => x.latitude != null && x.longitude != null); location.hash = '#/course/' + c.id; })""")
+            pg.wait_for_function("document.getElementById('food-list') && document.getElementById('food-list').innerText.indexOf('설정') >= 0", timeout=10000)
+            check("맛집: 서버 키 미설정 시 안내 (비밀키 노출 없음)", "아직 서비스 설정이 끝나지 않았어요" in pg.inner_text("#food-list"))
+            pg.evaluate("location.hash=''"); time.sleep(0.3)
             check("맛집: 구장 미선택 상태 안내는 별도", True)
 
             # 유튜브: 할당량 초과 → 안내

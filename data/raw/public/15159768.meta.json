@@ -1,0 +1,14 @@
+{
+  "id": "15159768",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 제주특별자치도_생활체육 종목별 클럽수 및 동호인 데이터_20251231",
+  "source_url": "https://www.data.go.kr/data/15159768/fileData.do",
+  "publisher": "제주특별자치도",
+  "dataset_updated": "2026-06-09",
+  "collected_at": "2026-10-27T07:06:50+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15159768.csv",
+  "sha256": "fc169f9db17822edc3e932a5ddb63c43e205cc959f784b278559d0ea9bbc0f68",
+  "bytes": 881
+}

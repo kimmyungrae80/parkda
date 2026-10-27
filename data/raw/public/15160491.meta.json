@@ -1,0 +1,14 @@
+{
+  "id": "15160491",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 서울특별시관악구시설관리공단_관악파크골프장 표준데이터_20260723",
+  "source_url": "https://www.data.go.kr/data/15160491/fileData.do",
+  "publisher": "서울특별시관악구시설관리공단",
+  "dataset_updated": "2026-07-23",
+  "collected_at": "2026-10-27T07:06:53+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15160491.csv",
+  "sha256": "aab7252eead1eb790188d18445223ecd4578b1e42fbc10aacdb7638a1e1d1bc8",
+  "bytes": 677
+}

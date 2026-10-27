@@ -1,0 +1,14 @@
+{
+  "id": "15142265",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 경상북도_파크골프장 현황_20250310",
+  "source_url": "https://www.data.go.kr/data/15142265/fileData.do",
+  "publisher": "경상북도",
+  "dataset_updated": "2026-10-21",
+  "collected_at": "2026-10-27T07:05:14+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15142265.csv",
+  "sha256": "2158612e4e8e401ea541adf451a7a923a0788aa7c8ee9dba1fd16084794d1c93",
+  "bytes": 4676
+}

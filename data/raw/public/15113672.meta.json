@@ -1,0 +1,14 @@
+{
+  "id": "15113672",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 서울특별시_파크골프장 현황_20230508",
+  "source_url": "https://www.data.go.kr/data/15113672/fileData.do",
+  "publisher": "서울특별시",
+  "dataset_updated": "2025-11-24",
+  "collected_at": "2026-10-27T07:05:11+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15113672.csv",
+  "sha256": "98fba1ff0c1f34e12145a40b8a4ac77e50ca57635eef88df185a2c3c9bf45510",
+  "bytes": 1266
+}

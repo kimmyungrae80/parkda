@@ -1,0 +1,14 @@
+{
+  "id": "15142438",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 세종특별자치시_파크골프장 현황_20250314",
+  "source_url": "https://www.data.go.kr/data/15142438/fileData.do",
+  "publisher": "세종특별자치시",
+  "dataset_updated": "2025-09-01",
+  "collected_at": "2026-10-27T07:05:28+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15142438.csv",
+  "sha256": "75aa29e901b71f1158762a522a908c0287dd3dfff03d7e3c15950f768b0247d1",
+  "bytes": 664
+}

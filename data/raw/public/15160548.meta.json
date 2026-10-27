@@ -1,0 +1,14 @@
+{
+  "id": "15160548",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 경주시시설관리공단_파크골프장 표준데이터_20260727",
+  "source_url": "https://www.data.go.kr/data/15160548/fileData.do",
+  "publisher": "경주시시설관리공단",
+  "dataset_updated": "2026-07-27",
+  "collected_at": "2026-10-27T07:05:51+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15160548.csv",
+  "sha256": "b6894b3f8c033529a0b91dabbcbc0c8ff64ca1a9665033932c7de57c589b23a0",
+  "bytes": 918
+}

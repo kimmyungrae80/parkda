@@ -1,0 +1,14 @@
+{
+  "id": "15104136",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 인천광역시_장애인 생활체육 동호회 현황_20250908",
+  "source_url": "https://www.data.go.kr/data/15104136/fileData.do",
+  "publisher": "인천광역시",
+  "dataset_updated": "2025-11-18",
+  "collected_at": "2026-10-27T07:06:04+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15104136.csv",
+  "sha256": "95da7b03170e8152af07ec9d4c776543f579c65e1b31e8c29405f0638bf1609f",
+  "bytes": 941
+}

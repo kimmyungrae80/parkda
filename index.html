@@ -351,6 +351,20 @@ body.hub-wide .tab-lbl{font-size:14px;font-weight:700}
 .hub-video-t{display:flex;flex-direction:column;gap:4px;font-size:17px}
 .hub-video-t small{color:var(--hub-mute);font-size:14px}
 a.hub-act,a.hub-act-g{display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+.hub-vt-row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.hub-vt-row a{color:var(--hub-ink);text-decoration:none}
+.hub-vt-row a:hover{text-decoration:underline}
+.hub-fav{flex:0 0 auto;min-width:48px;min-height:48px;font-size:26px;line-height:1;color:#b8860b;background:#fff;border:1.5px solid var(--hub-line);border-radius:14px;cursor:pointer}
+.hub-fav.on{border-color:#b8860b}
+.hub-badge{display:inline-block;margin:6px 0 10px;padding:4px 10px;font-size:14px;font-weight:700;color:var(--hub-green);background:#eaf2eb;border-radius:99px}
+.hub-pending{color:var(--hub-mute);font-style:italic}
+.hub-sub{font-size:18px;font-weight:800;margin:18px 0 6px}
+.hub-toggle{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
+.hub-check{display:inline-flex;align-items:center;gap:8px;min-height:44px;font-size:16px;margin-left:auto}
+.hub-check input{width:20px;height:20px}
+.hub-map-wrap{margin-top:12px}
+.hub-map{width:100%;height:420px;border-radius:16px;overflow:hidden;border:1px solid var(--hub-line)}
+.hub-map-wrap[hidden],.hub-list[hidden]{display:none}
 .hub-logo{height:36px;width:auto;vertical-align:middle;margin-right:8px}
 .hub-brand{display:inline-flex;align-items:center;gap:0}
 .hub-wm{font-family:'Bebas Neue','Noto Sans KR',sans-serif;font-size:26px;letter-spacing:.02em;color:var(--hub-green);margin-right:4px}
@@ -584,14 +598,25 @@ select.hub-input{flex:0 1 150px}
   <div class="hub-pad">
     <form class="hub-search" onsubmit="venueSearchFromForm(event)" role="search">
       <label class="hub-sr" for="venue-region">지역 선택</label>
-      <select id="venue-region" class="hub-input"></select>
+      <select id="venue-region" class="hub-input" aria-label="지역 선택" onchange="filterVenues()"></select>
       <label class="hub-sr" for="venue-q">구장 이름</label>
       <input id="venue-q" class="hub-input" type="search" placeholder="구장 이름 (예: 한강)" autocomplete="off">
       <button class="hub-btn" type="submit">검색</button>
     </form>
     <p class="hub-note">구장 정보는 공식 자료로 확인한 내용입니다. 방문 전 운영 여부를 꼭 확인하세요.</p>
+    <div class="hub-toggle" role="group" aria-label="보기 방식">
+      <button id="venue-view-list" class="hub-tab on" onclick="setVenueView('list')">목록</button>
+      <button id="venue-view-map" class="hub-tab" onclick="setVenueView('map')">지도</button>
+      <label class="hub-check"><input type="checkbox" id="venue-fav-only" onchange="filterVenues()"> 즐겨찾기만 보기</label>
+    </div>
     <div id="venue-list" class="hub-list" aria-live="polite"><p class="hub-msg">지역을 고르거나 구장 이름을 입력한 뒤 검색 버튼을 누르세요.</p></div>
+    <div id="venue-map-wrap" class="hub-map-wrap" hidden><div id="venue-map" class="hub-map"></div><p class="hub-note">지도 © OpenStreetMap contributors · 좌표는 공식 자료 또는 주소 기반 자동 좌표입니다.</p></div>
   </div>
+</div>
+
+<div class="pg hub" id="pg-course">
+  <div class="hub-bar"><button class="hub-back" onclick="location.hash='';go('pg-venues')">‹ 목록</button><h2>구장 상세</h2></div>
+  <div class="hub-pad" id="course-body"></div>
 </div>
 
 <div class="pg hub" id="pg-tournaments">
@@ -1373,25 +1398,30 @@ async function init() {
     go('pg-home');
   }
 
+  setTimeout(() => openCourseFromHash(), 1500); // 구장 상세 주소로 들어온 경우
   // 카카오 초기화 (오류나도 앱 실행 방해 안 함)
   try { await kakaoInit(); } catch(e) {}
 }
 
-/* ══ 공개 페이지 (P2): 검증된 데이터 + 서버 API. 비밀키는 브라우저에 없음 ══ */
+/* ══ 공개 페이지 (P3): 공식 출처 구장 데이터 · 상세 페이지 · 지도 · 주변 검색 · 즐겨찾기 ══ */
 const REGIONS = ['서울','부산','대구','인천','광주','대전','울산','세종','경기','강원','충북','충남','전북','전남','경북','경남','제주'];
-let _courses = null, _tournaments = null;
-let _shownVenues = [];   // 화면에 보이는 구장 (인덱스로만 참조)
-let _foodVenue = null;   // 맛집 기준 구장
+const PENDING = '정보 확인 중';
+const STATUS_LABEL = {
+  official_page_checked: '공식 페이지 직접 확인',
+  official_dataset: '공공데이터 기준 (현장 확인 전)',
+};
+let _courses = null, _tournaments = null, _leafletReady = null;
+let _shown = [];           // 목록에 보이는 구장 (인덱스로만 참조)
+let _mapInstance = null;
+let _venueView = 'list';   // list | map
 
 async function loadJson(path) {
   const r = await fetch(path, { cache: 'no-cache' });
   if (!r.ok) throw new Error(path);
   return r.json();
 }
-async function getCourses() {
-  if (!_courses) _courses = await loadJson('data/courses.json');
-  return _courses;
-}
+async function getCourses() { if (!_courses) _courses = await loadJson('data/verified/courses.json'); return _courses; }
+async function getTournaments() { if (!_tournaments) _tournaments = await loadJson('data/verified/tournaments.json'); return _tournaments; }
 async function apiJson(url) {
   const r = await fetch(url);
   const j = await r.json().catch(() => ({}));
@@ -1404,16 +1434,25 @@ function apiMessage(code) {
     quota_exceeded: '오늘 요청이 많아요. 잠시 후 다시 시도해 주세요.',
     kakao_auth: '검색 서비스 인증에 문제가 있어요. 관리자에게 알려 주세요.',
     forbidden: '영상 서비스 권한에 문제가 있어요. 관리자에게 알려 주세요.',
-    not_found: '구장 위치를 찾지 못했어요.',
-    invalid_address: '주소 정보가 올바르지 않아요.',
+    invalid_query: '검색어를 확인해 주세요 (한글·영문·숫자 2~40자).',
   })[code] || '정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.';
 }
 function hubMsg(text) { return `<p class="hub-msg">${escHtml(text)}</p>`; }
+function val(v, suffix = '') { return (v === null || v === undefined || v === '') ? `<span class="hub-pending">${PENDING}</span>` : escHtml(String(v)) + suffix; }
 function renderRegionOptions(id, withAll) {
   const el = document.getElementById(id);
   if (!el) return;
   el.innerHTML = (withAll ? '<option value="">전국</option>' : '') +
     REGIONS.map(r => `<option value="${escHtml(r)}">${escHtml(r)}</option>`).join('');
+}
+
+/* 즐겨찾기: 이 기기에만 저장 (로그인 없이 쓰는 개인 설정, 개인정보 아님) */
+function favIds() { try { return JSON.parse(localStorage.getItem('pd_fav_courses') || '[]'); } catch (e) { return []; } }
+function toggleFav(id) {
+  const f = favIds();
+  const next = f.includes(id) ? f.filter(x => x !== id) : [...f, id];
+  try { localStorage.setItem('pd_fav_courses', JSON.stringify(next)); } catch (e) {}
+  return next.includes(id);
 }
 
 /* 회원 전용 기능 진입 전 로그인 확인 */
@@ -1422,10 +1461,7 @@ function needLogin(pageId) {
   toast('로그인하면 이용할 수 있어요');
   go('pg-login');
 }
-function clubNotify() {
-  // 개인정보(전화번호) 저장 기능은 RLS 검증 전까지 열지 않음 → 안내만 표시
-  toast('Club Pro는 준비 중이에요. 오픈 알림은 아직 받지 않아요');
-}
+function clubNotify() { toast('Club Pro는 준비 중이에요. 오픈 알림은 아직 받지 않아요'); }
 
 /* 홈 상단 메뉴와 회원 영역 */
 function renderHub() {
@@ -1457,7 +1493,7 @@ function renderHub() {
   }
 }
 
-/* ── 구장: 검증된 공식 자료만 표시 ── */
+/* ── 구장 목록 ── */
 function hubSearch(e) {
   if (e) e.preventDefault();
   const region = document.getElementById('hub-region').value;
@@ -1465,127 +1501,278 @@ function hubSearch(e) {
   go('pg-venues');
   document.getElementById('venue-region').value = region;
   document.getElementById('venue-q').value = q;
-  filterVenues(q, region);
+  filterVenues();
 }
-function venueSearchFromForm(e) {
-  e.preventDefault();
-  filterVenues(document.getElementById('venue-q').value.trim(), document.getElementById('venue-region').value);
+function venueSearchFromForm(e) { e.preventDefault(); filterVenues(); }
+function setVenueView(v) {
+  _venueView = v;
+  document.getElementById('venue-view-list').classList.toggle('on', v === 'list');
+  document.getElementById('venue-view-map').classList.toggle('on', v === 'map');
+  document.getElementById('venue-list').hidden = v !== 'list';
+  document.getElementById('venue-map-wrap').hidden = v !== 'map';
+  if (v === 'map') renderVenueMap();
 }
-async function filterVenues(q, region) {
+async function filterVenues() {
   const list = document.getElementById('venue-list');
   if (!list) return;
   list.innerHTML = hubMsg('구장을 찾고 있어요...');
   let courses;
   try { courses = await getCourses(); } catch (e) { list.innerHTML = hubMsg('구장 정보를 불러오지 못했어요.'); return; }
-  const words = q.toLowerCase().split(/\s+/).filter(Boolean);
-  _shownVenues = courses.filter(c =>
+  const region = document.getElementById('venue-region').value;
+  const q = document.getElementById('venue-q').value.trim().toLowerCase();
+  const favOnly = document.getElementById('venue-fav-only').checked;
+  const fav = favIds();
+  const words = q.split(/\s+/).filter(Boolean);
+  _shown = courses.filter(c =>
     (!region || c.region === region) &&
-    words.every(w => (c.name + ' ' + c.address + ' ' + c.sigungu + ' ' + c.region).toLowerCase().includes(w)));
-  if (!_shownVenues.length) {
-    list.innerHTML = hubMsg(courses.length
-      ? '조건에 맞는 구장이 없어요. 지역을 바꾸거나 다른 이름으로 찾아보세요.'
-      : '아직 검증이 끝난 구장이 없어요.');
+    (!favOnly || fav.includes(c.id)) &&
+    words.every(w => ((c.name || '') + ' ' + (c.address || '') + ' ' + (c.city || '') + ' ' + (c.region || '')).toLowerCase().includes(w)));
+  const withCoord = _shown.filter(c => c.latitude != null && c.longitude != null).length;
+  const summary = `<p class="hub-note">공식 자료에 있는 구장 ${_shown.length}곳 (전체 ${courses.length}곳). 좌표가 있는 곳 ${withCoord}곳. 전국 전체 구장이 아니며, 지역을 순차적으로 넓혀 가고 있어요.</p>`;
+  if (!_shown.length) {
+    list.innerHTML = summary + hubMsg(courses.length ? '조건에 맞는 구장이 없어요. 지역이나 검색어를 바꿔 보세요.' : '아직 등록된 구장이 없어요.');
     return;
   }
-  list.innerHTML = `<p class="hub-note">공식 자료로 확인한 구장 ${_shownVenues.length}곳입니다. 전국 구장은 순차적으로 확인해 추가합니다.</p>` +
-    _shownVenues.map((c, i) => venueCardHtml(c, i)).join('');
+  list.innerHTML = summary + _shown.map((c, i) => venueCardHtml(c, i, fav.includes(c.id))).join('');
+  if (_venueView === 'map') renderVenueMap();
 }
-function venueCardHtml(c, i) {
-  const mapUrl = 'https://map.kakao.com/?q=' + encodeURIComponent(c.address);
+function venueCardHtml(c, i, isFav) {
   return `<article class="hub-venue">
-    <h3 class="hub-vt">${escHtml(c.name)}</h3>
-    <p class="hub-vs">${escHtml(c.address)}</p>
-    <p class="hub-vs">${escHtml(String(c.holes))}홀 · 이용료 ${escHtml(c.fee)} · ${escHtml(c.hours)}</p>
-    <div class="hub-acts">
-      <button class="hub-act" aria-expanded="false" aria-controls="venue-d-${i}" onclick="toggleVenueDetail(${i}, this)">자세히 보기</button>
-      <a class="hub-act" href="${escHtml(safeUrl(mapUrl))}" target="_blank" rel="noopener noreferrer">지도에서 보기 ↗</a>
-      <button class="hub-act hub-act-g" onclick="foodAtVenue(${i})">주변 맛집</button>
+    <div class="hub-vt-row">
+      <h3 class="hub-vt"><a href="#/course/${escHtml(c.id)}">${escHtml(c.name)}</a></h3>
+      <button class="hub-fav${isFav ? ' on' : ''}" aria-pressed="${isFav ? 'true' : 'false'}" aria-label="즐겨찾기" onclick="onFavClick('${escHtml(c.id)}', this)">${isFav ? '★' : '☆'}</button>
     </div>
-    <div id="venue-d-${i}" class="hub-detail" hidden>
-      <dl class="hub-dl">
-        <dt>휴장일</dt><dd>${escHtml(c.closed)}</dd>
-        <dt>입장 방법</dt><dd>${escHtml(c.entry)}</dd>
-        <dt>운영 주체</dt><dd>${escHtml(c.operator)}</dd>
-        <dt>전화</dt><dd><a href="tel:${escHtml(String(c.phone).replace(/[^0-9+]/g, ''))}">${escHtml(c.phone)}</a></dd>
-        <dt>출처</dt><dd><a href="${escHtml(safeUrl(c.source_url))}" target="_blank" rel="noopener noreferrer">공식 안내 페이지 ↗</a> (확인일 ${escHtml(c.checked_at)})</dd>
-      </dl>
-    </div>
+    <p class="hub-vs">${val(c.address)}</p>
+    <p class="hub-vs">${val(c.holes, '홀')} · 이용료 ${val(c.fee)}</p>
+    <p class="hub-badge">${escHtml(STATUS_LABEL[c.verification_status] || '')}</p>
+    <div class="hub-acts"><a class="hub-act hub-act-g" href="#/course/${escHtml(c.id)}">상세 보기</a></div>
   </article>`;
 }
-function toggleVenueDetail(i, btn) {
-  const panel = document.getElementById('venue-d-' + i);
-  if (!panel) return;
-  const open = panel.hasAttribute('hidden');
-  if (open) panel.removeAttribute('hidden'); else panel.setAttribute('hidden', '');
-  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-  btn.textContent = open ? '접기' : '자세히 보기';
+function onFavClick(id, btn) {
+  const on = toggleFav(id);
+  btn.classList.toggle('on', on);
+  btn.textContent = on ? '★' : '☆';
+  btn.setAttribute('aria-pressed', on ? 'true' : 'false');
 }
 
-/* ── 맛집: 선택한 구장 주소 → 좌표(카카오 주소 검색) → 반경 1km 음식점 ── */
-function foodAtVenue(i) {
-  const c = _shownVenues[i];
-  if (!c) return;
-  _foodVenue = c;
-  go('pg-food');
+/* ── 지도 (Leaflet, 필요할 때만 불러옴 / OpenStreetMap 타일) ── */
+function loadLeaflet() {
+  if (_leafletReady) return _leafletReady;
+  _leafletReady = new Promise((resolve, reject) => {
+    if (window.L) { resolve(); return; }
+    const css = document.createElement('link');
+    css.rel = 'stylesheet';
+    css.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
+    document.head.appendChild(css);
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error('leaflet'));
+    document.head.appendChild(s);
+  });
+  return _leafletReady;
 }
-async function loadFoodAround() {
-  const body = document.getElementById('food-body');
-  const label = document.getElementById('food-location-label');
-  if (!body || !label) return;
-  if (!_foodVenue) {
-    label.textContent = '구장을 먼저 선택하세요';
-    body.innerHTML = hubMsg('구장 찾기에서 구장을 고르면 주변 맛집을 보여드려요.');
+async function renderVenueMap() {
+  const wrap = document.getElementById('venue-map');
+  if (!wrap) return;
+  const pts = _shown.filter(c => c.latitude != null && c.longitude != null);
+  try { await loadLeaflet(); } catch (e) { wrap.innerHTML = hubMsg('지도를 불러오지 못했어요. 목록 보기를 이용해 주세요.'); return; }
+  if (_mapInstance) { _mapInstance.remove(); _mapInstance = null; }
+  wrap.innerHTML = '';
+  if (!pts.length) { wrap.innerHTML = hubMsg('이 조건에서 좌표가 있는 구장이 없어요.'); return; }
+  const map = L.map(wrap).setView([pts[0].latitude, pts[0].longitude], 10);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 18, attribution: '© OpenStreetMap contributors',
+  }).addTo(map);
+  const bounds = [];
+  pts.forEach(c => {
+    const m = L.marker([c.latitude, c.longitude]).addTo(map);
+    const note = c.coordinate_source === 'osm_nominatim' ? '<br><small>주소 기반 자동 좌표 (실제와 차이 가능)</small>' : '';
+    m.bindPopup(`<strong>${escHtml(c.name)}</strong><br>${escHtml(c.address || '')}${note}<br><a href="#/course/${escHtml(c.id)}">상세 보기</a>`);
+    bounds.push([c.latitude, c.longitude]);
+  });
+  if (bounds.length > 1) map.fitBounds(bounds, { padding: [24, 24] });
+  _mapInstance = map;
+}
+
+/* ── 구장 상세 (고유 주소: #/course/<id>) ── */
+async function openCourseFromHash() {
+  const m = location.hash.match(/^#\/course\/([\w-]+)$/);
+  if (!m) return false;
+  const courses = await getCourses();
+  const c = courses.find(x => x.id === m[1]);
+  const body = document.getElementById('course-body');
+  if (!body) return true;
+  if (!c) { body.innerHTML = hubMsg('구장을 찾지 못했어요. 목록에서 다시 골라 주세요.'); go('pg-course'); return true; }
+  go('pg-course');
+  renderCourse(c);
+  return true;
+}
+function renderCourse(c) {
+  const body = document.getElementById('course-body');
+  const hasCoord = c.latitude != null && c.longitude != null;
+  const isFav = favIds().includes(c.id);
+  const directions = hasCoord
+    ? `https://map.kakao.com/link/to/${encodeURIComponent(c.name)},${c.latitude},${c.longitude}`
+    : `https://map.kakao.com/?q=${encodeURIComponent(c.address || c.name)}`;
+  const phone = c.phone ? `<a href="tel:${escHtml(String(c.phone).replace(/[^0-9+]/g, ''))}">${escHtml(c.phone)}</a>` : `<span class="hub-pending">${PENDING}</span>`;
+  const coordNote = c.coordinate_source === 'osm_nominatim'
+    ? `<p class="hub-vs">좌표: 주소 기반 자동 지오코딩. 실제 위치와 차이가 있을 수 있어요. © OpenStreetMap contributors</p>`
+    : (hasCoord ? `<p class="hub-vs">좌표: 공공데이터 제공값</p>` : `<p class="hub-vs">좌표: <span class="hub-pending">${PENDING}</span></p>`);
+  const sources = (c.sources || []).map(s => `<li><a href="${escHtml(safeUrl(s.source_url))}" target="_blank" rel="noopener noreferrer">${escHtml(s.source_name)}</a> · 수집 ${escHtml(s.collected_at)}${s.dataset_updated ? ' · 자료 수정일 ' + escHtml(s.dataset_updated) : ''}</li>`).join('');
+  body.innerHTML = `
+    <article class="hub-course">
+      <div class="hub-vt-row">
+        <h2 class="hub-h2">${escHtml(c.name)}</h2>
+        <button class="hub-fav${isFav ? ' on' : ''}" aria-pressed="${isFav ? 'true' : 'false'}" aria-label="즐겨찾기" onclick="onFavClick('${escHtml(c.id)}', this)">${isFav ? '★' : '☆'}</button>
+      </div>
+      <p class="hub-badge">${escHtml(STATUS_LABEL[c.verification_status] || '')} · 확인일 ${escHtml(c.verified_at || c.sources?.[0]?.collected_at || '')}</p>
+      <dl class="hub-dl">
+        <dt>주소</dt><dd>${val(c.address)}</dd>
+        <dt>지역</dt><dd>${val(c.region)}${c.city ? ' · ' + escHtml(c.city) : ''}</dd>
+        <dt>홀 수</dt><dd>${val(c.holes, '홀')}${c.course_count ? ' · ' + escHtml(String(c.course_count)) + '코스' : ''}</dd>
+        <dt>이용료</dt><dd>${val(c.fee)}</dd>
+        <dt>운영시간</dt><dd>${val(c.opening_hours)}</dd>
+        <dt>휴장일</dt><dd>${val(c.closed_days)}</dd>
+        <dt>예약 방법</dt><dd>${val(c.reservation_method)}${c.reservation_url ? ` <a href="${escHtml(safeUrl(c.reservation_url))}" target="_blank" rel="noopener noreferrer">예약 페이지 ↗</a>` : ''}</dd>
+        <dt>전화</dt><dd>${phone}</dd>
+        <dt>운영 주체</dt><dd>${val(c.operator)}</dd>
+        <dt>주차·화장실</dt><dd>${val(c.parking)} · ${val(c.restroom)}</dd>
+      </dl>
+      <div class="hub-acts">
+        <a class="hub-act hub-act-g" href="${escHtml(safeUrl(directions))}" target="_blank" rel="noopener noreferrer">길찾기 ↗</a>
+        ${c.website ? `<a class="hub-act" href="${escHtml(safeUrl(c.website))}" target="_blank" rel="noopener noreferrer">공식 홈페이지 ↗</a>` : ''}
+      </div>
+      ${coordNote}
+      <div class="hub-box">
+        <div class="hub-box-h"><h3>주변 맛집·카페</h3></div>
+        <p class="hub-note">구장 좌표 기준 검색입니다 (현재 위치 아님).</p>
+        <div class="hub-tabs" role="group" aria-label="검색 종류">
+          <button class="hub-tab on" id="food-cat-FD6" onclick="setFoodCat('FD6')">음식점</button>
+          <button class="hub-tab" id="food-cat-CE7" onclick="setFoodCat('CE7')">카페</button>
+        </div>
+        <div class="hub-tabs" role="group" aria-label="검색 반경">
+          <button class="hub-tab on" id="food-r-1000" onclick="setFoodRadius(1000)">1km</button>
+          <button class="hub-tab" id="food-r-3000" onclick="setFoodRadius(3000)">3km</button>
+          <button class="hub-tab" id="food-r-5000" onclick="setFoodRadius(5000)">5km</button>
+        </div>
+        <div id="food-list" class="hub-list"></div>
+      </div>
+      <div class="hub-box">
+        <div class="hub-box-h"><h3>이 지역의 파크골프 대회</h3></div>
+        <div id="course-tournaments" class="hub-list"></div>
+      </div>
+      <div class="hub-box">
+        <div class="hub-box-h"><h3>관련 유튜브 영상</h3></div>
+        <div id="course-videos" class="hub-list"></div>
+      </div>
+      <div class="hub-box">
+        <h3>자료 출처</h3>
+        <ul class="hub-ul">${sources}</ul>
+        <p class="hub-note">정보는 공개 자료 기준입니다. 방문 전 운영 여부와 요금을 확인해 주세요.</p>
+      </div>
+    </article>`;
+  window._course = c;
+  window._foodCat = 'FD6';
+  window._foodRadius = 1000;
+  loadFood();
+  loadCourseTournaments(c);
+  loadCourseVideos(c);
+}
+function setFoodCat(cat) {
+  window._foodCat = cat;
+  document.getElementById('food-cat-FD6').classList.toggle('on', cat === 'FD6');
+  document.getElementById('food-cat-CE7').classList.toggle('on', cat === 'CE7');
+  loadFood();
+}
+function setFoodRadius(r) {
+  window._foodRadius = r;
+  [1000, 3000, 5000].forEach(x => document.getElementById('food-r-' + x).classList.toggle('on', x === r));
+  loadFood();
+}
+async function loadFood() {
+  const list = document.getElementById('food-list');
+  const c = window._course;
+  if (!list || !c) return;
+  if (c.latitude == null || c.longitude == null) {
+    list.innerHTML = hubMsg('이 구장은 좌표가 아직 없어 주변 검색을 할 수 없어요.');
     return;
   }
-  label.textContent = `${_foodVenue.name} 주변 1km`;
-  body.innerHTML = hubMsg('맛집을 찾고 있어요...');
+  list.innerHTML = hubMsg('검색하고 있어요...');
   try {
-    const g = await apiJson('/api/geocode?address=' + encodeURIComponent(_foodVenue.address));
-    const f = await apiJson(`/api/food?x=${encodeURIComponent(g.lng)}&y=${encodeURIComponent(g.lat)}`);
-    if (!f.items.length) { body.innerHTML = hubMsg('주변 1km 안에 검색된 음식점이 없어요.'); return; }
-    body.innerHTML = `<p class="hub-note">${escHtml(f.source)}</p>` + f.items.map(foodCardHtml).join('');
+    const f = await apiJson(`/api/food?x=${encodeURIComponent(c.longitude)}&y=${encodeURIComponent(c.latitude)}&radius=${window._foodRadius}&category=${window._foodCat}`);
+    if (!f.items.length) { list.innerHTML = hubMsg('이 반경 안에 검색된 곳이 없어요. 반경을 넓혀 보세요.'); return; }
+    list.innerHTML = `<p class="hub-note">${escHtml(f.source)}</p>` + f.items.map(foodCardHtml).join('');
   } catch (e) {
-    body.innerHTML = hubMsg(apiMessage(e.code));
+    list.innerHTML = hubMsg(apiMessage(e.code));
   }
 }
 function foodCardHtml(p) {
   const dist = p.distanceM != null ? (p.distanceM >= 1000 ? `${(p.distanceM / 1000).toFixed(1)}km` : `${p.distanceM}m`) : '';
   return `<article class="hub-venue">
     <h3 class="hub-vt">${escHtml(p.name)}</h3>
-    <p class="hub-vs">${escHtml(p.category)}${dist ? ' · ' + escHtml(dist) : ''}</p>
+    <p class="hub-vs">${escHtml(p.category || '')}${dist ? ' · ' + escHtml(dist) : ''}</p>
     ${p.address ? `<p class="hub-vs">${escHtml(p.address)}</p>` : ''}
     ${p.phone ? `<p class="hub-vs">전화 ${escHtml(p.phone)}</p>` : ''}
-    ${p.url ? `<div class="hub-acts"><a class="hub-act" href="${escHtml(safeUrl(p.url))}" target="_blank" rel="noopener noreferrer">카카오맵에서 보기 ↗</a></div>` : ''}
+    <div class="hub-acts">
+      ${p.url ? `<a class="hub-act" href="${escHtml(safeUrl(p.url))}" target="_blank" rel="noopener noreferrer">카카오맵 ↗</a>` : ''}
+      ${p.phone ? `<a class="hub-act" href="tel:${escHtml(String(p.phone).replace(/[^0-9+]/g, ''))}">전화</a>` : ''}
+    </div>
   </article>`;
 }
+function loadCourseTournaments(c) {
+  const el = document.getElementById('course-tournaments');
+  getTournaments().then(list => {
+    const same = list.filter(t => t.publisher && c.region && t.region === c.region);
+    el.innerHTML = same.length
+      ? same.map(tournamentCardHtml).join('')
+      : hubMsg('이 지역의 공식 대회 자료가 아직 없어요. 주최 기관 공지를 직접 확인해 주세요.');
+  }).catch(() => { el.innerHTML = hubMsg('대회 정보를 불러오지 못했어요.'); });
+}
+async function loadCourseVideos(c) {
+  const el = document.getElementById('course-videos');
+  el.innerHTML = hubMsg('영상을 찾고 있어요...');
+  try {
+    const d = await apiJson('/api/youtube?q=' + encodeURIComponent(c.name));
+    if (!d.items.length) { el.innerHTML = hubMsg('관련 영상이 없어요.'); return; }
+    el.innerHTML = d.items.map(videoCardHtml).join('') + `<p class="hub-note">${escHtml(d.source)}</p>`;
+  } catch (e) {
+    el.innerHTML = hubMsg(apiMessage(e.code));
+  }
+}
+function videoCardHtml(v) {
+  const date = v.publishedAt ? String(v.publishedAt).slice(0, 10) : '';
+  return `<a class="hub-video" href="${escHtml(safeUrl(v.url))}" target="_blank" rel="noopener noreferrer">
+    ${v.thumbnail ? `<img src="${escHtml(safeUrl(v.thumbnail))}" alt="" width="160" height="90" loading="lazy">` : ''}
+    <span class="hub-video-t"><b>${escHtml(v.title)}</b><small>${escHtml(v.channel || '')}${date ? ' · ' + escHtml(date) : ''}</small></span>
+  </a>`;
+}
 
-/* ── 대회: 검증된 공식 출처가 있는 항목만 표시 ── */
+/* ── 대회 목록: 공식 자료의 대회만 (예정/지난 구분) ── */
 async function loadParkgolfNews() {
   const body = document.getElementById('news-body');
   if (!body) return;
   let list;
-  try { list = await loadJson('data/tournaments.json'); }
+  try { list = await getTournaments(); }
   catch (e) { body.innerHTML = hubMsg('대회 정보를 불러오지 못했어요.') + searchLinksHtml(); return; }
-  const today = new Date().toISOString().slice(0, 10);
-  const upcoming = list
-    .filter(t => t.source_url && t.date_start && (t.date_end || t.date_start) >= today)
-    .sort((a, b) => a.date_start.localeCompare(b.date_start));
-  body.innerHTML = (upcoming.length
-    ? upcoming.map(tournamentCardHtml).join('')
-    : hubMsg('지금 공식 출처로 확인된 대회 일정이 없어요. 주최 기관 공지를 직접 확인해 주세요.')) + searchLinksHtml();
+  const upcoming = list.filter(t => t.period === '예정 대회');
+  const past = list.filter(t => t.period !== '예정 대회');
+  let html = '';
+  html += upcoming.length
+    ? `<h3 class="hub-sub">예정 대회</h3>` + upcoming.map(tournamentCardHtml).join('')
+    : hubMsg('공식 자료로 확인된 예정 대회가 없어요. 주최 기관 공지를 직접 확인해 주세요.');
+  if (past.length) html += `<h3 class="hub-sub">지난 대회 (공식 자료 기준)</h3>` + past.map(tournamentCardHtml).join('');
+  body.innerHTML = html + searchLinksHtml();
 }
 function tournamentCardHtml(t) {
-  const dates = t.date_end && t.date_end !== t.date_start ? `${t.date_start} ~ ${t.date_end}` : t.date_start;
+  const dates = t.date_end && t.date_end !== t.date_start ? `${t.date_start} ~ ${t.date_end}` : (t.date_start || PENDING);
   return `<article class="hub-venue">
     <h3 class="hub-vt">${escHtml(t.title)}</h3>
-    <p class="hub-vs">개최일 ${escHtml(dates)}${t.venue ? ' · ' + escHtml(t.venue) : ''}</p>
+    <p class="hub-vs">개최일 ${escHtml(dates)} · ${escHtml(t.period || '')}</p>
+    ${t.venue ? `<p class="hub-vs">장소 ${escHtml(t.venue)}</p>` : ''}
     ${t.organizer ? `<p class="hub-vs">주최 ${escHtml(t.organizer)}</p>` : ''}
-    ${t.apply_period ? `<p class="hub-vs">접수 ${escHtml(t.apply_period)}</p>` : ''}
-    <div class="hub-acts">
-      ${t.apply_url ? `<a class="hub-act hub-act-g" href="${escHtml(safeUrl(t.apply_url))}" target="_blank" rel="noopener noreferrer">접수 링크 ↗</a>` : ''}
-      ${t.result_url ? `<a class="hub-act" href="${escHtml(safeUrl(t.result_url))}" target="_blank" rel="noopener noreferrer">결과 ↗</a>` : ''}
-    </div>
-    <p class="hub-vs">출처: <a href="${escHtml(safeUrl(t.source_url))}" target="_blank" rel="noopener noreferrer">공식 공지 ↗</a> · 확인일 ${escHtml(t.checked_at || '')}</p>
+    ${t.contact ? `<p class="hub-vs">문의 ${escHtml(t.contact)}</p>` : ''}
+    <p class="hub-vs">출처: <a href="${escHtml(safeUrl(t.source_url))}" target="_blank" rel="noopener noreferrer">${escHtml(t.publisher || '공공데이터')} 공개 자료 ↗</a> · 확인일 ${escHtml(t.checked_at || '')} · ${escHtml(t.source_license || '')}</p>
   </article>`;
 }
 function searchLinksHtml() {
@@ -1599,7 +1786,7 @@ function searchLinksHtml() {
   ).join('');
 }
 
-/* ── 유튜브: 서버 API 경유 (키 비노출) ── */
+/* ── 유튜브 탭 (카테고리) ── */
 async function loadYoutubeVideos(category = '대회') {
   const body = document.getElementById('youtube-body');
   if (!body) return;
@@ -1611,13 +1798,6 @@ async function loadYoutubeVideos(category = '대회') {
   } catch (e) {
     body.innerHTML = hubMsg(apiMessage(e.code));
   }
-}
-function videoCardHtml(v) {
-  const date = v.publishedAt ? String(v.publishedAt).slice(0, 10) : '';
-  return `<a class="hub-video" href="${escHtml(safeUrl(v.url))}" target="_blank" rel="noopener noreferrer">
-    ${v.thumbnail ? `<img src="${escHtml(safeUrl(v.thumbnail))}" alt="" width="160" height="90" loading="lazy">` : ''}
-    <span class="hub-video-t"><b>${escHtml(v.title)}</b><small>${escHtml(v.channel || '')}${date ? ' · ' + escHtml(date) : ''}</small></span>
-  </a>`;
 }
 function setYtab(tab) {
   ['대회', '레슨', '장비', '구장'].forEach(t => {
@@ -1640,11 +1820,13 @@ function hubJoin(e) {
   joinGame();
 }
 
+window.addEventListener('hashchange', () => { openCourseFromHash(); });
+
 /* ══ 페이지 이동 ══ */
 const NO_TAB = ['pg-login','pg-create','pg-groups','pg-score','pg-admin'];
-const TAB_MAP = { 'pg-home':'home','pg-matches':'matches','pg-ranking':'ranking','pg-result':'matches','pg-matching':'matching','pg-venues':'home','pg-tournaments':'home','pg-mgmt':'home','pg-video':'home','pg-food':'home','pg-club':'home' };
+const TAB_MAP = { 'pg-home':'home','pg-matches':'matches','pg-ranking':'ranking','pg-result':'matches','pg-matching':'matching','pg-venues':'home','pg-tournaments':'home','pg-mgmt':'home','pg-video':'home','pg-food':'home','pg-club':'home','pg-course':'home' };
 
-const HUB_PAGES = ['pg-home','pg-venues','pg-tournaments','pg-mgmt','pg-video','pg-food','pg-club'];
+const HUB_PAGES = ['pg-home','pg-venues','pg-course','pg-tournaments','pg-mgmt','pg-video','pg-food','pg-club'];
 function go(id) {
   document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
   document.getElementById(id).classList.add('on');

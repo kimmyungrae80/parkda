@@ -1,0 +1,14 @@
+{
+  "id": "15037313",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 전남광주통합특별시_분류기준 외 체육시설 현황_20250820",
+  "source_url": "https://www.data.go.kr/data/15037313/fileData.do",
+  "publisher": "전남광주통합특별시",
+  "dataset_updated": "2025-08-25",
+  "collected_at": "2026-10-27T07:05:39+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15037313.csv",
+  "sha256": "c964d17770e078ee9ad9bb5416f6ee833351a0428304c58782047e9707def3cb",
+  "bytes": 7714
+}

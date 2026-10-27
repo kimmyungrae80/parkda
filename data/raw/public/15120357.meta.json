@@ -1,0 +1,14 @@
+{
+  "id": "15120357",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 대구광역시 북구_파크골프장_20260824",
+  "source_url": "https://www.data.go.kr/data/15120357/fileData.do",
+  "publisher": "대구광역시 북구",
+  "dataset_updated": "2026-09-03",
+  "collected_at": "2026-10-27T07:05:16+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15120357.csv",
+  "sha256": "ca0a5ff168d0dbc12dc1cc6a3ec6c20f7fc956b554aebf23450c23904152a3db",
+  "bytes": 484
+}

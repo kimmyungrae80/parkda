@@ -1,0 +1,14 @@
+{
+  "id": "15160557",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 용산구시설관리공단_용산 스크린 파크골프 현황_20260727",
+  "source_url": "https://www.data.go.kr/data/15160557/fileData.do",
+  "publisher": "용산구시설관리공단",
+  "dataset_updated": "2026-07-29",
+  "collected_at": "2026-10-27T07:05:25+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15160557.csv",
+  "sha256": "0250f4df9f5a7f05e7a6b0cc4da9557530a190e3be64f85ced2ba56376a6b6bc",
+  "bytes": 1037
+}

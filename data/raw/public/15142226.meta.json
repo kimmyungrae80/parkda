@@ -1,0 +1,14 @@
+{
+  "id": "15142226",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 전북특별자치도_파크골프장 현황_20250228",
+  "source_url": "https://www.data.go.kr/data/15142226/fileData.do",
+  "publisher": "전북특별자치도",
+  "dataset_updated": "2025-08-13",
+  "collected_at": "2026-10-27T07:05:19+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15142226.csv",
+  "sha256": "f8fe76768e449332af204e26f369c759b9dad952f2c6ccf22caf6994ee9a9e15",
+  "bytes": 2774
+}

@@ -72,7 +72,7 @@ const SECRET_K = 'TEST_KAKAO_KEY_654321';
   check('맛집: 카테고리 FD6·반경 1km·선택 좌표 기준 요청', calledUrl.includes('category_group_code=FD6') && calledUrl.includes('radius=1000') && calledUrl.includes('x=128.9') && calledUrl.includes('y=35.2'));
   check('맛집: 인증은 서버 헤더로만 전달', calledHeaders.Authorization === 'KakaoAK ' + SECRET_K && !r.body.includes(SECRET_K));
   check('맛집: 결과 정규화 (이름·분류·거리·주소·링크)', fb.items.length === 1 && fb.items[0].category === '한식' && fb.items[0].distanceM === 120 && fb.items[0].address === '가상로 1');
-  check('맛집: 광고·제휴 구분 없음을 출처에 명시', /광고·제휴 구분 없음/.test(fb.source));
+  check('맛집: 광고·제휴 표시 구분 없음을 출처에 명시', /광고·제휴 표시 구분 없음/.test(fb.source));
   check('맛집: 24시간 캐시 헤더', r.headers['cache-control'] === 'public, s-maxage=86400');
 
   globalThis.fetch = async () => ({ ok: true, status: 200, json: async () => ({ documents: [] }) });

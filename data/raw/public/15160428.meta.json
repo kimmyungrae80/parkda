@@ -1,0 +1,14 @@
+{
+  "id": "15160428",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 가평군시설관리공단_가평파크골프장_20260721",
+  "source_url": "https://www.data.go.kr/data/15160428/fileData.do",
+  "publisher": "가평군시설관리공단",
+  "dataset_updated": "2026-07-21",
+  "collected_at": "2026-10-27T07:06:59+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15160428.csv",
+  "sha256": "ae1000d95934ff04eca75a659d3e9ca1a58de5f5aa33057e02c0a06abf3cab97",
+  "bytes": 766
+}

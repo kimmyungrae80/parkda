@@ -1,0 +1,14 @@
+{
+  "id": "15006399",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 대구광역시 북구_생활체육시설_20260212",
+  "source_url": "https://www.data.go.kr/data/15006399/fileData.do",
+  "publisher": "대구광역시 북구",
+  "dataset_updated": "2026-02-19",
+  "collected_at": "2026-10-27T07:05:05+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15006399.csv",
+  "sha256": "d7f557db324039ea00d297e31fe23b941148cfeda0d6c33b7a15aaf5ab8d2b8d",
+  "bytes": 2791
+}

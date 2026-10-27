@@ -112,16 +112,20 @@ def main():
             pg.select_option("#venue-region", "부산"); pg.fill("#venue-q", ""); pg.click("#pg-venues .hub-search .hub-btn")
             time.sleep(0.4)
             check("구장 검색: 지역 필터 부산 = 검증된 2곳", pg.locator(".hub-venue").count() == 2, f"count={pg.locator('.hub-venue').count()}")
-            pg.click(".hub-venue >> nth=0 >> button.hub-act >> nth=0")
-            check("구장 상세: 자세히 보기 펼침 (출처·확인일 포함)", "확인일 2026-10-27" in pg.inner_text(".hub-venue >> nth=0"))
-            check("구장 지도 링크: 외부 지도 주소 (키 없이)", pg.get_attribute(".hub-venue >> nth=0 >> a.hub-act >> nth=0", "href").startswith("https://map.kakao.com/?q="))
+            pg.click(".hub-venue >> nth=0 >> a.hub-act-g")
+            pg.wait_for_selector("#course-body h2", timeout=5000)
+            check("구장 상세 페이지: 고유 주소(#/course/…)로 열림", "#/course/" in pg.url)
+            check("구장 상세: 출처·확인일 표시", "확인일 2026-10-27" in pg.inner_text("#course-body"))
+            check("구장 길찾기 링크 (키 없이 외부 지도)", pg.get_attribute("#course-body a.hub-act-g", "href").startswith("https://map.kakao.com/"))
+            pg.evaluate("location.hash=''"); time.sleep(0.4)
             check("구장 목록에 이미지 태그 없음 (외부 HTML 미삽입)", pg.locator(".hub-venue img").count() == 0)
 
             # ── D. 주변 맛집: 선택 구장 기준 ──
-            pg.click(".hub-venue >> nth=0 >> .hub-act-g")
-            pg.wait_for_selector("#food-body .hub-venue", timeout=5000)
-            check("구장 주변 맛집: 서버 경유 검색 결과 표시", pg.locator("#food-body .hub-venue").count() == 1 and "가상식당" in pg.inner_text("#food-body"))
-            check("맛집 기준 구장 표시", "대저생태공원" in pg.inner_text("#food-location-label"))
+            pg.evaluate("""() => fetch('data/verified/courses.json').then(r => r.json()).then(list => {
+                const c = list.find(x => x.latitude != null && x.longitude != null); location.hash = '#/course/' + c.id; })""")
+            pg.wait_for_selector("#course-body h2", timeout=8000)
+            pg.wait_for_selector("#food-list .hub-venue", timeout=8000)
+            check("구장 주변 맛집: 좌표 기준 서버 경유 검색 결과 표시", "가상식당" in pg.inner_text("#food-list"))
 
             # ── E. 대회·유튜브 (비회원) ──
             pg.evaluate("go('pg-tournaments')"); time.sleep(0.4)
@@ -137,7 +141,7 @@ def main():
             # ── E2. 대회 정보: 외부 검색 링크 (프록시 없음) ──
             pg.evaluate("go('pg-tournaments')"); time.sleep(0.3)
             links = pg.eval_on_selector_all("#news-body a.hub-ext", "els => els.map(e => [e.getAttribute('href'), e.getAttribute('rel'), e.getAttribute('target')])")
-            check("대회 정보: 검증된 일정 없음 안내 (데이터 비어 있음)", "확인된 대회 일정이 없어요" in pg.inner_text("#news-body"))
+            check("대회 정보: 예정 대회 없음 안내 + 지난 대회(공식 자료) 표시", "예정 대회가 없어요" in pg.inner_text("#news-body") and "지난 대회" in pg.inner_text("#news-body"))
             check("대회 정보: 외부 검색 링크 2개 (https, noopener, 새 창)",
                   len(links) == 2 and all(h.startswith("https://") and "noopener" in r and t == "_blank" for h, r, t in links), f"count={len(links)}")
             check("외부 뉴스 프록시 요청 없음 (allorigins)", not any("allorigins" in u for u in blocked), "")

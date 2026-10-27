@@ -29,8 +29,12 @@ fs.writeFileSync(path.join(out, 'index.html'), html, 'utf8');
 for (const f of ['sw.js', 'manifest.json', 'icon-192.png', 'icon-512.png']) {
   fs.copyFileSync(path.join(root, f), path.join(out, f));
 }
-for (const dir of ['api', 'data']) {
-  fs.rmSync(path.join(out, dir), { recursive: true, force: true });
-  fs.cpSync(path.join(root, dir), path.join(out, dir), { recursive: true });
+fs.rmSync(path.join(out, 'api'), { recursive: true, force: true });
+fs.cpSync(path.join(root, 'api'), path.join(out, 'api'), { recursive: true });
+// 공개 데이터는 공식 출처 확인분(verified)의 두 파일만 복사한다. raw·processed·내부 후보는 복사하지 않는다.
+fs.rmSync(path.join(out, 'data'), { recursive: true, force: true });
+fs.mkdirSync(path.join(out, 'data', 'verified'), { recursive: true });
+for (const f of ['courses.json', 'tournaments.json']) {
+  fs.copyFileSync(path.join(root, 'data', 'verified', f), path.join(out, 'data', 'verified', f));
 }
 console.log('preview 생성 완료:', out);

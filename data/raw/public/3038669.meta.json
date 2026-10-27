@@ -1,0 +1,14 @@
+{
+  "id": "3038669",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 경기도_구리시_동호회현황_20260401",
+  "source_url": "https://www.data.go.kr/data/3038669/fileData.do",
+  "publisher": "경기도 구리시",
+  "dataset_updated": "2026-04-30",
+  "collected_at": "2026-10-27T07:05:42+00:00",
+  "source_license": "이용허락범위 제한 없음",
+  "fee_notice": "무료",
+  "file": "data/raw/public/3038669.csv",
+  "sha256": "4e7d7f983048cb2468bb3a994cb86d95b9c6683302cc9faa3828314c6dba71b2",
+  "bytes": 14041
+}

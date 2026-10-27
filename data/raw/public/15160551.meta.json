@@ -1,0 +1,14 @@
+{
+  "id": "15160551",
+  "status": "ok",
+  "source_name": "공공데이터포털 - 중랑구시설관리공단_중랑구립파크골프장 시설정보_20260716",
+  "source_url": "https://www.data.go.kr/data/15160551/fileData.do",
+  "publisher": "중랑구시설관리공단",
+  "dataset_updated": "2026-07-27",
+  "collected_at": "2026-10-27T07:06:37+00:00",
+  "source_license": "공공저작물 : 자유이용 (제 0유형)",
+  "fee_notice": "무료",
+  "file": "data/raw/public/15160551.csv",
+  "sha256": "e92488c497c8b8c4db070dd1f18ca6d3a05162df6e42051cf06bfd637848f066",
+  "bytes": 448
+}
