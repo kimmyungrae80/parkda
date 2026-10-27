@@ -23,6 +23,7 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   const url = new URL(req.url);
   if (req.method !== 'GET' || url.origin !== self.location.origin) return; // 외부 요청: 브라우저 기본 동작
+  if (url.pathname.startsWith('/api/')) return; // 서버 API 응답(외부 API 기반)은 캐시하지 않음
   e.respondWith(
     fetch(req)
       .then(res => {

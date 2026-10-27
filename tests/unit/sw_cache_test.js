@@ -45,6 +45,8 @@ const runFetch = async (url, method = 'GET') => {
   check('외부 API 응답은 어떤 캐시에도 없음', !allCached.some(k => !k.startsWith(ORIGIN)));
 
   // POST 요청 → 가로채지 않음
+  const apiP = await runFetch(ORIGIN + '/api/youtube?category=대회');
+  check('서버 API(/api/) 응답은 서비스워커가 캐시하지 않음', apiP === null);
   const postP = await runFetch(ORIGIN + '/api/x', 'POST');
   check('POST 요청은 캐시·가로채기 대상이 아님', postP === null);
 

@@ -51,8 +51,19 @@ def main():
         with sync_playwright() as p:
             browser = p.chromium.launch(channel="chrome", headless=True)
 
+            API_STUBS = {
+                "/api/youtube": json.dumps({"category": "대회", "source": "YouTube Data API v3", "items": [
+                    {"videoId": "AAAAAAAAAAA", "title": "가상 파크골프 영상", "channel": "가상채널", "publishedAt": "2026-01-01T00:00:00Z",
+                     "thumbnail": None, "url": "https://www.youtube.com/watch?v=AAAAAAAAAAA"}]}),
+                "/api/geocode": json.dumps({"address": "x", "lat": 35.2143, "lng": 129.0067, "source": "카카오 로컬 주소 검색"}),
+                "/api/food": json.dumps({"source": "카카오 로컬 API (일반 검색 결과, 광고·제휴 구분 없음)", "items": [
+                    {"name": "가상식당", "category": "한식", "distanceM": 120, "phone": "", "address": "가상로 1", "url": "https://place.map.kakao.com/3"}]}),
+            }
             def route(r):
                 url = r.request.url
+                for path, body in API_STUBS.items():
+                    if path in url:
+                        return r.fulfill(status=200, content_type="application/json", headers={"Access-Control-Allow-Origin": "*"}, body=body)
                 if url.startswith(f"http://127.0.0.1:{PORT}"):
                     return r.continue_()
                 if "dapi.kakao.com" in url and "sdk.js" in url:
@@ -93,21 +104,24 @@ def main():
             pg.evaluate("go('pg-home')")
 
             # ── C. 구장 검색 (스텁 카카오) + XSS 방어 ──
-            pg.fill("#hub-q", "한강"); pg.click("form.hub-search .hub-btn")
+            pg.fill("#hub-q", "화명"); pg.click("form.hub-search .hub-btn")
             pg.wait_for_function("document.getElementById('pg-venues').classList.contains('on')")
             pg.wait_for_selector(".hub-venue", timeout=5000)
             n = pg.locator(".hub-venue").count()
-            check("구장 검색 결과 표시 (비회원)", n == 2, f"count={n}")
-            check("구장 이름 속 HTML은 실행되지 않음", pg.evaluate("window.__xss") is None)
-            check("구장 이름 속 img 태그가 DOM에 생기지 않음", pg.locator(".hub-venue img").count() == 0)
-            kw = pg.evaluate("window.__lastKeyword")
-            check("검색어 조합: 지역 + 검색어 + '파크골프장'", "한강" in kw and "파크골프장" in kw, kw)
+            check("구장 검색: 검증된 구장 이름으로 찾기 (비회원)", n == 1 and "화명생태공원" in pg.inner_text("#venue-list"), f"count={n}")
+            pg.select_option("#venue-region", "부산"); pg.fill("#venue-q", ""); pg.click("#pg-venues .hub-search .hub-btn")
+            time.sleep(0.4)
+            check("구장 검색: 지역 필터 부산 = 검증된 2곳", pg.locator(".hub-venue").count() == 2, f"count={pg.locator('.hub-venue').count()}")
+            pg.click(".hub-venue >> nth=0 >> button.hub-act >> nth=0")
+            check("구장 상세: 자세히 보기 펼침 (출처·확인일 포함)", "확인일 2026-10-27" in pg.inner_text(".hub-venue >> nth=0"))
+            check("구장 지도 링크: 외부 지도 주소 (키 없이)", pg.get_attribute(".hub-venue >> nth=0 >> a.hub-act >> nth=0", "href").startswith("https://map.kakao.com/?q="))
+            check("구장 목록에 이미지 태그 없음 (외부 HTML 미삽입)", pg.locator(".hub-venue img").count() == 0)
 
             # ── D. 주변 맛집: 선택 구장 기준 ──
             pg.click(".hub-venue >> nth=0 >> .hub-act-g")
             pg.wait_for_selector("#food-body .hub-venue", timeout=5000)
-            check("구장 주변 맛집: 선택 구장 기준 1km 검색", pg.evaluate("window.__lastFood && window.__lastFood.radius") == 1000)
-            check("맛집 목록 표시", pg.locator("#food-body .hub-venue").count() == 1)
+            check("구장 주변 맛집: 서버 경유 검색 결과 표시", pg.locator("#food-body .hub-venue").count() == 1 and "가상식당" in pg.inner_text("#food-body"))
+            check("맛집 기준 구장 표시", "대저생태공원" in pg.inner_text("#food-location-label"))
 
             # ── E. 대회·유튜브 (비회원) ──
             pg.evaluate("go('pg-tournaments')"); time.sleep(0.4)
@@ -115,7 +129,7 @@ def main():
             pg.evaluate("go('pg-video')")
             pg.wait_for_function("!document.getElementById('youtube-body').innerText.includes('검색 중')", timeout=10000)
             vids = pg.locator("#youtube-body").inner_text()
-            check("유튜브 영상 목록 표시 (비회원)", "가상 파크골프 영상" in vids, vids[:40])
+            check("유튜브 영상 목록 표시 (서버 API 경유, 비회원)", "가상 파크골프 영상" in vids, vids[:40])
             tabs = pg.eval_on_selector_all(".hub-tab", "els => els.map(e => e.getAttribute('aria-pressed'))")
             pg.click("#ytab-레슨"); time.sleep(0.3)
             check("유튜브 탭 전환: 선택 상태 표시", pg.get_attribute("#ytab-레슨", "class").find("on") >= 0)
@@ -123,8 +137,9 @@ def main():
             # ── E2. 대회 정보: 외부 검색 링크 (프록시 없음) ──
             pg.evaluate("go('pg-tournaments')"); time.sleep(0.3)
             links = pg.eval_on_selector_all("#news-body a.hub-ext", "els => els.map(e => [e.getAttribute('href'), e.getAttribute('rel'), e.getAttribute('target')])")
-            check("대회 정보: 외부 검색 링크 3개 (https, noopener, 새 창)",
-                  len(links) == 3 and all(h.startswith("https://") and "noopener" in r and t == "_blank" for h, r, t in links), f"count={len(links)}")
+            check("대회 정보: 검증된 일정 없음 안내 (데이터 비어 있음)", "확인된 대회 일정이 없어요" in pg.inner_text("#news-body"))
+            check("대회 정보: 외부 검색 링크 2개 (https, noopener, 새 창)",
+                  len(links) == 2 and all(h.startswith("https://") and "noopener" in r and t == "_blank" for h, r, t in links), f"count={len(links)}")
             check("외부 뉴스 프록시 요청 없음 (allorigins)", not any("allorigins" in u for u in blocked), "")
 
             # ── F. Club Pro: 비회원은 로그인 안내 ──

@@ -340,6 +340,17 @@ body.hub-wide #app,body.hub-wide .tabbar{max-width:1100px}
 .hub-ext:hover{background:#eaf2eb}
 body.hub-wide .tab-ico{font-size:24px}
 body.hub-wide .tab-lbl{font-size:14px;font-weight:700}
+.hub-detail{margin-top:12px;padding-top:12px;border-top:1px solid var(--hub-line)}
+.hub-detail[hidden]{display:none}
+.hub-dl{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;margin:0;font-size:16px}
+.hub-dl dt{font-weight:700;color:var(--hub-mute)}
+.hub-dl dd{margin:0;word-break:keep-all}
+.hub-dl a{color:var(--hub-green)}
+.hub-video{display:flex;gap:12px;align-items:center;padding:12px;background:#fff;border:1px solid var(--hub-line);border-radius:16px;text-decoration:none;color:var(--hub-ink)}
+.hub-video img{width:160px;height:90px;object-fit:cover;border-radius:10px;flex:0 0 auto}
+.hub-video-t{display:flex;flex-direction:column;gap:4px;font-size:17px}
+.hub-video-t small{color:var(--hub-mute);font-size:14px}
+a.hub-act,a.hub-act-g{display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
 .hub-logo{height:36px;width:auto;vertical-align:middle;margin-right:8px}
 .hub-brand{display:inline-flex;align-items:center;gap:0}
 .hub-wm{font-family:'Bebas Neue','Noto Sans KR',sans-serif;font-size:26px;letter-spacing:.02em;color:var(--hub-green);margin-right:4px}
@@ -578,7 +589,7 @@ select.hub-input{flex:0 1 150px}
       <input id="venue-q" class="hub-input" type="search" placeholder="구장 이름 (예: 한강)" autocomplete="off">
       <button class="hub-btn" type="submit">검색</button>
     </form>
-    <p class="hub-note">구장 정보는 카카오 지도 검색 결과입니다. 방문 전 운영 여부를 꼭 확인하세요. 한 번에 최대 15곳을 보여드려요.</p>
+    <p class="hub-note">구장 정보는 공식 자료로 확인한 내용입니다. 방문 전 운영 여부를 꼭 확인하세요.</p>
     <div id="venue-list" class="hub-list" aria-live="polite"><p class="hub-msg">지역을 고르거나 구장 이름을 입력한 뒤 검색 버튼을 누르세요.</p></div>
   </div>
 </div>
@@ -619,6 +630,7 @@ select.hub-input{flex:0 1 150px}
       <button id="ytab-대회" class="hub-tab on" onclick="setYtab('대회')">대회</button>
       <button id="ytab-레슨" class="hub-tab" onclick="setYtab('레슨')">레슨</button>
       <button id="ytab-장비" class="hub-tab" onclick="setYtab('장비')">장비</button>
+      <button id="ytab-구장" class="hub-tab" onclick="setYtab('구장')">구장 소개</button>
     </div>
     <div id="youtube-body" class="hub-list"></div>
   </div>
@@ -1365,19 +1377,44 @@ async function init() {
   try { await kakaoInit(); } catch(e) {}
 }
 
-/* ══ P1 홈·공개 페이지 (비회원 이용 가능, 회원 전용 기능만 로그인 요청) ══ */
+/* ══ 공개 페이지 (P2): 검증된 데이터 + 서버 API. 비밀키는 브라우저에 없음 ══ */
 const REGIONS = ['서울','부산','대구','인천','광주','대전','울산','세종','경기','강원','충북','충남','전북','전남','경북','경남','제주'];
-let _venues = [];       // 마지막 구장 검색 결과 (인덱스로만 참조 → 속성 주입 없음)
-let _foodVenue = null;  // 맛집 검색 기준 구장 {name, lat, lng}
-let _foods = [];
+let _courses = null, _tournaments = null;
+let _shownVenues = [];   // 화면에 보이는 구장 (인덱스로만 참조)
+let _foodVenue = null;   // 맛집 기준 구장
 
+async function loadJson(path) {
+  const r = await fetch(path, { cache: 'no-cache' });
+  if (!r.ok) throw new Error(path);
+  return r.json();
+}
+async function getCourses() {
+  if (!_courses) _courses = await loadJson('data/courses.json');
+  return _courses;
+}
+async function apiJson(url) {
+  const r = await fetch(url);
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) { const e = new Error(j.error || 'http'); e.code = j.error || ('http_' + r.status); throw e; }
+  return j;
+}
+function apiMessage(code) {
+  return ({
+    not_configured: '이 기능은 아직 서비스 설정이 끝나지 않았어요.',
+    quota_exceeded: '오늘 요청이 많아요. 잠시 후 다시 시도해 주세요.',
+    kakao_auth: '검색 서비스 인증에 문제가 있어요. 관리자에게 알려 주세요.',
+    forbidden: '영상 서비스 권한에 문제가 있어요. 관리자에게 알려 주세요.',
+    not_found: '구장 위치를 찾지 못했어요.',
+    invalid_address: '주소 정보가 올바르지 않아요.',
+  })[code] || '정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.';
+}
+function hubMsg(text) { return `<p class="hub-msg">${escHtml(text)}</p>`; }
 function renderRegionOptions(id, withAll) {
   const el = document.getElementById(id);
   if (!el) return;
   el.innerHTML = (withAll ? '<option value="">전국</option>' : '') +
     REGIONS.map(r => `<option value="${escHtml(r)}">${escHtml(r)}</option>`).join('');
 }
-function hubMsg(text) { return `<p class="hub-msg">${escHtml(text)}</p>`; }
 
 /* 회원 전용 기능 진입 전 로그인 확인 */
 function needLogin(pageId) {
@@ -1393,7 +1430,7 @@ function clubNotify() {
 /* 홈 상단 메뉴와 회원 영역 */
 function renderHub() {
   const auth = document.getElementById('hub-auth');
-  const box  = document.getElementById('hub-member');
+  const box = document.getElementById('hub-member');
   if (!auth || !box) return;
   renderRegionOptions('hub-region', true);
   if (S.user) {
@@ -1420,7 +1457,7 @@ function renderHub() {
   }
 }
 
-/* 구장 검색: 카카오 지도 SDK 키워드 검색 (JS 키, 도메인 제한 전제) */
+/* ── 구장: 검증된 공식 자료만 표시 ── */
 function hubSearch(e) {
   if (e) e.preventDefault();
   const region = document.getElementById('hub-region').value;
@@ -1428,90 +1465,169 @@ function hubSearch(e) {
   go('pg-venues');
   document.getElementById('venue-region').value = region;
   document.getElementById('venue-q').value = q;
-  searchVenues(q, region);
+  filterVenues(q, region);
 }
 function venueSearchFromForm(e) {
   e.preventDefault();
-  searchVenues(document.getElementById('venue-q').value.trim(), document.getElementById('venue-region').value);
+  filterVenues(document.getElementById('venue-q').value.trim(), document.getElementById('venue-region').value);
 }
-async function searchVenues(q, region) {
+async function filterVenues(q, region) {
   const list = document.getElementById('venue-list');
   if (!list) return;
   list.innerHTML = hubMsg('구장을 찾고 있어요...');
-  await loadKakaoSdk();
-  if (!_kakaoSdkReady || !window.kakao?.maps?.services) {
-    list.innerHTML = hubMsg('지도 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.'); return;
+  let courses;
+  try { courses = await getCourses(); } catch (e) { list.innerHTML = hubMsg('구장 정보를 불러오지 못했어요.'); return; }
+  const words = q.toLowerCase().split(/\s+/).filter(Boolean);
+  _shownVenues = courses.filter(c =>
+    (!region || c.region === region) &&
+    words.every(w => (c.name + ' ' + c.address + ' ' + c.sigungu + ' ' + c.region).toLowerCase().includes(w)));
+  if (!_shownVenues.length) {
+    list.innerHTML = hubMsg(courses.length
+      ? '조건에 맞는 구장이 없어요. 지역을 바꾸거나 다른 이름으로 찾아보세요.'
+      : '아직 검증이 끝난 구장이 없어요.');
+    return;
   }
-  const keyword = [region, q, '파크골프장'].filter(Boolean).join(' ');
-  new kakao.maps.services.Places().keywordSearch(keyword, (data, status) => {
-    const St = kakao.maps.services.Status;
-    if (status === St.ZERO_RESULT) { _venues = []; list.innerHTML = hubMsg('검색 결과가 없어요. 다른 지역이나 이름으로 찾아보세요.'); return; }
-    if (status !== St.OK) { _venues = []; list.innerHTML = hubMsg('검색에 실패했어요. 잠시 후 다시 시도해 주세요.'); return; }
-    _venues = data.slice(0, 15);
-    list.innerHTML = _venues.map((p, i) => venueCardHtml(p, i)).join('');
-  }, { size: 15 });
+  list.innerHTML = `<p class="hub-note">공식 자료로 확인한 구장 ${_shownVenues.length}곳입니다. 전국 구장은 순차적으로 확인해 추가합니다.</p>` +
+    _shownVenues.map((c, i) => venueCardHtml(c, i)).join('');
 }
-function venueCardHtml(p, i) {
-  const addr = p.road_address_name || p.address_name || '';
+function venueCardHtml(c, i) {
+  const mapUrl = 'https://map.kakao.com/?q=' + encodeURIComponent(c.address);
   return `<article class="hub-venue">
-    <h3 class="hub-vt">${escHtml(p.place_name)}</h3>
-    <p class="hub-vs">${escHtml(addr)}</p>
-    ${p.phone ? `<p class="hub-vs">전화 ${escHtml(p.phone)}</p>` : ''}
+    <h3 class="hub-vt">${escHtml(c.name)}</h3>
+    <p class="hub-vs">${escHtml(c.address)}</p>
+    <p class="hub-vs">${escHtml(String(c.holes))}홀 · 이용료 ${escHtml(c.fee)} · ${escHtml(c.hours)}</p>
     <div class="hub-acts">
-      <button class="hub-act" onclick="openVenueMap(${i})">지도 보기</button>
+      <button class="hub-act" aria-expanded="false" aria-controls="venue-d-${i}" onclick="toggleVenueDetail(${i}, this)">자세히 보기</button>
+      <a class="hub-act" href="${escHtml(safeUrl(mapUrl))}" target="_blank" rel="noopener noreferrer">지도에서 보기 ↗</a>
       <button class="hub-act hub-act-g" onclick="foodAtVenue(${i})">주변 맛집</button>
+    </div>
+    <div id="venue-d-${i}" class="hub-detail" hidden>
+      <dl class="hub-dl">
+        <dt>휴장일</dt><dd>${escHtml(c.closed)}</dd>
+        <dt>입장 방법</dt><dd>${escHtml(c.entry)}</dd>
+        <dt>운영 주체</dt><dd>${escHtml(c.operator)}</dd>
+        <dt>전화</dt><dd><a href="tel:${escHtml(String(c.phone).replace(/[^0-9+]/g, ''))}">${escHtml(c.phone)}</a></dd>
+        <dt>출처</dt><dd><a href="${escHtml(safeUrl(c.source_url))}" target="_blank" rel="noopener noreferrer">공식 안내 페이지 ↗</a> (확인일 ${escHtml(c.checked_at)})</dd>
+      </dl>
     </div>
   </article>`;
 }
-function openVenueMap(i) {
-  const p = _venues[i];
-  if (p) window.open(safeUrl(p.place_url), '_blank', 'noopener');
-}
-function foodAtVenue(i) {
-  const p = _venues[i];
-  if (!p) return;
-  _foodVenue = { name: p.place_name, lat: +p.y, lng: +p.x };
-  go('pg-food');
+function toggleVenueDetail(i, btn) {
+  const panel = document.getElementById('venue-d-' + i);
+  if (!panel) return;
+  const open = panel.hasAttribute('hidden');
+  if (open) panel.removeAttribute('hidden'); else panel.setAttribute('hidden', '');
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  btn.textContent = open ? '접기' : '자세히 보기';
 }
 
-/* 맛집: 선택한 구장 반경 1km의 음식점 (카카오 카테고리 FD6) */
+/* ── 맛집: 선택한 구장 주소 → 좌표(카카오 주소 검색) → 반경 1km 음식점 ── */
+function foodAtVenue(i) {
+  const c = _shownVenues[i];
+  if (!c) return;
+  _foodVenue = c;
+  go('pg-food');
+}
 async function loadFoodAround() {
   const body = document.getElementById('food-body');
   const label = document.getElementById('food-location-label');
   if (!body || !label) return;
-  if (!_foodVenue || !isFinite(_foodVenue.lat) || !isFinite(_foodVenue.lng)) {
+  if (!_foodVenue) {
     label.textContent = '구장을 먼저 선택하세요';
     body.innerHTML = hubMsg('구장 찾기에서 구장을 고르면 주변 맛집을 보여드려요.');
     return;
   }
   label.textContent = `${_foodVenue.name} 주변 1km`;
   body.innerHTML = hubMsg('맛집을 찾고 있어요...');
-  await loadKakaoSdk();
-  if (!_kakaoSdkReady || !window.kakao?.maps?.services) {
-    body.innerHTML = hubMsg('지도 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.'); return;
+  try {
+    const g = await apiJson('/api/geocode?address=' + encodeURIComponent(_foodVenue.address));
+    const f = await apiJson(`/api/food?x=${encodeURIComponent(g.lng)}&y=${encodeURIComponent(g.lat)}`);
+    if (!f.items.length) { body.innerHTML = hubMsg('주변 1km 안에 검색된 음식점이 없어요.'); return; }
+    body.innerHTML = `<p class="hub-note">${escHtml(f.source)}</p>` + f.items.map(foodCardHtml).join('');
+  } catch (e) {
+    body.innerHTML = hubMsg(apiMessage(e.code));
   }
-  const v = _foodVenue;
-  new kakao.maps.services.Places().categorySearch('FD6', (data, status) => {
-    const St = kakao.maps.services.Status;
-    if (status === St.ZERO_RESULT) { _foods = []; body.innerHTML = hubMsg('주변 맛집 정보가 없어요.'); return; }
-    if (status !== St.OK) { _foods = []; body.innerHTML = hubMsg('검색에 실패했어요. 잠시 후 다시 시도해 주세요.'); return; }
-    _foods = data.slice(0, 10);
-    body.innerHTML = _foods.map((p, i) => foodCardHtml(p, i)).join('');
-  }, { location: new kakao.maps.LatLng(v.lat, v.lng), radius: 1000, size: 10, sort: 'distance' });
 }
-function foodCardHtml(p, i) {
-  const dist = +p.distance >= 1000 ? `${(+p.distance / 1000).toFixed(1)}km` : `${p.distance}m`;
-  const cat = (p.category_name || '').split('>').pop().trim();
+function foodCardHtml(p) {
+  const dist = p.distanceM != null ? (p.distanceM >= 1000 ? `${(p.distanceM / 1000).toFixed(1)}km` : `${p.distanceM}m`) : '';
   return `<article class="hub-venue">
-    <h3 class="hub-vt">${escHtml(p.place_name)}</h3>
-    <p class="hub-vs">${escHtml(cat)} · ${escHtml(dist)}</p>
+    <h3 class="hub-vt">${escHtml(p.name)}</h3>
+    <p class="hub-vs">${escHtml(p.category)}${dist ? ' · ' + escHtml(dist) : ''}</p>
+    ${p.address ? `<p class="hub-vs">${escHtml(p.address)}</p>` : ''}
     ${p.phone ? `<p class="hub-vs">전화 ${escHtml(p.phone)}</p>` : ''}
-    <div class="hub-acts"><button class="hub-act" onclick="openFoodMap(${i})">지도 보기</button></div>
+    ${p.url ? `<div class="hub-acts"><a class="hub-act" href="${escHtml(safeUrl(p.url))}" target="_blank" rel="noopener noreferrer">카카오맵에서 보기 ↗</a></div>` : ''}
   </article>`;
 }
-function openFoodMap(i) {
-  const p = _foods[i];
-  if (p) window.open(safeUrl(p.place_url), '_blank', 'noopener');
+
+/* ── 대회: 검증된 공식 출처가 있는 항목만 표시 ── */
+async function loadParkgolfNews() {
+  const body = document.getElementById('news-body');
+  if (!body) return;
+  let list;
+  try { list = await loadJson('data/tournaments.json'); }
+  catch (e) { body.innerHTML = hubMsg('대회 정보를 불러오지 못했어요.') + searchLinksHtml(); return; }
+  const today = new Date().toISOString().slice(0, 10);
+  const upcoming = list
+    .filter(t => t.source_url && t.date_start && (t.date_end || t.date_start) >= today)
+    .sort((a, b) => a.date_start.localeCompare(b.date_start));
+  body.innerHTML = (upcoming.length
+    ? upcoming.map(tournamentCardHtml).join('')
+    : hubMsg('지금 공식 출처로 확인된 대회 일정이 없어요. 주최 기관 공지를 직접 확인해 주세요.')) + searchLinksHtml();
+}
+function tournamentCardHtml(t) {
+  const dates = t.date_end && t.date_end !== t.date_start ? `${t.date_start} ~ ${t.date_end}` : t.date_start;
+  return `<article class="hub-venue">
+    <h3 class="hub-vt">${escHtml(t.title)}</h3>
+    <p class="hub-vs">개최일 ${escHtml(dates)}${t.venue ? ' · ' + escHtml(t.venue) : ''}</p>
+    ${t.organizer ? `<p class="hub-vs">주최 ${escHtml(t.organizer)}</p>` : ''}
+    ${t.apply_period ? `<p class="hub-vs">접수 ${escHtml(t.apply_period)}</p>` : ''}
+    <div class="hub-acts">
+      ${t.apply_url ? `<a class="hub-act hub-act-g" href="${escHtml(safeUrl(t.apply_url))}" target="_blank" rel="noopener noreferrer">접수 링크 ↗</a>` : ''}
+      ${t.result_url ? `<a class="hub-act" href="${escHtml(safeUrl(t.result_url))}" target="_blank" rel="noopener noreferrer">결과 ↗</a>` : ''}
+    </div>
+    <p class="hub-vs">출처: <a href="${escHtml(safeUrl(t.source_url))}" target="_blank" rel="noopener noreferrer">공식 공지 ↗</a> · 확인일 ${escHtml(t.checked_at || '')}</p>
+  </article>`;
+}
+function searchLinksHtml() {
+  const q = encodeURIComponent('파크골프 대회');
+  const links = [
+    ['네이버 뉴스', 'https://search.naver.com/search.naver?where=news&query=' + q + '&sort=1'],
+    ['구글 뉴스', 'https://news.google.com/search?q=' + q + '&hl=ko&gl=KR'],
+  ];
+  return `<p class="hub-note">더 찾아보려면 직접 검색하세요 (외부 사이트로 이동)</p>` + links.map(([label, url]) =>
+    `<a class="hub-ext" href="${escHtml(safeUrl(url))}" target="_blank" rel="noopener noreferrer">${escHtml(label)}에서 “파크골프 대회” 검색 <span aria-hidden="true">↗</span></a>`
+  ).join('');
+}
+
+/* ── 유튜브: 서버 API 경유 (키 비노출) ── */
+async function loadYoutubeVideos(category = '대회') {
+  const body = document.getElementById('youtube-body');
+  if (!body) return;
+  body.innerHTML = hubMsg('영상을 불러오고 있어요...');
+  try {
+    const d = await apiJson('/api/youtube?category=' + encodeURIComponent(category));
+    if (!d.items.length) { body.innerHTML = hubMsg('표시할 영상이 없어요.'); return; }
+    body.innerHTML = d.items.map(videoCardHtml).join('') + `<p class="hub-note">${escHtml(d.source)}</p>`;
+  } catch (e) {
+    body.innerHTML = hubMsg(apiMessage(e.code));
+  }
+}
+function videoCardHtml(v) {
+  const date = v.publishedAt ? String(v.publishedAt).slice(0, 10) : '';
+  return `<a class="hub-video" href="${escHtml(safeUrl(v.url))}" target="_blank" rel="noopener noreferrer">
+    ${v.thumbnail ? `<img src="${escHtml(safeUrl(v.thumbnail))}" alt="" width="160" height="90" loading="lazy">` : ''}
+    <span class="hub-video-t"><b>${escHtml(v.title)}</b><small>${escHtml(v.channel || '')}${date ? ' · ' + escHtml(date) : ''}</small></span>
+  </a>`;
+}
+function setYtab(tab) {
+  ['대회', '레슨', '장비', '구장'].forEach(t => {
+    const btn = document.getElementById('ytab-' + t);
+    if (!btn) return;
+    const on = t === tab;
+    btn.classList.toggle('on', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+  loadYoutubeVideos(tab);
 }
 
 /* 게임코드 참가 (홈 입력란 → 기존 joinGame 재사용) */
@@ -1543,7 +1659,7 @@ function go(id) {
   if (id === 'pg-create')      setTimeout(initCourseRegion, 150);
   if (id === 'pg-venues')      renderRegionOptions('venue-region', true);
   if (id === 'pg-tournaments') loadParkgolfNews();
-  if (id === 'pg-video')       loadYoutubeVideos('파크골프 대회');
+  if (id === 'pg-video')       loadYoutubeVideos('대회');
   if (id === 'pg-food')        loadFoodAround();
 }
 function goTab(t) {
@@ -1787,57 +1903,7 @@ function renderMyRankCard() {
 let _ytLoaded = false;
 let _ytCurrentTab = '대회';
 
-function setYtab(tab) {
-  _ytCurrentTab = tab;
-  ['대회','레슨','장비'].forEach(t => {
-    const btn = document.getElementById('ytab-' + t);
-    if (!btn) return;
-    const on = t === tab;
-    btn.classList.toggle('on', on);
-    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-  });
-  _ytLoaded = false;
-  loadYoutubeVideos('파크골프 ' + tab, true);
-}
 
-async function loadYoutubeVideos(query = '파크골프 대회', force = false) {
-  if (_ytLoaded && !force) return;
-  const body = document.getElementById('youtube-body');
-  if (!body) return;
-  _ytLoaded = false;
-  body.innerHTML = '<div style="padding:20px 0;color:var(--gray3);font-size:13px;text-align:center">⏳ 영상 검색 중...</div>';
-  try {
-    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=6&order=relevance&relevanceLanguage=ko&key=${YOUTUBE_KEY}`;
-    const r = await fetch(url);
-    const d = await r.json();
-    if (!d.items?.length) { body.innerHTML = '<div style="padding:20px;color:var(--gray3);font-size:13px;text-align:center">영상을 찾지 못했어요</div>'; return; }
-    _ytLoaded = true;
-    body.innerHTML = `<div style="display:flex;gap:12px;overflow-x:auto;padding:2px 0 8px;-webkit-overflow-scrolling:touch;scrollbar-width:none">
-      ${d.items.map(v => {
-        const vid   = v.id.videoId;
-        const title = v.snippet.title.replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&amp;/g,'&');
-        const ch    = v.snippet.channelTitle;
-        const thumb = v.snippet.thumbnails?.medium?.url || v.snippet.thumbnails?.default?.url || '';
-        const date  = _relativeDate ? _relativeDate(new Date(v.snippet.publishedAt)) : '';
-        return `<div style="flex-shrink:0;width:160px;cursor:pointer" onclick="window.open('https://www.youtube.com/watch?v=${safeId(vid)}','_blank')">
-          <div style="position:relative;width:160px;height:90px;border-radius:10px;overflow:hidden;background:#111">
-            <img src="${escHtml(thumb)}" style="width:100%;height:100%;object-fit:cover" loading="lazy">
-            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
-              <div style="width:36px;height:36px;background:rgba(220,0,0,.9);border-radius:50%;display:flex;align-items:center;justify-content:center">
-                <div style="width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:13px solid #fff;margin-left:3px"></div>
-              </div>
-            </div>
-          </div>
-          <div style="font-size:12px;font-weight:700;color:var(--text);margin-top:7px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${escHtml(title)}</div>
-          <div style="font-size:11px;color:var(--gray3);margin-top:3px">${escHtml(ch)}</div>
-          <div style="font-size:10px;color:var(--gray3)">${date}</div>
-        </div>`;
-      }).join('')}
-    </div>`;
-  } catch(e) {
-    body.innerHTML = '<div style="padding:20px;color:var(--gray3);font-size:13px;text-align:center">영상을 불러오지 못했어요</div>';
-  }
-}
 
 /* ══ 파크골프 대회·뉴스 (외부 검색 링크) ══ */
 let _newsLoaded = false;
@@ -1850,97 +1916,10 @@ function _relativeDate(d) {
   return `${Math.floor(diff/1440)}일 전`;
 }
 
-async function loadParkgolfNews(force = false) {
-  // 제3자 CORS 프록시를 쓰지 않는다. 검색은 사용자가 직접 여는 외부 링크로만 제공한다.
-  const body = document.getElementById('news-body');
-  if (!body || (_newsLoaded && !force)) return;
-  _newsLoaded = true;
-  const q = encodeURIComponent('파크골프 대회');
-  const links = [
-    ['네이버 뉴스', 'https://search.naver.com/search.naver?where=news&query=' + q + '&sort=1'],
-    ['구글 뉴스', 'https://news.google.com/search?q=' + q + '&hl=ko&gl=KR'],
-    ['유튜브 대회 영상', 'https://www.youtube.com/results?search_query=' + q],
-  ];
-  body.innerHTML = links.map(([label, url]) =>
-    `<a class="hub-ext" href="${escHtml(safeUrl(url))}" target="_blank" rel="noopener noreferrer">${escHtml(label)}에서 “파크골프 대회” 보기 <span aria-hidden="true">↗</span><span class="hub-sr">(외부 사이트로 이동)</span></a>`
-  ).join('');
-}
 
 /* ══ 주변 맛집 (카카오맵 JS SDK) ══ */
-const KAKAO_REST_KEY = '059a7981fef454926dd389d3994627d8';
-const KAKAO_JS_KEY   = '1f61ed2143bb0567405d3c00a520cfce';
-const YOUTUBE_KEY    = 'AIzaSyDsgn4InY8HjHk1FTSw2Pen-wz1OXMvQq4';
-let _foodLoaded = false;
-let _kakaoSdkReady = false;
 
-function loadKakaoSdk() {
-  return new Promise((resolve) => {
-    if (window.kakao?.maps) { resolve(); return; }
-    const s = document.createElement('script');
-    s.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_JS_KEY}&libraries=services&autoload=false`;
-    s.onload = () => kakao.maps.load(() => { _kakaoSdkReady = true; resolve(); });
-    s.onerror = () => resolve();
-    document.head.appendChild(s);
-  });
-}
 
-async function loadNearbyFood(force = false) {
-  if (_foodLoaded && !force) return;
-  const body = document.getElementById('food-body');
-  if (!body) return;
-  _foodLoaded = false;
-  body.innerHTML = '<div style="padding:20px 0;color:var(--gray3);font-size:13px;text-align:center">📍 위치 확인 중...</div>';
-  if (!navigator.geolocation) {
-    body.innerHTML = '<div style="padding:20px;color:var(--gray3);font-size:13px;text-align:center">위치 서비스를 지원하지 않아요</div>';
-    return;
-  }
-  navigator.geolocation.getCurrentPosition(
-    async (pos) => {
-      const { latitude: lat, longitude: lng } = pos.coords;
-      body.innerHTML = '<div style="padding:20px 0;color:var(--gray3);font-size:13px;text-align:center">🍽️ 맛집 검색 중...</div>';
-      try {
-        await loadKakaoSdk();
-        if (!_kakaoSdkReady) throw new Error('sdk');
-        new kakao.maps.services.Places().categorySearch('FD6',
-          (data, status) => {
-            if (status !== kakao.maps.services.Status.OK || !data.length) {
-              body.innerHTML = '<div style="padding:20px;color:var(--gray3);font-size:13px;text-align:center">주변 맛집 정보가 없어요</div>'; return;
-            }
-            _foodLoaded = true;
-            document.getElementById('food-location-label').textContent = '📍 현재 위치 반경 1km';
-            const ico = c => /치킨|피자/.test(c)?'🍗':/한식|국밥|탕|찌개/.test(c)?'🍲':/고기|삼겹|갈비/.test(c)?'🥩':/커피|카페/.test(c)?'☕':/중식/.test(c)?'🥢':/일식|초밥/.test(c)?'🍱':'🍽️';
-            body.innerHTML = data.slice(0,6).map((p, i) => {
-              const dist = +p.distance>=1000?`${(+p.distance/1000).toFixed(1)}km`:`${p.distance}m`;
-              const cat  = p.category_name?.split('>').pop()?.trim() || '';
-              return `<div onclick="window.open('${safeUrl(p.place_url)}','_blank')" style="display:flex;align-items:center;gap:13px;padding:13px 0;border-bottom:${i<5?'1px solid var(--gray1)':'none'};cursor:pointer">
-                <div style="width:38px;height:38px;border-radius:10px;background:var(--o5);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${ico(cat)}</div>
-                <div style="flex:1;min-width:0">
-                  <div style="font-size:15px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(p.place_name)}</div>
-                  <div style="font-size:12px;color:var(--gray3);margin-top:2px">${escHtml(cat)}${p.phone?' · '+escHtml(p.phone):''}</div>
-                </div>
-                <div style="text-align:right;flex-shrink:0">
-                  <div style="font-size:14px;font-weight:900;color:var(--b2)">${dist}</div>
-                  ${i===0?'<div style="font-size:10px;color:var(--o2);font-weight:700;margin-top:1px">🔥인기1위</div>':''}
-                </div>
-              </div>`;
-            }).join('') + '<div style="padding:8px 0 2px;font-size:11px;color:var(--gray3);text-align:center">카카오맵 인기순 · 탭하면 지도로 이동</div>';
-          },
-          { location: new kakao.maps.LatLng(lat, lng), radius: 1000, sort: kakao.maps.services.SortBy.POPULARITY }
-        );
-      } catch(e) {
-        body.innerHTML = '<div style="padding:20px;color:var(--gray3);font-size:13px;text-align:center">맛집 정보를 불러오지 못했어요</div>';
-      }
-    },
-    () => {
-      body.innerHTML = `<div style="padding:24px 16px;text-align:center">
-        <div style="font-size:36px;margin-bottom:10px">📍</div>
-        <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px">위치 권한이 필요해요</div>
-        <div style="font-size:12px;color:var(--gray3);line-height:1.7">주소창 옆 자물쇠 아이콘 → 위치 → 허용</div>
-      </div>`;
-    },
-    { timeout: 8000, maximumAge: 60000 }
-  );
-}
 async function createMatch() {
   const title  = V('c-title').trim();
   const date   = V('c-date');
