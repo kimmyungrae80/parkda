@@ -4,10 +4,11 @@
 - 데이터는 tests/fixtures/fictional_match.json 의 완전 가상 값만 사용한다.
 실행: python3 tests/e2e/test_regression.py
 """
-import json, pathlib, subprocess, sys, time, datetime
+import json, os, pathlib, subprocess, sys, time, datetime
 from playwright.sync_api import sync_playwright
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
+SERVE = pathlib.Path(os.environ.get("PARKDA_SERVE_DIR", ROOT))
 FIX = json.loads((ROOT / "tests/fixtures/fictional_match.json").read_text(encoding="utf-8"))
 PORT = 8765
 BASE = f"http://127.0.0.1:{PORT}/index.html"
@@ -27,7 +28,7 @@ def ls_get(page, key):
 
 def main():
     srv = subprocess.Popen([sys.executable, "-m", "http.server", str(PORT), "--bind", "127.0.0.1"],
-                           cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                           cwd=SERVE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     time.sleep(1)
     errors, dialogs, expected_dialogs = [], [], []
     try:

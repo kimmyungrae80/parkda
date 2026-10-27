@@ -4,10 +4,11 @@
 - 카카오 SDK·유튜브 응답은 테스트용 스텁으로 대체해 결과를 결정적으로 만든다.
 - 실행: python3 tests/e2e/test_p1_home.py
 """
-import json, pathlib, subprocess, sys, time, datetime
+import json, os, pathlib, subprocess, sys, time, datetime
 from playwright.sync_api import sync_playwright
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
+SERVE = pathlib.Path(os.environ.get("PARKDA_SERVE_DIR", ROOT))
 PORT = 8767
 BASE = f"http://127.0.0.1:{PORT}/index.html"
 OUT = ROOT / "tests/results"; OUT.mkdir(parents=True, exist_ok=True)
@@ -43,7 +44,7 @@ def check(name, cond, detail=""):
 
 def main():
     srv = subprocess.Popen([sys.executable, "-m", "http.server", str(PORT), "--bind", "127.0.0.1"],
-                           cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                           cwd=SERVE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     time.sleep(1)
     errors, dialogs, blocked = [], [], []
     try:
