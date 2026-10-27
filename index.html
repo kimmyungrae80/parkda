@@ -1132,14 +1132,15 @@ select.hub-input{flex:0 1 150px}
 <div id="toast"></div>
 </div>
 
+<script src="config/client.js"></script>
 <script>
 /* ══════════════════════════════════════
    ★ Supabase 설정 — 나중에 여기만 바꾸세요
    SB_URL = 'https://xxxx.supabase.co'
    SB_KEY = 'eyJ...'
 ══════════════════════════════════════ */
-const SB_URL = 'https://szoxnkarkdxirbyxmzgr.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6b3hua2Fya2R4aXJieXhtemdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNDc5NDQsImV4cCI6MjA5MTcyMzk0NH0.Rm3y9LQT7rKASC3Cro2TDFG_b-VkH4HWAci3yURkZes';
+const SB_URL = (window.PARKDA_CONFIG && window.PARKDA_CONFIG.supabaseUrl) || ''; // 환경별 설정 (config/client.js, 저장소에 운영 값 없음)
+const SB_KEY = (window.PARKDA_CONFIG && window.PARKDA_CONFIG.supabaseAnonKey) || ''; // anon 키도 환경 설정에서만 로드
 const SB_T   = 'parkda_store';
 const SB_OK  = () => new URLSearchParams(location.search).has('sync'); // 운영 Supabase 동기화는 ?sync=1 일 때만 (기본: 이 기기에만 저장)
 

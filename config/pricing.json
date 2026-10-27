@@ -1,0 +1,8 @@
+{
+  "_note": "테스트 가설 가격. 실제 과금은 활성화하지 않음.",
+  "currency": "KRW",
+  "plans": {
+    "free": { "monthly": 0 },
+    "club_pro": { "monthly": 14900, "status": "test_hypothesis" }
+  }
+}

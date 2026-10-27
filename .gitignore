@@ -9,3 +9,4 @@ data/verified/courses_checked.json
 data/verified/quality_report.json
 __pycache__/
 *.pyc
+config/client.js

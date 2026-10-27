@@ -11,9 +11,7 @@ fs.mkdirSync(out, { recursive: true });
 
 let html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const rules = [
-  [/const SB_URL = '[^']*';/, "const SB_URL = '';"],
   [/const KAKAO_KEY = '[^']*';/, "const KAKAO_KEY = ''; // 미리보기: 카카오 로그인 키 제거"],
-  [/const SB_KEY = '[^']*';/, "const SB_KEY = '';"],
   [/const SB_OK\s*= \(\) => [^\n]*/, "const SB_OK  = () => false; // 미리보기: 운영 DB 연결 없음"],
   [/const ADMIN_PW = '[^']*';/, "const ADMIN_PW = null; // 미리보기: 관리자 로그인 불가"],
 ];
@@ -26,6 +24,9 @@ const leftovers = [/eyJhbGciOi/, /AIza[0-9A-Za-z_-]{20,}/, /szoxnkarkdxirbyxmzgr
 for (const re of leftovers) if (re.test(html)) throw new Error('미리보기에 운영 값이 남아 있음: ' + re);
 
 fs.writeFileSync(path.join(out, 'index.html'), html, 'utf8');
+// 미리보기는 빈 설정 (운영 연결 값 없음)
+fs.mkdirSync(path.join(out, 'config'), { recursive: true });
+fs.writeFileSync(path.join(out, 'config', 'client.js'), 'window.PARKDA_CONFIG = {"env":"preview","supabaseUrl":"","supabaseAnonKey":""};\n');
 for (const f of ['sw.js', 'manifest.json', 'icon-192.png', 'icon-512.png']) {
   fs.copyFileSync(path.join(root, f), path.join(out, f));
 }

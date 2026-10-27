@@ -30,3 +30,13 @@
 3. 동호회 나머지 기능과 권한 함수 구현 (서버 측)
 4. 경기관리 통합 (정기모임 → 확정 → 조편성 → 게임코드 → 점수 → 결과 확정)
 5. Club Pro와 결제 테스트 환경 (실제 결제 금지)
+
+## 추가 진행 (staging 준비 단계)
+- staging 프로젝트 생성: **시도했으나 권한 거부로 실행하지 못함** (Claude 자동 권한 정책). 소유자가 직접 생성해야 함 → `docs/STAGING_SETUP.md`
+- 운영 프로젝트 `szoxnkarkdxirbyxmzgr` 접근·변경: 하지 않음
+- staging 스키마·RLS 정책 작성: `supabase/staging/0001_platform_schema.sql` (미적용)
+- 환경 분리: 운영 주소를 코드에서 제거하고 `config/client.js`(생성, 비커밋)로 이동. `tools/check_env.js` 통과
+- 카카오 로그인 모듈(Supabase Auth 경유), 테스트 5/5
+- 토스 테스트 결제 서버 처리 (실키 거부, 금액 대조, 중복 방지, 웹훅 재조회), 테스트 9/9. 실제 호출 없음
+- Club Pro 가격 14,900원: 테스트 가설로만 기록 (`config/pricing.json`)
+- 미구현: 서버 DB 연동 전체, RLS 실검증, 동호회 나머지 기능, P4 통합, Club Pro 화면, 관리자 콘솔
