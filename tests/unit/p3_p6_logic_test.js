@@ -27,6 +27,14 @@ t('동호회: 일반 회원 목록은 승인 회원만, 운영자는 상태까�
   assert.equal(club.listMembers(c, 'manager').length, 2);
   assert.equal(club.listMembers(c, 'manager')[1].status, 'pending');
 });
+t('동호회: 역할 지정은 운영자만, 운영자 역할은 바꿀 수 없다', () => {
+  const c = club.createClub({ name: '테스트클럽', region: '부산', ownerId: 'o' });
+  club.requestJoin(c, 'a'); club.decide(c, 'owner', 'a', true);
+  assert.equal(club.setRole(c, 'manager', 'a', 'treasurer').reason, 'forbidden');
+  assert.deepEqual(club.setRole(c, 'owner', 'a', 'manager'), { ok: true });
+  assert.equal(club.findMember(c, 'a').role, 'manager');
+  assert.equal(club.setRole(c, 'owner', 'o', 'member').reason, 'cannot_change');
+});
 t('동호회: 출석률은 출석 기록이 있는 모임만 센다', () => {
   const ms = [{ attendance: { a: true } }, { attendance: { a: false } }, {}];
   assert.equal(club.attendanceRate(ms, 'a'), 50);
@@ -43,6 +51,14 @@ t('함께 치기: 정원 초과는 대기, 취소하면 대기 1번이 승격', 
   assert.equal(r.promoted, 'b');
   assert.equal(meet.activeCount(m), 2);
   assert.equal(m.waitlist[0], 'c');
+});
+t('함께 치기: 대기자는 대기만 취소할 수 있고 승격되지 않는다', () => {
+  const m = meet.createMeetup({ capacity: 2, creatorId: 'h' });
+  meet.join(m, 'a'); meet.join(m, 'b'); meet.join(m, 'c');
+  assert.deepEqual(meet.cancelWait(m, 'b'), { ok: true });
+  assert.equal(meet.cancelWait(m, 'a').reason, 'not_waiting');
+  assert.equal(meet.activeCount(m), 2);
+  assert.deepEqual(m.waitlist, ['c']);
 });
 t('함께 치기: 중복 참가·차단 사용자·마감 모임은 거절', () => {
   const m = meet.createMeetup({ capacity: 4, creatorId: 'h' });

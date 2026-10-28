@@ -148,10 +148,10 @@ def main():
             check("외부 뉴스 프록시 요청 없음 (allorigins)", not any("allorigins" in u for u in blocked), "")
 
             # ── F. Club Pro: 비회원은 로그인 안내 ──
-            pg.evaluate("go('pg-club')"); pg.click("#pg-club .hub-btn-big")
-            time.sleep(0.3)
-            check("Club Pro 알림: 개인정보를 저장하지 않고 준비 중 안내만", "준비 중" in pg.evaluate("(document.getElementById('toast')||{}).textContent||''")
-                  and pg.evaluate("document.getElementById('pg-club').classList.contains('on')"))
+            pg.evaluate("go('pg-club')"); time.sleep(0.3)
+            club_txt = pg.inner_text("#pg-club")
+            check("Club Pro: 비회원에게는 운영 동호회 없음 안내 + 무료 화면", "운영자나 임원으로 참여한 동호회가 없어요" in club_txt and "무료" in club_txt, club_txt[:120])
+            check("Club Pro: 결제 버튼 없음 (데모 체험 토글만)", pg.locator("#pg-club button:has-text('결제')").count() == 1 and pg.locator("#pg-club button:has-text('결제 없음')").count() == 1 and pg.locator("#pg-club button:has-text('구독')").count() == 0)
             ctx.close()
 
             # ── G. 회원 흐름: 로그인 → 홈 회원 영역 → 경기관리 → 기존 기능 진입 ──

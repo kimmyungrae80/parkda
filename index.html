@@ -654,6 +654,11 @@ select.hub-input{flex:0 1 150px}
   </div>
 </div>
 
+<div class="pg hub" id="pg-console">
+  <div class="hub-bar"><button class="hub-back" onclick="go('pg-home')">‹ 홈</button><h2>관리자 콘솔 (개발용)</h2></div>
+  <div class="hub-pad" id="console-body"></div>
+</div>
+
 <div class="pg hub" id="pg-clubs">
   <div class="hub-bar"><button class="hub-back" onclick="go('pg-home')">‹ 홈</button><h2>동호회</h2></div>
   <div class="hub-pad">
@@ -722,16 +727,7 @@ select.hub-input{flex:0 1 150px}
 
 <div class="pg hub" id="pg-club">
   <div class="hub-bar"><button class="hub-back" onclick="go('pg-home')">‹ 홈</button><h2>동호회 운영자 Club Pro</h2></div>
-  <div class="hub-pad">
-    <h3 class="hub-h2">동호회 운영을 더 편하게</h3>
-    <ul class="hub-ul">
-      <li>회원, 출석, 정기모임 관리</li>
-      <li>회비 관리와 경기 기록</li>
-      <li>기록 기반 통계</li>
-    </ul>
-    <p class="hub-note">Club Pro는 준비 중입니다. 현재 결제는 열려 있지 않아요. 오픈 알림을 받으시겠어요?</p>
-    <button class="hub-btn-big" onclick="clubNotify()">오픈 알림 신청</button>
-  </div>
+  <div class="hub-pad" id="pro-body"></div>
 </div>
 
 <div class="pg" id="pg-create">
@@ -859,6 +855,7 @@ select.hub-input{flex:0 1 150px}
 <div class="pg" id="pg-score">
   <div class="bar"><span class="bar-back" onclick="go('pg-matches')">‹</span><span class="bar-title" id="score-bar-title">📊 점수 입력</span><span class="bar-sub" id="score-bar-sub"></span><button onclick="toggleTip('tip-score')" style="background:none;border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:2px 8px;font-size:11px;color:rgba(255,255,255,.9);cursor:pointer;margin-right:4px">?</button></div><div id="tip-score" style="display:none;background:var(--g5);border-radius:10px;padding:10px 12px;margin:6px 14px;font-size:13px;color:var(--g2);line-height:1.6">조장만 점수를 입력할 수 있습니다(총무/회장 예외). 홀별 타수 입력 → 💾저장 → 모두 완료되면 🏆포인트 결과를 확인하세요.</div>
   <div id="score-auth-box"></div>
+  <div id="score-controls"></div>
   <div class="bubble"><span class="bubble-ico">💡</span><span id="score-help">조장만 점수를 입력할 수 있어요.</span></div>
 
   <!-- ⛳ 홀별 PAR 설정 (점수 입력 화면) -->
@@ -902,6 +899,7 @@ select.hub-input{flex:0 1 150px}
   <div id="podium-area"></div>
   <div class="card"><div class="card-hd" style="display:flex;align-items:center;justify-content:space-between"><span>📋 전체 순위</span><button onclick="toggleTip('tip-rank')" style="background:none;border:1px solid var(--g3);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--g2);cursor:pointer">? 설명</button></div><div id="tip-rank" style="display:none;background:var(--g5);border-radius:10px;padding:10px 12px;margin:6px 0;font-size:13px;color:var(--g2);line-height:1.6">전체 참가자의 최종 순위와 총 타수, PAR 대비 성적, 포인트 합산 결과를 보여줍니다.</div><div style="overflow-x:auto"><table class="rtbl" id="result-tbl"></table></div></div>
   <div class="card" id="result-share-card"><div class="card-hd" style="display:flex;align-items:center;justify-content:space-between"><span>📱 카카오톡 공유</span><button onclick="toggleTip('tip-share')" style="background:none;border:1px solid var(--b3);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--b2);cursor:pointer">? 설명</button></div><div id="tip-share" style="display:none;background:var(--b5);border-radius:10px;padding:10px 12px;margin:6px 0;font-size:13px;color:var(--b1);line-height:1.6">순위와 포인트 정산 결과를 텍스트로 자동 생성합니다. 복사 버튼을 눌러 카카오톡에 붙여넣기 하세요!</div><div class="card-bd"><div class="share-box" id="share-box"></div><div style="margin-top:9px" id="result-copy-btn-wrap"></div></div></div>
+  <div id="final-area" style="padding:0 14px"></div>
   <div class="btn-wrap" id="result-edit-btn-wrap"></div>
 </div>
 
@@ -1133,6 +1131,10 @@ select.hub-input{flex:0 1 150px}
 </div>
 
 <script src="config/client.js"></script>
+<script src="lib/club-logic.js"></script>
+<script src="lib/meeting-logic.js"></script>
+<script src="lib/score-logic.js"></script>
+<script src="lib/pro-logic.js"></script>
 <script>
 /* ══════════════════════════════════════
    ★ Supabase 설정 — 나중에 여기만 바꾸세요
@@ -1732,6 +1734,7 @@ function renderCourse(c) {
   loadFood();
   loadCourseTournaments(c);
   loadCourseVideos(c);
+  body.insertAdjacentHTML('beforeend', venueReportHtml(c));
 }
 function setFoodCat(cat) {
   window._foodCat = cat;
@@ -1880,13 +1883,36 @@ function hubJoin(e) {
 
 window.addEventListener('hashchange', () => { openCourseFromHash(); });
 
-/* ══ 함께 치기 · 동호회 (데모: 이 기기에만 저장, 서버 연결 전) ══ */
+/* ══ 함께 치기 · 동호회 (데모: 이 기기에만 저장, 서버 연결 전. 규칙은 lib/ 의 순수 함수 사용) ══ */
 const DEMO_BANNER = '데모 기능입니다. 데이터는 이 기기에만 저장되며 운영 서버에 기록되지 않습니다. 권한 검사는 서버 인증 전까지 임시입니다.';
 function demoGet(key, def) { try { const v = JSON.parse(localStorage.getItem(key)); return v == null ? def : v; } catch (e) { return def; } }
 function demoSet(key, v) { try { localStorage.setItem(key, JSON.stringify(v)); } catch (e) {} }
-function meName() { return S.user ? S.user.name : ''; }   // 표시 이름만 사용 (전화번호는 저장·표시하지 않음)
+function meName() { return S.user ? S.user.name : ''; }   // 표시 이름만 사용 (전화번호는 저장·표시하지 않음). 동명이인은 구분되지 않는 데모 한계
 function newId(prefix) { return prefix + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 5).toUpperCase(); }
+const DK = { clubs: 'pd_demo_clubs_v2', meets: 'pd_demo_meetings_v2', blocks: 'pd_demo_blocks_v2' };
+const REPORT_REASONS = ['노쇼 반복', '욕설·부적절한 언행', '허위 모임', '기타'];
 let _tgTab = 'list';
+
+/* 데모 전용 공통 처리: data-dm 속성 위임 (이름을 인라인 스크립트에 넣지 않는다) */
+function dmRun(act, id, name, el) {
+  if (act.startsWith('club-')) return clubAction(act, id, name, el);
+  if (act.startsWith('meet-')) return meetAction(act, id, name, el);
+  if (act.startsWith('pro-')) return proAction(act, id, name, el);
+  if (act.startsWith('adm-')) return adminAction(act, id);
+  if (act === 'venue-report') return submitVenueReport(id);
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-dm]');
+  if (b && b.tagName !== 'SELECT' && b.type !== 'checkbox') dmRun(b.dataset.dm, b.dataset.id, b.dataset.name, b);
+});
+document.addEventListener('change', e => {
+  const el = e.target.closest('[data-dm-chg]');
+  if (el) dmChange(el.dataset.dmChg, el.dataset.id, el.dataset.name, el);
+});
+
+/* ── 차단 (보는 사람 기준: 차단한 사람이 만든 모임은 내 목록에서 숨긴다) ── */
+function myBlocks() { const all = demoGet(DK.blocks, {}); return all[meName()] || []; }
+function setMyBlocks(list) { const all = demoGet(DK.blocks, {}); all[meName()] = list; demoSet(DK.blocks, all); }
 
 /* ── 함께 치기 ── */
 function setTgTab(t) {
@@ -1904,42 +1930,53 @@ async function fillTgForm() {
   sel.innerHTML = courses.map(c => `<option value="${escHtml(c.id)}">${escHtml(c.region || '')} · ${escHtml(c.name)}</option>`).join('');
   document.getElementById('tg-date').min = new Date().toISOString().slice(0, 10);
 }
+function meetAll() { return demoGet(DK.meets, []); }
 async function renderTogether() {
   const list = document.getElementById('tg-list');
   if (!list) return;
   const region = document.getElementById('tg-region').value;
-  const meetings = demoGet('pd_demo_meetings', []).filter(m => m.status !== 'cancelled' && (!region || m.region === region));
-  const courses = await getCourses();
-  const byId = Object.fromEntries(courses.map(c => [c.id, c]));
+  const blocks = myBlocks();
+  const meetings = PD_MEET.visibleTo(meetAll(), blocks).filter(m => m.status !== 'cancelled' && (!region || m.region === region));
+  // 구장 이름은 모임 생성 때 저장한 값을 쓴다 (구장 자료를 기다리지 않고 바로 그린다)
   if (!meetings.length) { list.innerHTML = hubMsg('아직 모집 중인 모임이 없어요. 모임을 만들어 보세요.'); return; }
-  list.innerHTML = meetings.map(m => tgCardHtml(m, byId[m.venueId])).join('');
+  list.innerHTML = meetings.map(m => tgCardHtml(m)).join('');
 }
-function tgCardHtml(m, venue) {
+function tgCardHtml(m) {
   const me = meName();
   const active = m.participants.filter(p => p.status !== 'cancelled');
-  const joined = active.some(p => p.name === me);
-  const full = active.length >= m.capacity;
+  const joined = active.some(p => p.userId === me);
+  const waiting = m.waitlist.includes(me);
+  const full = PD_MEET.activeCount(m) >= m.capacity;
   const state = m.status === 'confirmed' ? '참가 확정' : (m.status === 'closed' || full ? '모집 마감' : '모집 중');
-  const isOwner = m.organizer === me;
-  const names = m.participants.filter(p => p.status === 'joined' || p.status === 'confirmed')
-    .map(p => `${escHtml(p.name)}${p.status === 'confirmed' ? ' (확정)' : ''}`).join(', ') || '아직 없음';
-  const btn = !me ? `<button class="hub-act" onclick="needLogin('pg-together')">로그인하고 참가</button>`
-    : (joined ? `<button class="hub-act" onclick="cancelJoinMeeting('${escHtml(m.id)}')">참가 취소</button>`
-      : (m.status === 'open' && !full ? `<button class="hub-act hub-act-g" onclick="joinMeeting('${escHtml(m.id)}')">참가 신청</button>` : ''));
+  const isOwner = m.creatorId === me;
+  const names = active.filter(p => p.status === 'joined' || p.status === 'confirmed')
+    .map(p => `${escHtml(p.userId)}${p.status === 'confirmed' ? ' (확정)' : ''}`).join(', ') || '아직 없음';
+  const waitNames = m.waitlist.length ? `<p class="hub-vs">대기: ${m.waitlist.map(escHtml).join(', ')}</p>` : '';
+  let btn = '';
+  if (!me) btn = `<button class="hub-act" onclick="needLogin('pg-together')">로그인하고 참가</button>`;
+  else if (joined) btn = `<button class="hub-act" data-dm="meet-cancel" data-id="${escHtml(m.id)}">참가 취소</button>`;
+  else if (waiting) btn = `<button class="hub-act" data-dm="meet-cancel-wait" data-id="${escHtml(m.id)}">대기 취소</button>`;
+  else if (m.status === 'open') btn = `<button class="hub-act hub-act-g" data-dm="meet-join" data-id="${escHtml(m.id)}">${full ? '대기 신청' : '참가 신청'}</button>`;
   const owner = isOwner ? `
     <div class="hub-acts">
-      <button class="hub-act" onclick="toggleMeetingClosed('${escHtml(m.id)}')">${m.status === 'closed' ? '모집 다시 열기' : '모집 마감'}</button>
-      <button class="hub-act" onclick="confirmAllMeeting('${escHtml(m.id)}')">참가자 확정</button>
-      <button class="hub-act hub-act-g" onclick="startMeetingMatch('${escHtml(m.id)}')">자동 조편성 시작</button>
+      <button class="hub-act" data-dm="meet-close" data-id="${escHtml(m.id)}">${m.status === 'closed' ? '모집 다시 열기' : '모집 마감'}</button>
+      <button class="hub-act" data-dm="meet-confirm" data-id="${escHtml(m.id)}">참가자 확정</button>
+      <button class="hub-act hub-act-g" data-dm="meet-match" data-id="${escHtml(m.id)}">자동 조편성 시작</button>
     </div>
     ${m.gameCode ? `<p class="hub-vs">게임코드 <b>${escHtml(m.gameCode)}</b> (참가자가 입력하면 이 경기에 연결됩니다)</p>` : ''}` : '';
+  const other = me && !isOwner ? `<div class="hub-acts">
+      <select class="hub-input" aria-label="신고 사유" id="rs-${escHtml(m.id)}">${REPORT_REASONS.map(r => `<option>${escHtml(r)}</option>`).join('')}</select>
+      <button class="hub-act" data-dm="meet-report" data-id="${escHtml(m.id)}">모임 신고</button>
+      <button class="hub-act" data-dm="meet-block" data-name="${escHtml(m.creatorId)}">모임장 차단</button>
+    </div>` : '';
+  const reportNote = m.reports.length ? `<p class="hub-vs">신고 ${m.reports.length}건${m.reports.length >= 3 ? ' · 운영 검토 대기' : ''}</p>` : '';
   return `<article class="hub-venue">
     <h3 class="hub-vt">${escHtml(m.title)}</h3>
-    <p class="hub-vs">${escHtml(m.date)} ${escHtml(m.time)} · ${escHtml(venue ? venue.name : m.venueName)}</p>
-    <p class="hub-vs">모집 ${active.length}/${m.capacity}명 · ${escHtml(state)} · 모임장 ${escHtml(m.organizer)}</p>
+    <p class="hub-vs">${escHtml(m.date)} ${escHtml(m.time)} · ${escHtml(m.venueName)}</p>
+    <p class="hub-vs">모집 ${PD_MEET.activeCount(m)}/${m.capacity}명 · ${escHtml(state)} · 모임장 ${escHtml(m.creatorId)}</p>
     ${m.memo ? `<p class="hub-vs">${escHtml(m.memo)}</p>` : ''}
-    <p class="hub-vs">참가자: ${names}</p>
-    <div class="hub-acts">${btn}</div>${owner}
+    <p class="hub-vs">참가자: ${names}</p>${waitNames}${reportNote}
+    <div class="hub-acts">${btn}</div>${owner}${other}
   </article>`;
 }
 function createMeeting(e) {
@@ -1955,56 +1992,67 @@ function createMeeting(e) {
   if (!(capacity >= 2 && capacity <= 4)) { toast('모집 인원은 2~4명으로 입력해 주세요'); return; }
   getCourses().then(courses => {
     const c = courses.find(x => x.id === venueSel.value);
-    const meetings = demoGet('pd_demo_meetings', []);
-    meetings.unshift({ id: newId('M'), title, date, time: time || '시간 미정', venueId: c.id, venueName: c.name, region: c.region,
-      capacity, memo, organizer: meName(), status: 'open', gameCode: null, createdAt: new Date().toISOString(),
-      participants: [{ name: meName(), status: 'confirmed' }] });
-    demoSet('pd_demo_meetings', meetings);
+    const base = PD_MEET.createMeetup({ capacity, creatorId: meName() });
+    // 생성자는 확정 참가자로 시작한다 (기존 데모와 동일)
+    base.participants[0].status = 'confirmed';
+    const meetings = meetAll();
+    meetings.unshift(Object.assign(base, { id: newId('M'), title, date, time: time || '시간 미정', venueId: c.id, venueName: c.name,
+      region: c.region, memo, createdAt: new Date().toISOString(), gameCode: null }));
+    demoSet(DK.meets, meetings);
     document.getElementById('tg-title').value = ''; document.getElementById('tg-memo').value = '';
     toast('모임을 만들었어요 (데모)');
     setTgTab('list'); renderTogether();
   });
 }
 function updMeeting(id, fn) {
-  const meetings = demoGet('pd_demo_meetings', []);
-  const m = meetings.find(x => x.id === id);
+  const all = meetAll();
+  const m = all.find(x => x.id === id);
   if (!m) { toast('모임을 찾지 못했어요'); return; }
-  fn(m, meetings);
-  demoSet('pd_demo_meetings', meetings);
+  const r = fn(m, all);
+  demoSet(DK.meets, all);
   renderTogether();
+  return r;
 }
-function joinMeeting(id) {
+const MEET_MSG = { closed: '모집이 마감됐어요', duplicate: '이미 참가했거나 대기 중이에요', blocked: '차단한 사용자가 만든 모임이에요',
+  forbidden: '모임장만 할 수 있어요', not_joined: '참가 중이 아니에요', not_waiting: '대기 중이 아니에요', invalid: '내용을 확인해 주세요' };
+function meetResult(r, okMsg) { if (r && r.ok) toast(okMsg); else toast(MEET_MSG[r && r.reason] || '처리하지 못했어요'); }
+function meetAction(act, id, name, el) {
   if (!S.user) { go('pg-login'); return; }
-  updMeeting(id, m => {
-    const active = m.participants.filter(p => p.status !== 'cancelled');
-    if (m.status !== 'open' || active.length >= m.capacity) { toast('모집이 마감됐어요'); return; }
-    if (active.some(p => p.name === meName())) return;
-    m.participants.push({ name: meName(), status: 'joined' });
-    toast('참가 신청했어요 (데모)');
+  const me = meName();
+  if (act === 'meet-block') {
+    const list = myBlocks();
+    if (!list.includes(name)) setMyBlocks([...list, name]);
+    toast(`${name}님이 만든 모임을 숨겼어요`); renderTogether(); return;
+  }
+  if (act === 'meet-unblock') { setMyBlocks(myBlocks().filter(x => x !== name)); toast('차단을 해제했어요'); renderTogether(); return; }
+  if (act === 'meet-join') return updMeeting(id, m => {
+    const r = PD_MEET.join(m, me, myBlocks());
+    if (!r.ok) return meetResult(r);
+    toast(r.status === 'waitlisted' ? '정원이 찼어요. 대기자로 등록했어요 (데모)' : '참가 신청했어요 (데모)');
   });
-}
-function cancelJoinMeeting(id) {
-  updMeeting(id, m => {
-    const p = m.participants.find(x => x.name === meName() && x.status !== 'cancelled');
-    if (!p) return;
-    if (p.status === 'confirmed' && m.organizer !== meName()) { toast('확정된 참가는 모임장에게 문의해 주세요'); return; }
-    p.status = 'cancelled';
-    toast('참가를 취소했어요');
+  if (act === 'meet-cancel') return updMeeting(id, m => {
+    const r = PD_MEET.cancel(m, me);
+    if (!r.ok) return meetResult(r);
+    toast(r.promoted ? `참가를 취소했어요. 대기자 ${r.promoted}님이 참가로 올라갔어요` : '참가를 취소했어요');
   });
+  if (act === 'meet-cancel-wait') return updMeeting(id, m => { meetResult(PD_MEET.cancelWait(m, me), '대기를 취소했어요'); });
+  if (act === 'meet-close') return updMeeting(id, m => { const closed = m.status !== 'closed'; meetResult(PD_MEET.setClosed(m, me, closed), closed ? '모집을 마감했어요' : '모집을 다시 열었어요'); });
+  if (act === 'meet-confirm') return updMeeting(id, m => { meetResult(PD_MEET.confirmAll(m, me), '참가자를 확정했어요 (데모)'); });
+  if (act === 'meet-report') {
+    const reason = (document.getElementById('rs-' + id) || {}).value || REPORT_REASONS[0];
+    return updMeeting(id, m => {
+      if (m.reports.some(x => x.reporterId === me)) { toast('이미 이 모임을 신고했어요'); return; }
+      const r = PD_MEET.report(m, me, reason);
+      meetResult(r, r.needsReview ? '신고했어요. 3건 이상이라 운영 검토 대기로 표시됐어요 (데모)' : '신고했어요 (데모)');
+    });
+  }
+  if (act === 'meet-match') return startMeetingMatch(id);
 }
-function toggleMeetingClosed(id) {
-  updMeeting(id, (m, all) => { if (m.organizer !== meName()) return; m.status = m.status === 'closed' ? 'open' : 'closed'; });
-}
-function confirmAllMeeting(id) {
-  updMeeting(id, (m) => { if (m.organizer !== meName()) return;
-    m.participants.forEach(p => { if (p.status === 'joined') p.status = 'confirmed'; });
-    m.status = 'confirmed'; toast('참가자를 확정했어요 (데모)'); });
-}
+
 function startMeetingMatch(id) {
-  const meetings = demoGet('pd_demo_meetings', []);
-  const m = meetings.find(x => x.id === id);
-  if (!m || m.organizer !== meName()) return;
-  const names = m.participants.filter(p => p.status === 'confirmed').map(p => p.name);
+  const m = meetAll().find(x => x.id === id);
+  if (!m || m.creatorId !== meName()) return;
+  const names = m.participants.filter(p => p.status === 'confirmed').map(p => p.userId);
   if (names.length < 2) { toast('확정된 참가자가 2명 이상이어야 조편성을 시작할 수 있어요'); return; }
   go('pg-create');
   setTimeout(() => {
@@ -2019,43 +2067,78 @@ function startMeetingMatch(id) {
   }, 200);
 }
 
-/* ── 동호회 (데모) ── */
-function clubsAll() { return demoGet('pd_demo_clubs', []); }
+/* ── 동호회 ── */
+function clubsAll() { return demoGet(DK.clubs, []); }
+function myRoleIn(club) { const m = (club.members || []).find(x => x.userId === meName()); return m && m.status === 'approved' ? m.role : null; }
+function ownerOf(club) { const o = (club.members || []).find(x => x.role === 'owner'); return o ? o.userId : ''; }
+const CLUB_MSG = { already: '이미 가입했거나 신청 중이에요', forbidden: '운영자 또는 임원만 할 수 있어요', not_pending: '대기 중인 신청이 아니에요',
+  not_member: '회원이 아니에요', owner_cannot_leave: '운영자는 탈퇴할 수 없어요 (운영자 이전 기능은 아직 없어요)', cannot_remove: '이 회원은 내보낼 수 없어요',
+  cannot_change: '역할을 바꿀 수 없어요', invalid_role: '잘못된 역할이에요' };
+function clubResult(r, okMsg) { if (r && r.ok) toast(okMsg); else toast(CLUB_MSG[r && r.reason] || '처리하지 못했어요'); }
 function renderClubs() {
   const box = document.getElementById('club-list');
   if (!box) return;
   const clubs = clubsAll();
-  const me = meName();
   if (!clubs.length) { box.innerHTML = hubMsg('아직 동호회가 없어요. 동호회를 만들어 보세요.'); return; }
-  box.innerHTML = clubs.map(c => {
-    const mine = c.members.find(x => x.name === me);
-    const approved = c.members.filter(x => x.status === 'approved').length;
-    const isOwner = c.owner === me;
-    const action = !me ? '' : (mine ? (mine.status === 'approved' ? '' : `<p class="hub-vs">가입 신청 중 (승인 대기)</p>`)
-      : `<button class="hub-act hub-act-g" onclick="requestJoinClub('${escHtml(c.id)}')">가입 신청</button>`);
-    const pending = isOwner ? c.members.filter(x => x.status === 'pending').map(x =>
-      `<li>${escHtml(x.name)} <button class="hub-act" onclick="approveClubMember('${escHtml(c.id)}','${escHtml(x.name)}')">승인</button></li>`).join('') : '';
-    const notices = c.notices.slice(0, 3).map(n => `<li><b>${escHtml(n.title)}</b> · ${escHtml(n.body)} <small>(${escHtml(n.by)})</small></li>`).join('') || '<li>공지가 없어요</li>';
-    const meets = c.meetings.slice(0, 5).map(m => `<li>${escHtml(m.date)} ${escHtml(m.place)} · ${escHtml(m.title)}</li>`).join('') || '<li>정기모임 일정이 없어요</li>';
-    return `<article class="hub-venue">
-      <h3 class="hub-vt">${escHtml(c.name)}</h3>
-      <p class="hub-vs">${escHtml(c.region)} · 회원 ${approved}명 · 운영자 ${escHtml(c.owner)}</p>
-      <p class="hub-vs">${escHtml(c.intro)}</p>
-      ${action}
-      <h4 class="hub-sub">공지</h4><ul class="hub-ul">${notices}</ul>
-      <h4 class="hub-sub">정기모임</h4><ul class="hub-ul">${meets}</ul>
-      ${isOwner ? `<h4 class="hub-sub">가입 신청 (운영자만 보임)</h4><ul class="hub-ul">${pending || '<li>대기 중인 신청이 없어요</li>'}</ul>
-        <div class="hub-box"><label class="hub-sr" for="nt-${escHtml(c.id)}">공지 제목</label>
+  box.innerHTML = clubs.map(c => clubCardHtml(c)).join('');
+}
+function clubCardHtml(c) {
+  const me = meName();
+  const role = myRoleIn(c);
+  const mine = c.members.find(x => x.userId === me);
+  const staff = PD_CLUB.isStaff(role || '');
+  const approved = c.members.filter(x => x.status === 'approved');
+  let action = '';
+  if (!me) action = '';
+  else if (!mine || mine.status === 'rejected' || mine.status === 'left' || mine.status === 'removed')
+    action = `<button class="hub-act hub-act-g" data-dm="club-join" data-id="${escHtml(c.id)}">가입 신청</button>`;
+  else if (mine.status === 'pending') action = `<p class="hub-vs">가입 신청 중 (승인 대기)</p>`;
+  else if (mine.role !== 'owner') action = `<button class="hub-act" data-dm="club-leave" data-id="${escHtml(c.id)}">탈퇴</button>`;
+  const memberList = role ? PD_CLUB.listMembers(c, role).map(x => {
+    const rate = PD_CLUB.attendanceRate(c.meetups, x.userId);
+    const roleLabel = { owner: '운영자', manager: '매니저', treasurer: '총무', member: '회원' }[x.role] || x.role;
+    let ops = '';
+    if (staff && x.status === 'pending') ops = `<button class="hub-act hub-act-g" data-dm="club-approve" data-id="${escHtml(c.id)}" data-name="${escHtml(x.userId)}">승인</button>
+      <button class="hub-act" data-dm="club-reject" data-id="${escHtml(c.id)}" data-name="${escHtml(x.userId)}">거절</button>`;
+    if (staff && x.status === 'approved' && x.role !== 'owner') ops = `<button class="hub-act" data-dm="club-remove" data-id="${escHtml(c.id)}" data-name="${escHtml(x.userId)}">내보내기</button>`;
+    if (role === 'owner' && x.status === 'approved' && x.role !== 'owner')
+      ops += ` <select class="hub-input" data-dm-chg="club-role" data-id="${escHtml(c.id)}" data-name="${escHtml(x.userId)}" aria-label="${escHtml(x.userId)} 역할">
+        ${['member', 'manager', 'treasurer'].map(r => `<option value="${r}"${r === x.role ? ' selected' : ''}>${{ member: '회원', manager: '매니저', treasurer: '총무' }[r]}</option>`).join('')}</select>`;
+    const statusText = x.status === 'pending' ? ' · 승인 대기' : '';
+    return `<li>${escHtml(x.userId)} · ${roleLabel}${statusText}${rate == null ? '' : ` · 출석 ${rate}%`} ${ops}</li>`;
+  }).join('') : '';
+  const members = role ? `<h4 class="hub-sub">회원 목록 (${approved.length}명)</h4><ul class="hub-ul">${memberList || '<li>회원이 없어요</li>'}</ul>`
+    : `<p class="hub-vs">회원 ${approved.length}명 · 회원 목록은 회원에게만 보여요</p>`;
+  const notices = (c.notices || []).slice(0, 3).map(n => `<li><b>${escHtml(n.title)}</b> · ${escHtml(n.body)} <small>(${escHtml(n.by)})</small></li>`).join('') || '<li>공지가 없어요</li>';
+  const meets = (c.meetups || []).slice(0, 5).map(m => {
+    const att = m.attendance || {};
+    const checks = staff ? approved.map(x => `<label class="hub-check"><input type="checkbox" data-dm-chg="club-att" data-id="${escHtml(c.id)}" data-name="${escHtml(x.userId)}" data-m="${escHtml(m.id)}" ${att[x.userId] ? 'checked' : ''}> ${escHtml(x.userId)}</label>`).join('') : '';
+    const count = Object.values(att).filter(Boolean).length;
+    return `<li>${escHtml(m.date)} ${escHtml(m.place)} · ${escHtml(m.title)} · 출석 ${count}명${checks ? `<div class="hub-acts">${checks}</div>` : ''}</li>`;
+  }).join('') || '<li>정기모임 일정이 없어요</li>';
+  const staffTools = staff ? `
+      <h4 class="hub-sub">가입 신청·회원 관리 (운영자·임원만 보임)</h4>
+      <div class="hub-box">
+        <label class="hub-sr" for="nt-${escHtml(c.id)}">공지 제목</label>
         <input id="nt-${escHtml(c.id)}" class="hub-input" placeholder="공지 제목" maxlength="40">
         <textarea id="nb-${escHtml(c.id)}" class="hub-input" placeholder="공지 내용" maxlength="300" rows="2"></textarea>
-        <button class="hub-btn" onclick="postClubNotice('${escHtml(c.id)}')">공지 올리기</button>
+        <button class="hub-btn" data-dm="club-notice" data-id="${escHtml(c.id)}">공지 올리기</button>
         <label class="hub-sr" for="mt-${escHtml(c.id)}">정기모임 이름</label>
         <input id="mt-${escHtml(c.id)}" class="hub-input" placeholder="정기모임 이름" maxlength="40">
         <input id="md-${escHtml(c.id)}" class="hub-input" type="date">
         <input id="mp-${escHtml(c.id)}" class="hub-input" placeholder="장소 (구장 이름)" maxlength="40">
-        <button class="hub-btn" onclick="addClubMeeting('${escHtml(c.id)}')">정기모임 등록</button></div>` : ''}
+        <button class="hub-btn" data-dm="club-meet-add" data-id="${escHtml(c.id)}">정기모임 등록</button>
+      </div>` : '';
+  return `<article class="hub-venue">
+      <h3 class="hub-vt">${escHtml(c.name)}</h3>
+      <p class="hub-vs">${escHtml(c.region)} · 회원 ${approved.length}명 · 운영자 ${escHtml(ownerOf(c))}${role ? ` · 내 역할 ${escHtml(role)}` : ''}</p>
+      <p class="hub-vs">${escHtml(c.intro)}</p>
+      <div class="hub-acts">${action}</div>
+      ${members}
+      <h4 class="hub-sub">공지</h4><ul class="hub-ul">${notices}</ul>
+      <h4 class="hub-sub">정기모임</h4><ul class="hub-ul">${meets}</ul>
+      ${staffTools}
     </article>`;
-  }).join('');
 }
 function createClub(e) {
   e.preventDefault();
@@ -2063,50 +2146,331 @@ function createClub(e) {
   const name = document.getElementById('club-name').value.trim();
   const region = document.getElementById('club-region').value;
   const intro = document.getElementById('club-intro').value.trim().slice(0, 200);
-  if (!name || !region) { toast('동호회 이름과 지역을 입력해 주세요'); return; }
-  const clubs = clubsAll();
-  clubs.unshift({ id: newId('C'), name, region, intro: intro || '소개가 아직 없어요', owner: meName(),
-    members: [{ name: meName(), status: 'approved', role: 'owner' }], notices: [], meetings: [], createdAt: new Date().toISOString() });
-  demoSet('pd_demo_clubs', clubs);
+  if (!region) { toast('지역을 선택해 주세요'); return; }
+  let club;
+  try { club = PD_CLUB.createClub({ name, region, intro: intro || '소개가 아직 없어요', ownerId: meName() }); }
+  catch (err) { toast('동호회 이름은 2~40자로 입력해 주세요'); return; }
+  club.id = newId('C'); club.notices = []; club.createdAt = new Date().toISOString();
+  const clubs = clubsAll(); clubs.unshift(club); demoSet(DK.clubs, clubs);
   document.getElementById('club-name').value = ''; document.getElementById('club-intro').value = '';
   toast('동호회를 만들었어요 (데모)'); renderClubs();
 }
 function updClub(id, fn) {
   const clubs = clubsAll(); const c = clubs.find(x => x.id === id);
-  if (!c) return;
-  fn(c, clubs); demoSet('pd_demo_clubs', clubs); renderClubs();
+  if (!c) { toast('동호회를 찾지 못했어요'); return; }
+  const r = fn(c, clubs);
+  demoSet(DK.clubs, clubs); renderClubs();
+  return r;
 }
-function requestJoinClub(id) {
+function clubAction(act, id, name, el) {
   if (!S.user) { go('pg-login'); return; }
-  updClub(id, c => { if (c.members.some(x => x.name === meName())) return;
-    c.members.push({ name: meName(), status: 'pending', role: 'member' }); toast('가입 신청했어요 (데모)'); });
+  const me = meName();
+  if (act === 'club-join') return updClub(id, c => clubResult(PD_CLUB.requestJoin(c, me), '가입 신청했어요 (데모)'));
+  if (act === 'club-leave') return updClub(id, c => clubResult(PD_CLUB.leave(c, me), '탈퇴했어요'));
+  const club = clubsAll().find(c => c.id === id);
+  const role = club ? myRoleIn(club) : null;
+  if (act === 'club-approve' || act === 'club-reject')
+    return updClub(id, c => clubResult(PD_CLUB.decide(c, role || 'viewer', name, act === 'club-approve'), act === 'club-approve' ? '승인했어요 (데모)' : '거절했어요'));
+  if (act === 'club-remove') return updClub(id, c => clubResult(PD_CLUB.removeMember(c, role || 'viewer', name), '내보냈어요'));
+  if (act === 'club-notice') {
+    const t = document.getElementById('nt-' + id).value.trim();
+    const b = document.getElementById('nb-' + id).value.trim();
+    if (!t) { toast('공지 제목을 입력해 주세요'); return; }
+    return updClub(id, c => {
+      if (!PD_CLUB.isStaff(role || '')) { toast('운영자 또는 임원만 공지를 올릴 수 있어요'); return; }
+      c.notices.unshift({ id: newId('N'), title: t, body: b || '-', by: me, at: new Date().toISOString() });
+      toast('공지를 올렸어요 (데모)');
+    });
+  }
+  if (act === 'club-meet-add') {
+    const t = document.getElementById('mt-' + id).value.trim();
+    const d = document.getElementById('md-' + id).value;
+    const p = document.getElementById('mp-' + id).value.trim();
+    if (!t || !d) { toast('정기모임 이름과 날짜를 입력해 주세요'); return; }
+    return updClub(id, c => {
+      if (!PD_CLUB.isStaff(role || '')) { toast('운영자 또는 임원만 정기모임을 등록할 수 있어요'); return; }
+      c.meetups.unshift({ id: newId('R'), title: t, date: d, place: p || '장소 미정', attendance: {} });
+      toast('정기모임을 등록했어요 (데모)');
+    });
+  }
 }
-function approveClubMember(id, name) {
-  updClub(id, c => { if (c.owner !== meName()) { toast('운영자만 승인할 수 있어요'); return; }
-    const m = c.members.find(x => x.name === name); if (m) m.status = 'approved'; });
+function clubChange(act, id, name, el) {
+  if (act === 'club-role') return updClub(id, c => clubResult(PD_CLUB.setRole(c, myRoleIn(c), name, el.value), '역할을 바꿨어요 (데모)'));
+  if (act === 'club-att') {
+    const mid = el.dataset.m;
+    return updClub(id, c => {
+      const meetup = (c.meetups || []).find(x => x.id === mid);
+      const r = meetup ? PD_CLUB.recordAttendance(meetup, myRoleIn(c), { [name]: el.checked }) : { ok: false, reason: 'forbidden' };
+      if (!r.ok) { toast('운영자 또는 임원만 출석을 기록할 수 있어요'); renderClubs(); }
+    });
+  }
 }
-function postClubNotice(id) {
-  const t = document.getElementById('nt-' + id).value.trim();
-  const b = document.getElementById('nb-' + id).value.trim();
-  if (!t) { toast('공지 제목을 입력해 주세요'); return; }
-  updClub(id, c => { if (c.owner !== meName()) return;
-    c.notices.unshift({ id: newId('N'), title: t, body: b || '-', by: meName(), at: new Date().toISOString() }); });
+function dmChange(act, id, name, el) {
+  if (act.startsWith('club-')) clubChange(act, id, name, el);
+  if (act.startsWith('pro-')) proChange(act, id, name, el);
 }
-function addClubMeeting(id) {
-  const t = document.getElementById('mt-' + id).value.trim();
-  const d = document.getElementById('md-' + id).value;
-  const p = document.getElementById('mp-' + id).value.trim();
-  if (!t || !d) { toast('정기모임 이름과 날짜를 입력해 주세요'); return; }
-  updClub(id, c => { if (c.owner !== meName()) return;
-    c.meetings.unshift({ id: newId('R'), title: t, date: d, place: p || '장소 미정', by: meName() }); });
+
+/* ══ Club Pro (데모 미리보기: 결제 없음, 이 기기 데이터만) ══ */
+function proPlan() { return demoGet('pd_demo_plan_v2', 'free') === 'club_pro' ? 'club_pro' : 'free'; }
+let _proClubId = null;
+function proManagedClubs() { return clubsAll().filter(c => PD_CLUB.isStaff(myRoleIn(c) || '')); }
+function proGames() {
+  // 이 기기에 저장된 경기 중 모든 홀 점수가 입력된 경기만 집계한다 (기존 경기 데이터는 읽기만 한다)
+  return Object.values(S.matches || {}).filter(m => m && m.sd && m.groups && m.holes).map(m => {
+    const H = m.holes;
+    const players = m.groups.flatMap(g => g.players).map(p => {
+      const sc = (m.sd[p] || []).slice(0, H);
+      return sc.length === H && sc.every(v => +v > 0) ? { userId: p, total: sc.reduce((a, b) => a + (+b), 0) } : null;
+    }).filter(Boolean);
+    return { date: m.date || '', course: m.course || '미지정', players };
+  }).filter(g => g.players.length);
+}
+function renderPro() {
+  const box = document.getElementById('pro-body');
+  if (!box) return;
+  const plan = proPlan();
+  const banner = `<p class="hub-msg hub-demo">데모 화면입니다. 실제 결제는 열려 있지 않아요. 'Pro 체험'은 이 기기에서 기능을 미리 보는 기능이며 구독·결제 상태와 무관합니다. 운영 서버 권한이 아닙니다.</p>`;
+  const planBox = `<div class="hub-box"><p class="hub-vs">현재 화면: <b>${plan === 'club_pro' ? 'Pro 체험 (이 기기)' : '무료'}</b></p>
+    <button class="hub-btn" data-dm="pro-plan">${plan === 'club_pro' ? '무료 화면으로 보기' : 'Pro 체험 켜기 (결제 없음)'}</button></div>`;
+  const clubs = proManagedClubs();
+  if (!clubs.length) { box.innerHTML = banner + planBox + hubMsg('운영자나 임원으로 참여한 동호회가 없어요. 동호회를 만든 뒤 이용할 수 있어요.'); return; }
+  const club = clubs.find(c => c.id === _proClubId) || clubs[0];
+  _proClubId = club.id;
+  const sel = clubs.length > 1 ? `<select class="hub-input" data-dm-chg="pro-club" aria-label="동호회 선택">${clubs.map(c => `<option value="${escHtml(c.id)}"${c.id === club.id ? ' selected' : ''}>${escHtml(c.name)}</option>`).join('')}</select>` : '';
+  box.innerHTML = banner + planBox + sel + proSections(club, plan);
+}
+function proLocked(plan, feature, label, html) {
+  return PD_PRO.canUse(plan, feature) ? html : `<div class="hub-box"><h4 class="hub-sub">${label}</h4><p class="hub-vs">Pro 기능입니다. 무료 화면에서는 보이지 않아요.</p></div>`;
+}
+function proSections(c, plan) {
+  const approved = c.members.filter(x => x.status === 'approved');
+  const pending = c.members.filter(x => x.status === 'pending').length;
+  const dues = c.dues || [], payments = c.payments || [], tx = c.tx || [];
+  const meetupsForStats = (c.meetups || []).map(m => ({ id: m.id, date: m.date, status: Object.values(m.attendance || {}).some(Boolean) ? 'held' : 'planned' }));
+  const names = new Set(approved.map(x => x.userId));
+  const games = proGames().map(g => ({ ...g, players: g.players.filter(p => names.has(p.userId)) })).filter(g => g.players.length);
+  const roleCount = approved.reduce((a, x) => { a[x.role] = (a[x.role] || 0) + 1; return a; }, {});
+  const basic = `<h4 class="hub-sub">회원 현황</h4><p class="hub-vs">승인 ${approved.length}명 · 승인 대기 ${pending}명 · 운영자 ${roleCount.owner || 0} · 매니저 ${roleCount.manager || 0} · 총무 ${roleCount.treasurer || 0} · 회원 ${roleCount.member || 0}</p>`;
+  const meets = proLocked(plan, 'regular_meetup_auto', '정기모임', `<h4 class="hub-sub">정기모임</h4><ul class="hub-ul">${(c.meetups || []).map(m => {
+    const n = Object.values(m.attendance || {}).filter(Boolean).length;
+    return `<li>${escHtml(m.date)} ${escHtml(m.place)} · ${escHtml(m.title)} · 출석 ${n}명</li>`; }).join('') || '<li>정기모임이 없어요</li>'}</ul>`);
+  const rates = proLocked(plan, 'attendance_dues_stats', '출석률', `<h4 class="hub-sub">출석률</h4><ul class="hub-ul">${approved.map(x => {
+    const r = PD_CLUB.attendanceRate(c.meetups || [], x.userId);
+    return `<li>${escHtml(x.userId)} · ${r == null ? '기록 없음' : r + '%'}</li>`; }).join('') || '<li>회원이 없어요</li>'}</ul>`);
+  const duesRows = PD_PRO.duesStatus(dues, payments, approved.map(x => ({ userId: x.userId })));
+  const canTreasure = PD_CLUB.isStaff(myRoleIn(c) || '');
+  const duesUi = `<h4 class="hub-sub">회비 항목</h4>
+    <ul class="hub-ul">${dues.map(d => `<li>${escHtml(d.title)} · ${d.amount.toLocaleString('ko-KR')}원</li>`).join('') || '<li>회비 항목이 없어요</li>'}</ul>
+    ${canTreasure ? `<div class="hub-box"><input id="pd-dt-${escHtml(c.id)}" class="hub-input" placeholder="회비 이름 (예: 5월 회비)" maxlength="40">
+      <input id="pd-da-${escHtml(c.id)}" class="hub-input" type="number" min="1" placeholder="금액(원)">
+      <button class="hub-btn" data-dm="pro-dues-add" data-id="${escHtml(c.id)}">회비 항목 추가</button></div>
+      <h4 class="hub-sub">납부 체크</h4><ul class="hub-ul">${dues.map(d => approved.map(x => {
+        const paid = payments.some(p => p.duesId === d.id && p.userId === x.userId);
+        return `<li><label class="hub-check"><input type="checkbox" data-dm-chg="pro-paid" data-id="${escHtml(c.id)}" data-name="${escHtml(x.userId)}" data-m="${escHtml(d.id)}" ${paid ? 'checked' : ''}> ${escHtml(d.title)} · ${escHtml(x.userId)}</label></li>`;
+      }).join('')).join('')}</ul>` : ''}`;
+  const duesBlock = proLocked(plan, 'attendance_dues_stats', '회비 장부', `<h4 class="hub-sub">회비 장부</h4>${duesUi}`);
+  const unpaid = proLocked(plan, 'attendance_dues_stats', '미납 현황', `<h4 class="hub-sub">미납 현황</h4><ul class="hub-ul">${duesRows.map(r => `<li>${escHtml(r.title)} · 수납 ${r.collected.toLocaleString('ko-KR')}원 · 미납 ${r.unpaid.length ? r.unpaid.map(escHtml).join(', ') : '없음'}</li>`).join('') || '<li>회비 항목이 없어요</li>'}</ul>`);
+  const playerStats = proLocked(plan, 'advanced_game_stats', '회원별 경기 통계', `<h4 class="hub-sub">회원별 경기 통계</h4><ul class="hub-ul">${PD_PRO.playerStats(games).map(s => `<li>${escHtml(s.userId)} · ${s.games}경기 · 평균 ${s.average}타</li>`).join('') || '<li>모든 홀 점수가 입력된 경기가 없어요</li>'}</ul>`);
+  const courseStats = proLocked(plan, 'advanced_game_stats', '구장별 통계', `<h4 class="hub-sub">구장별 통계</h4><ul class="hub-ul">${PD_PRO.courseRanking(games).map(s => `<li>${escHtml(s.course)} · ${s.games}명 기록 · 평균 ${s.average}타</li>`).join('') || '<li>기록이 없어요</li>'}</ul>`);
+  const monthly = proLocked(plan, 'monthly_report', '월간 운영 요약', `<h4 class="hub-sub">월간 운영 요약</h4>
+    <ul class="hub-ul">${PD_PRO.monthlyActivity(meetupsForStats).map(x => `<li>${escHtml(x.month)} · 출석 기록 모임 ${x.held}회</li>`).join('') || '<li>기록된 모임이 없어요</li>'}</ul>
+    <ul class="hub-ul">${PD_PRO.ledgerMonthly(tx).map(x => `<li>${escHtml(x.month)} · 수입 ${x.income.toLocaleString('ko-KR')}원 · 지출 ${x.expense.toLocaleString('ko-KR')}원 · 잔액 변화 ${x.net.toLocaleString('ko-KR')}원</li>`).join('') || '<li>장부 기록이 없어요</li>'}</ul>
+    ${canTreasure ? `<div class="hub-box"><input id="pd-td-${escHtml(c.id)}" type="date" class="hub-input">
+      <select id="pd-tk-${escHtml(c.id)}" class="hub-input"><option value="income">수입</option><option value="expense">지출</option></select>
+      <input id="pd-ta-${escHtml(c.id)}" class="hub-input" type="number" min="1" placeholder="금액(원)">
+      <input id="pd-tm-${escHtml(c.id)}" class="hub-input" placeholder="메모" maxlength="40">
+      <button class="hub-btn" data-dm="pro-tx-add" data-id="${escHtml(c.id)}">장부 기록 추가</button></div>` : ''}`);
+  const csv = proLocked(plan, 'export', 'CSV 내보내기', `<h4 class="hub-sub">CSV 내보내기</h4><button class="hub-btn" data-dm="pro-csv" data-id="${escHtml(c.id)}">회비 현황 CSV 받기</button>`);
+  return basic + meets + rates + duesBlock + unpaid + playerStats + courseStats + monthly + csv;
+}
+function proAction(act, id, name, el) {
+  if (act === 'pro-plan') {
+    const next = proPlan() === 'club_pro' ? 'free' : 'club_pro';
+    demoSet('pd_demo_plan_v2', next); renderPro(); toast(next === 'club_pro' ? 'Pro 체험을 켰어요 (결제 없음, 이 기기만)' : '무료 화면으로 바꿨어요'); return;
+  }
+  if (act === 'pro-csv') {
+    const c = clubsAll().find(x => x.id === id); if (!c) return;
+    const approved = c.members.filter(x => x.status === 'approved');
+    const rows = PD_PRO.duesStatus(c.dues || [], c.payments || [], approved.map(x => ({ userId: x.userId })));
+    const blob = new Blob(['﻿' + PD_PRO.duesCsv(rows)], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'parkda-dues-demo.csv';
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    toast('CSV 파일을 받았어요 (데모)'); return;
+  }
+  const clubs = clubsAll(); const c = clubs.find(x => x.id === id); if (!c) return;
+  const role = myRoleIn(c);
+  if (!PD_CLUB.isStaff(role || '')) { toast('운영자 또는 임원만 할 수 있어요'); return; }
+  if (act === 'pro-dues-add') {
+    const t = document.getElementById('pd-dt-' + id).value.trim();
+    const amount = Math.round(Number(document.getElementById('pd-da-' + id).value));
+    if (!t || !(amount > 0)) { toast('회비 이름과 금액을 입력해 주세요'); return; }
+    c.dues = c.dues || []; c.dues.push({ id: newId('D'), title: t, amount });
+    demoSet(DK.clubs, clubs); renderPro(); toast('회비 항목을 추가했어요 (데모)'); return;
+  }
+  if (act === 'pro-tx-add') {
+    const date = document.getElementById('pd-td-' + id).value;
+    const kind = document.getElementById('pd-tk-' + id).value;
+    const amount = Math.round(Number(document.getElementById('pd-ta-' + id).value));
+    const memo = document.getElementById('pd-tm-' + id).value.trim().slice(0, 40);
+    if (!date || !(amount > 0)) { toast('날짜와 금액을 입력해 주세요'); return; }
+    c.tx = c.tx || []; c.tx.push({ date, kind, amount, memo });
+    demoSet(DK.clubs, clubs); renderPro(); toast('장부에 기록했어요 (데모)'); return;
+  }
+}
+function proChange(act, id, name, el) {
+  if (act === 'pro-club') { _proClubId = el.value; renderPro(); return; }
+  if (act === 'pro-paid') {
+    const clubs = clubsAll(); const c = clubs.find(x => x.id === id); if (!c) return;
+    if (!PD_CLUB.isStaff(myRoleIn(c) || '')) { toast('운영자 또는 임원만 기록할 수 있어요'); renderPro(); return; }
+    const due = (c.dues || []).find(d => d.id === el.dataset.m); if (!due) return;
+    c.payments = (c.payments || []).filter(p => !(p.duesId === due.id && p.userId === name));
+    if (el.checked) c.payments.push({ userId: name, duesId: due.id, amount: due.amount });
+    demoSet(DK.clubs, clubs); renderPro(); return;
+  }
+}
+
+/* ══ 관리자 콘솔 (개발용 데모: ?dev=1 에서만 열림. 서버 인증 전까지 운영 권한 아님) ══ */
+function consoleAllowed() { return /(^|[?&])dev=1(&|$)/.test(location.search); }
+function venueReportsAll() { return demoGet('pd_demo_venue_reports_v2', []); }
+function submitVenueReport(id) {
+  const ta = document.getElementById('vr-' + id);
+  const text = ta ? ta.value.trim().slice(0, 300) : '';
+  if (!text) { toast('수정할 내용을 입력해 주세요'); return; }
+  getCourses().then(courses => {
+    const c = courses.find(x => x.id === id) || {};
+    const all = venueReportsAll();
+    all.unshift({ id: newId('V'), venueId: id, venueName: c.name || '', text, at: new Date().toISOString() });
+    demoSet('pd_demo_venue_reports_v2', all.slice(0, 200));
+    ta.value = ''; toast('제보를 보냈어요 (데모: 이 기기에만 저장됩니다)');
+  });
+}
+function adminAction(act, id) {
+  if (act === 'adm-review') {
+    const all = meetAll(); const m = all.find(x => x.id === id); if (!m) return;
+    m.reviewedAt = new Date().toISOString(); demoSet(DK.meets, all); renderConsole(); toast('검토 완료로 표시했어요 (데모)');
+  }
+  if (act === 'adm-venue-done') {
+    const all = venueReportsAll().filter(x => x.id !== id); demoSet('pd_demo_venue_reports_v2', all); renderConsole(); toast('제보를 처리됨으로 지웠어요 (데모)');
+  }
+}
+function renderConsole() {
+  const box = document.getElementById('console-body');
+  if (!box) return;
+  const clubs = clubsAll(); const meetings = meetAll();
+  const members = clubs.reduce((a, c) => { a.approved += c.members.filter(x => x.status === 'approved').length; a.pending += c.members.filter(x => x.status === 'pending').length; return a; }, { approved: 0, pending: 0 });
+  const reported = meetings.filter(m => m.reports.length > 0);
+  const errs = demoGet('pd_err_log', []).slice(-20).reverse();
+  const reports = reported.map(m => {
+    const reasons = [...new Set(m.reports.map(r => r.reason))].join(', ');
+    return `<li>${escHtml(m.title)} · 신고 ${m.reports.length}건${m.reports.length >= 3 ? ' (운영 검토 대기)' : ''} · 사유: ${escHtml(reasons)}${m.reviewedAt ? ' · 검토 완료' : ` <button class="hub-act" data-dm="adm-review" data-id="${escHtml(m.id)}">검토 완료</button>`}</li>`;
+  }).join('') || '<li>신고가 없어요</li>';
+  const vr = venueReportsAll().map(r => `<li>${escHtml(r.venueName || r.venueId)} · ${escHtml(r.text)} <small>(${escHtml(r.at.slice(0, 10))})</small> <button class="hub-act" data-dm="adm-venue-done" data-id="${escHtml(r.id)}">처리 완료</button></li>`).join('') || '<li>제보가 없어요</li>';
+  box.innerHTML = `<p class="hub-msg hub-demo">개발용 데모 콘솔입니다. 관리자 인증은 서버 연결 전이라 실제 운영 권한이 아닙니다. 이 기기의 데모 데이터만 보여요.</p>
+    <h3 class="hub-sub">회원·동호회 현황</h3><p class="hub-vs">동호회 ${clubs.length}개 · 승인 회원 ${members.approved}명 · 승인 대기 ${members.pending}명 · 함께 치기 모임 ${meetings.length}개</p>
+    <h3 class="hub-sub">신고 관리</h3><ul class="hub-ul">${reports}</ul>
+    <h3 class="hub-sub">구장 정보 수정 제보</h3><ul class="hub-ul">${vr}</ul>
+    <h3 class="hub-sub">데이터 품질 현황</h3><p class="hub-vs" id="console-quality">불러오는 중…</p>
+    <h3 class="hub-sub">서비스 오류 현황 (이 기기 기준, 최근 20건)</h3><ul class="hub-ul">${errs.map(e => `<li>${escHtml(e.at)} · ${escHtml(e.msg)}</li>`).join('') || '<li>기록된 오류가 없어요</li>'}</ul>`;
+  getCourses().then(cs => {
+    const el = document.getElementById('console-quality'); if (!el) return;
+    const mv = cs.filter(c => c.map_visible).length;
+    const byStatus = cs.reduce((a, c) => { a[c.verification_status] = (a[c.verification_status] || 0) + 1; return a; }, {});
+    el.textContent = `구장 ${cs.length}곳 · 지도 표시 ${mv}곳 · 위치 확인 중 ${cs.length - mv}곳 · 확인 상태 ${Object.entries(byStatus).map(([k, v]) => `${k} ${v}`).join(', ')}`;
+  });
+}
+window.addEventListener('error', e => errLog(e.message));
+window.addEventListener('unhandledrejection', e => errLog(String((e.reason && e.reason.message) || e.reason)));
+function errLog(msg) {
+  const all = demoGet('pd_err_log', []);
+  all.push({ at: new Date().toISOString().slice(0, 19).replace('T', ' '), msg: String(msg).slice(0, 160) });
+  demoSet('pd_err_log', all.slice(-50));
+}
+
+/* ══ 경기관리 보강 (기존 점수 데이터는 그대로 두고, 중단·이력·확정 정보만 추가) ══ */
+function scoreGame(m) {
+  return { holes: m.holes, creatorId: m.by, status: m.paused ? 'paused' : 'in_progress',
+    players: m.groups.flatMap(g => g.players).map(p => ({ id: p, name: p,
+      scores: Object.fromEntries((m.sd[p] || []).slice(0, m.holes).map((v, i) => [i + 1, +v || null]).filter(([, v]) => v)) })) };
+}
+function logScoreDiffs(m, players, hr, before) {
+  m.scoreLog = m.scoreLog || [];
+  const at = new Date().toISOString(), by = S.user?.name || '';
+  players.forEach(p => hr.forEach(h => {
+    const a = (before[p] || [])[h] || 0, b = (m.sd[p] || [])[h] || 0;
+    if (a !== b) m.scoreLog.push({ at, by, player: p, hole: h + 1, from: a || null, to: b || null, kind: m.final ? 'post_final_edit' : 'edit' });
+  }));
+  if (m.scoreLog.length > 500) m.scoreLog = m.scoreLog.slice(-500);
+}
+function renderScoreControls() {
+  const box = document.getElementById('score-controls'); if (!box) return;
+  const m = S.matches[S.mid]; if (!m) { box.innerHTML = ''; return; }
+  const isCreator = m.by === S.user?.name;
+  const pauseBtn = isCreator ? `<button class="btn btn-gray btn-sm" onclick="togglePause()">${m.paused ? '▶ 경기 재개' : '⏸ 경기 중단'}</button>` : '';
+  const hist = `<button class="btn btn-gray btn-sm" onclick="toggleScoreLog()">📜 수정 이력 (${(m.scoreLog || []).length})</button>`;
+  box.innerHTML = `<div class="btn-row" style="padding:0 14px 8px">${m.paused ? '<span class="auth-box">⏸ 중단된 경기입니다. 재개 후 저장할 수 있어요.</span> ' : ''}${pauseBtn} ${hist}</div>
+    <div id="score-log" hidden></div>`;
+}
+function togglePause() {
+  const m = S.matches[S.mid]; if (!m) return;
+  const g = scoreGame(m), me = S.user?.name;
+  const r = m.paused ? PD_SCORE.resume(g, me) : PD_SCORE.pause(g, me);
+  if (!r.ok) { toast('생성자만 중단·재개할 수 있어요'); return; }
+  m.paused = !m.paused;
+  saveMatch(m); renderScoreControls(); toast(m.paused ? '경기를 중단했어요' : '경기를 재개했어요');
+}
+function toggleScoreLog() {
+  const el = document.getElementById('score-log'); if (!el) return;
+  const m = S.matches[S.mid];
+  el.hidden = !el.hidden;
+  el.innerHTML = el.hidden ? '' : `<ul class="hub-ul">${(m.scoreLog || []).slice(-30).reverse().map(e => `<li>${escHtml(e.at.slice(0, 16).replace('T', ' '))} · ${escHtml(e.by)} · ${escHtml(e.player)} ${e.hole}홀 ${e.from ?? '-'} → ${e.to ?? '-'}${e.kind === 'post_final_edit' ? ' (확정 후 수정)' : ''}</li>`).join('') || '<li>수정 이력이 없어요</li>'}</ul>`;
+}
+function renderFinalArea() {
+  const box = document.getElementById('final-area'); if (!box) return;
+  const m = S.matches[S.mid]; if (!m) { box.innerHTML = ''; return; }
+  const isCreator = m.by === S.user?.name;
+  let body = '';
+  if (m.final) {
+    body = `<ul class="hub-ul">${m.final.rows.map(r => `<li>${r.rank}위 · ${escHtml(r.id)} · 총 ${r.total}타</li>`).join('')}</ul>
+      <p class="hub-vs">확정 ${escHtml(m.final.at.slice(0, 16).replace('T', ' '))} · 동점은 같은 순위로 표시합니다 (뒤 9홀 → 마지막 홀 순으로 먼저 비교)</p>
+      ${m.editApproval ? `<p class="hub-vs">수정 승인됨 (${escHtml(m.editApproval.by)}). 점수를 저장하면 확정 결과가 다시 계산됩니다.</p>` : ''}`;
+    if (isCreator && !m.editApproval) body += `<button class="btn btn-gold btn-sm" onclick="approveEdit()">✏️ 확정 후 수정 승인</button>`;
+  } else if (isCreator) {
+    body = `<button class="btn btn-green btn-sm" onclick="finalizeResult()">🔒 결과 확정</button>
+      <p class="hub-vs">모든 참가자의 전체 홀 점수가 입력되어야 확정할 수 있어요.</p>`;
+  } else body = '<p class="hub-vs">결과는 총무(생성자)가 확정합니다.</p>';
+  box.innerHTML = `<div class="card"><div class="card-hd">🔒 결과 확정</div><div style="padding:10px 14px">${body}</div></div>`;
+}
+function finalizeResult() {
+  const m = S.matches[S.mid]; if (!m) return;
+  if (m.by !== S.user?.name) { toast('총무(생성자)만 결과를 확정할 수 있어요'); return; }
+  const g = scoreGame(m);
+  const r = PD_SCORE.confirmResult(g, S.user.name);
+  if (!r.ok) { toast(r.reason === 'incomplete' ? '모든 참가자의 전체 홀 점수를 먼저 입력해 주세요' : '결과를 확정할 수 없어요'); return; }
+  m.final = { at: new Date().toISOString(), by: S.user.name, rows: g.final };
+  saveMatch(m); renderFinalArea(); toast('결과를 확정했어요');
+}
+function approveEdit() {
+  const m = S.matches[S.mid]; if (!m || !m.final) return;
+  if (m.by !== S.user?.name) { toast('총무(생성자)만 승인할 수 있어요'); return; }
+  m.editApproval = { by: S.user.name, at: new Date().toISOString() };
+  saveMatch(m); renderFinalArea(); toast('수정을 승인했어요. 점수를 수정하고 저장해 주세요');
+}
+
+function venueReportHtml(c) {
+  return `<div class="hub-box"><h3 class="hub-sub">정보 수정 제보</h3>
+    <label class="hub-sr" for="vr-${escHtml(c.id)}">수정할 내용</label>
+    <textarea id="vr-${escHtml(c.id)}" class="hub-input" maxlength="300" rows="2" placeholder="잘못된 정보나 수정할 내용 (개인정보는 적지 마세요)"></textarea>
+    <button class="hub-btn" data-dm="venue-report" data-id="${escHtml(c.id)}">제보 보내기 (데모)</button>
+    <p class="hub-vs">데모: 제보는 이 기기에만 저장되며 운영팀에 전달되지 않습니다.</p></div>`;
 }
 
 /* ══ 페이지 이동 ══ */
 const NO_TAB = ['pg-login','pg-create','pg-groups','pg-score','pg-admin'];
 const TAB_MAP = { 'pg-home':'home','pg-matches':'matches','pg-ranking':'ranking','pg-result':'matches','pg-matching':'matching','pg-venues':'home','pg-tournaments':'home','pg-mgmt':'home','pg-video':'home','pg-food':'home','pg-club':'home','pg-course':'home','pg-together':'home','pg-clubs':'home' };
 
-const HUB_PAGES = ['pg-home','pg-venues','pg-course','pg-tournaments','pg-mgmt','pg-video','pg-food','pg-club','pg-together','pg-clubs'];
+const HUB_PAGES = ['pg-home','pg-venues','pg-course','pg-tournaments','pg-mgmt','pg-video','pg-food','pg-club','pg-together','pg-clubs','pg-console'];
 function go(id) {
+  if (id === 'pg-console' && !consoleAllowed()) { toast('접근할 수 없는 페이지예요'); return; }
   document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
   document.getElementById(id).classList.add('on');
   document.body.classList.toggle('hub-wide', HUB_PAGES.includes(id)); // 홈·공개 페이지만 넓은 화면 사용
@@ -2121,6 +2485,10 @@ function go(id) {
   if (id === 'pg-venues')      renderRegionOptions('venue-region', true);
   if (id === 'pg-together')    { renderRegionOptions('tg-region', true); renderTogether(); }
   if (id === 'pg-clubs')       { renderRegionOptions('club-region', false); renderClubs(); }
+  if (id === 'pg-club')        renderPro();
+  if (id === 'pg-console')     renderConsole();
+  if (id === 'pg-score')       renderScoreControls();
+  if (id === 'pg-result')      renderFinalArea();
   if (id === 'pg-tournaments') loadParkgolfNews();
   if (id === 'pg-video')       loadYoutubeVideos('대회');
   if (id === 'pg-food')        loadFoodAround();
@@ -2725,13 +3093,32 @@ function collectScores() {
   const sh = H === 18 ? S.ch * 9 : 0;
   const hr = Array.from({ length: 9 }, (_, i) => sh + i);
   const g = m.groups[S.cg];
+  const before = {};
+  g.players.forEach(p => { before[p] = (m.sd[p] || []).slice(); });
   g.players.forEach(p => {
     if (!m.sd[p]) m.sd[p] = Array(H).fill(0);
     hr.forEach(h => { const inp = document.querySelector(`input[data-p="${p}"][data-h="${h}"]`); m.sd[p][h] = +inp?.value || 0; });
   });
+  logScoreDiffs(m, g.players, hr, before);
+}
+// 중단·확정 상태 확인 (저장 전). 확정 후에는 총무 승인이 있어야 저장할 수 있다.
+function scoreBlocked() {
+  const m = S.matches[S.mid]; if (!m) return false;
+  if (m.paused) { toast('경기가 중단된 상태예요. 재개한 뒤 저장해 주세요'); return true; }
+  if (m.final && !m.editApproval) { toast('확정된 결과예요. 총무 승인 후 수정할 수 있어요'); return true; }
+  return false;
+}
+// 승인된 확정 후 수정은 저장 뒤 결과를 다시 계산하고 승인 표시를 소비한다
+function afterScoreSave(m) {
+  if (!m.final || !m.editApproval) return;
+  const r = PD_SCORE.standings(scoreGame(m));
+  if (r.complete) m.final = { ...m.final, rows: r.rows.map(x => ({ id: x.id, total: x.total, rank: x.rank })), revisedAt: new Date().toISOString(), revisedBy: m.editApproval.by };
+  delete m.editApproval;
+  saveMatch(m);
 }
 async function saveScore() {
   if (!canEdit()) { toast('조장 또는 총무/회장만 저장할 수 있어요 🔒'); return; }
+  if (scoreBlocked()) return;
   collectScores();
 
   // 9홀 단위 빈 칸 검증
@@ -2754,9 +3141,14 @@ async function saveScore() {
   }
 
   await saveMatch(S.matches[S.mid]);
+  afterScoreSave(S.matches[S.mid]);
+  renderFinalArea();
   toast('💾 저장됐어요!');
 }
-async function saveAndResult() { if (canEdit()) collectScores(); await saveMatch(S.matches[S.mid]); openResult(S.mid); }
+async function saveAndResult() {
+  if (canEdit() && !scoreBlocked()) { collectScores(); await saveMatch(S.matches[S.mid]); afterScoreSave(S.matches[S.mid]); }
+  openResult(S.mid);
+}
 
 /* ══ 정산 계산 ══ */
 function calcHalfSettle(m, halfIdx) {

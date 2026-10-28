@@ -30,6 +30,9 @@ fs.writeFileSync(path.join(out, 'config', 'client.js'), 'window.PARKDA_CONFIG = 
 for (const f of ['sw.js', 'manifest.json', 'icon-192.png', 'icon-512.png']) {
   fs.copyFileSync(path.join(root, f), path.join(out, f));
 }
+// 화면 규칙 파일 (순수 함수, 비밀값 없음). index.html 이 config/client.js 다음에 불러온다.
+fs.rmSync(path.join(out, 'lib'), { recursive: true, force: true });
+fs.cpSync(path.join(root, 'lib'), path.join(out, 'lib'), { recursive: true });
 fs.rmSync(path.join(out, 'api'), { recursive: true, force: true });
 fs.cpSync(path.join(root, 'api'), path.join(out, 'api'), { recursive: true });
 // 공개 데이터는 공식 출처 확인분(verified)의 두 파일만 복사한다. raw·processed·내부 후보는 복사하지 않는다.

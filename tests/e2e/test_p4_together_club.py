@@ -58,18 +58,32 @@ def main():
             check("모임 생성 후 목록에 표시", "가상 아침 모임" in pg.inner_text("#tg-list"))
             check("모임장 본인 확정 참가 1명", "1/2명" in pg.inner_text("#tg-list") or "모집 1" in pg.inner_text("#tg-list") or "모집 1/2" in pg.inner_text("#tg-list"))
 
-            # 3. 회원 B: 참가 → 정원 2/2 마감 (정원 초과 방지)
+            # 3. 회원 B: 참가 → 정원 2/2 마감
             login_as(pg, "라마바"); time.sleep(0.3)
             pg.click("#tg-list .hub-venue >> nth=0 >> button.hub-act-g"); time.sleep(0.5)
             text = pg.inner_text("#tg-list")
             check("B 참가 신청 → 모집 마감", "모집 2/2명" in text and "모집 마감" in text, text[:120])
-            check("정원 초과 신청 불가 (버튼 없음)", pg.locator("#tg-list .hub-venue >> nth=0 >> button.hub-act-g").count() == 0)
+            check("정원 찬 모임: B 화면에는 참가 신청 버튼 없음", pg.locator("#tg-list .hub-venue >> nth=0 >> button:has-text('참가 신청')").count() == 0)
 
-            # 4. B 참가 취소 → 다시 모집 중
-            pg.click("#tg-list .hub-venue >> nth=0 >> button.hub-act"); time.sleep(0.5)
-            check("B 참가 취소 → 모집 1/2명", "모집 1/2명" in pg.inner_text("#tg-list"))
+            # 3b. 회원 C: 정원이 찼으므로 대기 신청
+            login_as(pg, "마바사"); pg.wait_for_selector("#tg-list .hub-venue", timeout=10000)
+            check("정원 찬 모임: 대기 신청 버튼 표시", pg.locator("#tg-list .hub-venue >> nth=0 >> button:has-text('대기 신청')").count() == 1)
+            pg.click("#tg-list .hub-venue >> nth=0 >> button:has-text('대기 신청')"); time.sleep(0.5)
+            check("C 대기 등록 표시", "대기: 마바사" in pg.inner_text("#tg-list"))
+
+            # 3c. B 가 참가 취소 → 대기자 C 자동 승격
+            login_as(pg, "라마바"); time.sleep(0.3)
+            pg.click("#tg-list .hub-venue >> nth=0 >> button:has-text('참가 취소')"); time.sleep(0.5)
+            text = pg.inner_text("#tg-list")
+            check("B 취소 → 대기자 C 자동 참가 승격", "모집 2/2명" in text and "마바사" in text and "대기: 마바사" not in text, text[:160])
+
+            # 4. C 가 참가 취소 → 다시 모집 1/2명
+            login_as(pg, "마바사"); time.sleep(0.3)
+            pg.click("#tg-list .hub-venue >> nth=0 >> button:has-text('참가 취소')"); time.sleep(0.5)
+            check("C 참가 취소 → 모집 1/2명", "모집 1/2명" in pg.inner_text("#tg-list"))
 
             # 5. 다시 신청 후 모임장 A 가 확정 → 조편성 연결
+            login_as(pg, "라마바"); time.sleep(0.3)
             pg.click("#tg-list .hub-venue >> nth=0 >> button.hub-act-g"); time.sleep(0.4)
             login_as(pg, "가나다"); time.sleep(0.3)
             pg.evaluate("go('pg-together')"); time.sleep(0.3)
@@ -78,7 +92,7 @@ def main():
             pg.click("#tg-list button:has-text('자동 조편성 시작')")
             pg.wait_for_function("document.getElementById('pg-groups').classList.contains('on')", timeout=20000)  # 저장 요청 대기 포함
             check("자동 조편성 화면으로 이동", True)
-            meetings = pg.evaluate("JSON.parse(localStorage.getItem('pd_demo_meetings') || '[]')")
+            meetings = pg.evaluate("JSON.parse(localStorage.getItem('pd_demo_meetings_v2') || '[]')")
             check("게임코드가 모임에 연결됨", bool(meetings and meetings[0].get("gameCode")), str(meetings[0].get("gameCode") if meetings else None))
 
             # 6. 게임코드로 다른 기기(같은 저장소) 참가 흐름: 기존 joinGame 재사용
@@ -93,8 +107,8 @@ def main():
             pg.click("form:has(#club-name) button[type=submit]"); time.sleep(0.5)
             check("동호회 생성", "가상 파크골프회" in pg.inner_text("#club-list"))
             pg.click("#club-list .hub-venue >> nth=0 >> text=승인", timeout=500) if False else None
-            pg.fill("#nt-" + pg.evaluate("JSON.parse(localStorage.getItem('pd_demo_clubs'))[0].id"), "가상 공지")
-            pg.fill("#nb-" + pg.evaluate("JSON.parse(localStorage.getItem('pd_demo_clubs'))[0].id"), "정기 모임 안내")
+            pg.fill("#nt-" + pg.evaluate("JSON.parse(localStorage.getItem('pd_demo_clubs_v2'))[0].id"), "가상 공지")
+            pg.fill("#nb-" + pg.evaluate("JSON.parse(localStorage.getItem('pd_demo_clubs_v2'))[0].id"), "정기 모임 안내")
             pg.click("#club-list button:has-text('공지 올리기')"); time.sleep(0.4)
             check("운영자 공지 등록", "가상 공지" in pg.inner_text("#club-list"))
             login_as(pg, "라마바"); pg.evaluate("go('pg-clubs')"); time.sleep(0.4)
@@ -107,7 +121,7 @@ def main():
             check("운영자 승인 → 회원 수 증가", "회원 2명" in pg.inner_text("#club-list"))
 
             # 8. 전화번호는 어디에도 표시·저장되지 않음
-            all_text = pg.inner_text("body") + pg.evaluate("localStorage.getItem('pd_demo_meetings') || ''") + pg.evaluate("localStorage.getItem('pd_demo_clubs') || ''")
+            all_text = pg.inner_text("body") + pg.evaluate("localStorage.getItem('pd_demo_meetings_v2') || ''") + pg.evaluate("localStorage.getItem('pd_demo_clubs_v2') || ''")
             check("전화번호 미표시·미저장", PHONE not in all_text)
 
             # 9. 외부 API·Supabase 직접 호출 없음
