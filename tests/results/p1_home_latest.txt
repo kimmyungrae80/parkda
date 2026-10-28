@@ -1,7 +1,8 @@
-2026-10-28T14:24:25 P1 PASS 42/42
+2026-10-28T14:55:11 P1 PASS 43/43
 PASS 비회원 첫 화면은 홈(로그인 강제 없음) 
-PASS 메인 서비스 순서 (구장→함께→대회→경기관리→유튜브→맛집→Club Pro) 전국 파크골프장 찾기 / 함께 칠 사람 찾기 / 전국 파크골프 대회 정보 / 자동 조편성 및 경기관리 / 파크골프 유튜브 / 구장 주변 맛집 / 동호회 / 동호회 운영자 Club Pro
-PASS 상단 메뉴·통합검색 존재 
+PASS 핵심 서비스 4개 순서 (구장→함께→대회→경기관리) 구장 찾기 / 함께 치기 / 대회 정보 / 경기 관리
+PASS 하단 메뉴 5개 (홈·구장·모임·경기·MY) 
+PASS 상단 지역 선택·통합검색 존재 
 PASS 지역 선택 목록 채워짐 options=18
 PASS 회원 전용 항목에만 로그인 표시 (경기관리) locks=1
 PASS 로고 이미지 포함 
@@ -30,20 +31,20 @@ PASS Club Pro: 비회원에게는 운영 동호회 없음 안내 + 무료 화면
 현재 화
 PASS Club Pro: 결제 버튼 없음 (데모 체험 토글만) 
 PASS 로그인 후 홈 회원 영역 표시 
-PASS 상단 메뉴가 '내 경기'로 바뀜 
+PASS 로그인 후 상단 링크가 '내 경기'로 바뀜 
 PASS 회원: 경기관리 페이지 진입 
 PASS 회원: 새 경기 만들기 화면 진입 (기존 기능) 
 PASS 서비스워커 캐시: 외부 URL 없음 caches=['parkda-v2'] external=0
 PASS 미리보기(?local=1): Supabase 호출 0건 calls=0
 PASS 기존 게임 링크(?game=) 재방문 자동 참가 S.mid=TEST_PRESERVE_0001
 PASS 반응형 360px: 가로 스크롤 없음 scrollWidth=360
-PASS 반응형 360px: 카드 1열 cols=1
+PASS 반응형 360px: 핵심 서비스 카드 2열 cols=2
 PASS 반응형 390px: 가로 스크롤 없음 scrollWidth=390
-PASS 반응형 390px: 카드 1열 cols=1
+PASS 반응형 390px: 핵심 서비스 카드 2열 cols=2
 PASS 반응형 768px: 가로 스크롤 없음 scrollWidth=768
-PASS 반응형 768px: 카드 2열 cols=2
+PASS 반응형 768px: 핵심 서비스 카드 2열 cols=2
 PASS 반응형 1280px: 가로 스크롤 없음 scrollWidth=1280
-PASS 반응형 1280px: 카드 2열 cols=2
+PASS 반응형 1280px: 핵심 서비스 카드 2열 cols=2
 PASS 접근성: 모든 버튼·링크·입력에 이름 있음 
 PASS 접근성: html lang=ko 
 PASS JavaScript 오류 없음 

@@ -1,0 +1,85 @@
+{
+ "contrast": {
+  "pg-home": [],
+  "pg-venues": [],
+  "pg-together": [],
+  "pg-clubs": [],
+  "pg-club": [],
+  "pg-my": [],
+  "pg-tournaments": [],
+  "pg-mgmt": [],
+  "pg-login": []
+ },
+ "focus": [
+  {
+   "tag": "A",
+   "id": "",
+   "outline": "solid 3px"
+  },
+  {
+   "tag": "SELECT",
+   "id": "hub-region",
+   "outline": "solid 3px"
+  },
+  {
+   "tag": "BUTTON",
+   "id": "",
+   "outline": "solid 3px"
+  },
+  {
+   "tag": "INPUT",
+   "id": "hub-q",
+   "outline": "solid 3px"
+  },
+  {
+   "tag": "BUTTON",
+   "id": "",
+   "outline": "solid 3px"
+  },
+  {
+   "tag": "BUTTON",
+   "id": "",
+   "outline": "solid 3px"
+  },
+  {
+   "tag": "BUTTON",
+   "id": "",
+   "outline": "solid 3px"
+  },
+  {
+   "tag": "BUTTON",
+   "id": "",
+   "outline": "solid 3px"
+  },
+  {
+   "tag": "BUTTON",
+   "id": "",
+   "outline": "solid 3px"
+  },
+  {
+   "tag": "BUTTON",
+   "id": "",
+   "outline": "solid 3px"
+  },
+  {
+   "tag": "A",
+   "id": "",
+   "outline": "solid 3px"
+  },
+  {
+   "tag": "A",
+   "id": "",
+   "outline": "solid 3px"
+  },
+  {
+   "tag": "A",
+   "id": "",
+   "outline": "solid 3px"
+  },
+  {
+   "tag": "BUTTON",
+   "id": "",
+   "outline": "solid 3px"
+  }
+ ]
+}

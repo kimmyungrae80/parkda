@@ -87,24 +87,24 @@ def main():
             ctx, pg = new_page(390, 844)
             pg.goto(BASE); time.sleep(0.6)
             check("비회원 첫 화면은 홈(로그인 강제 없음)", pg.evaluate("document.getElementById('pg-home').classList.contains('on')"))
-            titles = pg.eval_on_selector_all(".hub-grid .hub-card .hub-t", "els => els.map(e => e.textContent.trim())")
-            expected = ["전국 파크골프장 찾기", "함께 칠 사람 찾기", "전국 파크골프 대회 정보",
-                        "자동 조편성 및 경기관리", "파크골프 유튜브", "구장 주변 맛집", "동호회", "동호회 운영자 Club Pro"]
-            check("메인 서비스 순서 (구장→함께→대회→경기관리→유튜브→맛집→Club Pro)", titles == expected, " / ".join(titles))
-            check("상단 메뉴·통합검색 존재", pg.locator(".hub-nav").count() == 1 and pg.locator("#hub-q").count() == 1 and pg.locator("#hub-region").count() == 1)
+            titles = pg.eval_on_selector_all(".svc-grid .svc .svc-t", "els => els.map(e => e.textContent.trim())")
+            expected = ["구장 찾기", "함께 치기", "대회 정보", "경기 관리"]
+            check("핵심 서비스 4개 순서 (구장→함께→대회→경기관리)", titles == expected, " / ".join(titles))
+            check("하단 메뉴 5개 (홈·구장·모임·경기·MY)", pg.eval_on_selector_all("#tabbar .tab-lbl", "els => els.map(e => e.textContent.trim())") == ["홈", "구장", "모임", "경기", "MY"])
+            check("상단 지역 선택·통합검색 존재", pg.locator("#hub-q").count() == 1 and pg.locator("#hub-region").count() == 1)
             check("지역 선택 목록 채워짐", pg.locator("#hub-region option").count() >= 18, f"options={pg.locator('#hub-region option').count()}")
             lock_count = pg.locator(".hub-lock").count()
             check("회원 전용 항목에만 로그인 표시 (경기관리)", lock_count == 1, f"locks={lock_count}")
             check("로고 이미지 포함", pg.locator(".hub-logo").count() == 1)
 
             # ── B. 비회원: 회원 전용 기능은 로그인으로 안내 ──
-            pg.click(".hub-card:has-text('자동 조편성')")
+            pg.click(".svc:has-text('경기 관리')")
             time.sleep(0.2)
             check("비회원: 경기관리 클릭 시 로그인 화면", pg.evaluate("document.getElementById('pg-login').classList.contains('on')"))
             pg.evaluate("go('pg-home')")
 
             # ── C. 구장 검색 (스텁 카카오) + XSS 방어 ──
-            pg.fill("#hub-q", "화명"); pg.click("form.hub-search .hub-btn")
+            pg.fill("#hub-q", "화명"); pg.click("form.home-search button")
             pg.wait_for_function("document.getElementById('pg-venues').classList.contains('on')")
             pg.wait_for_selector(".hub-venue", timeout=5000)
             n = pg.locator(".hub-venue").count()
@@ -161,8 +161,8 @@ def main():
             pg.fill("#l-name", "가상관리"); pg.fill("#l-phone", "010-0000-0000")
             pg.click("button[onclick='doLogin()']"); time.sleep(0.6)
             check("로그인 후 홈 회원 영역 표시", "가상관리" in pg.inner_text("#hub-member"))
-            check("상단 메뉴가 '내 경기'로 바뀜", "내 경기" in pg.inner_text("#hub-auth"))
-            pg.click(".hub-card:has-text('자동 조편성')"); time.sleep(0.3)
+            check("로그인 후 상단 링크가 '내 경기'로 바뀜", "내 경기" in pg.evaluate("document.getElementById('hub-auth').innerHTML"))
+            pg.click(".svc:has-text('경기 관리')"); time.sleep(0.3)
             check("회원: 경기관리 페이지 진입", pg.evaluate("document.getElementById('pg-mgmt').classList.contains('on')"))
             pg.click("button.hub-act-big >> nth=0"); time.sleep(0.3)
             check("회원: 새 경기 만들기 화면 진입 (기존 기능)", pg.evaluate("document.getElementById('pg-create').classList.contains('on')"))
@@ -213,9 +213,9 @@ def main():
                 pg.goto(BASE); time.sleep(0.4)
                 sw = pg.evaluate("document.documentElement.scrollWidth")
                 check(f"반응형 {w}px: 가로 스크롤 없음", sw <= w, f"scrollWidth={sw}")
-                cols = pg.evaluate("getComputedStyle(document.querySelector('.hub-grid')).gridTemplateColumns.split(' ').length")
-                expect_cols = 2 if w >= 720 else 1
-                check(f"반응형 {w}px: 카드 {expect_cols}열", cols == expect_cols, f"cols={cols}")
+                cols = pg.evaluate("getComputedStyle(document.querySelector('.svc-grid')).gridTemplateColumns.split(' ').length")
+                expect_cols = 2  # 핵심 서비스 카드는 모든 폭에서 2열 (390px 에서도 글씨가 잘리지 않음)
+                check(f"반응형 {w}px: 핵심 서비스 카드 {expect_cols}열", cols == expect_cols, f"cols={cols}")
                 if w in (390, 1280):
                     pg.screenshot(path=str(OUT / f"p1_home_{w}.png"), full_page=True)
                 ctx.close()

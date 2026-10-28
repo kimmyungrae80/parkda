@@ -101,23 +101,23 @@ def run(pg, label, vw):
     check(f"[{label}] 자동 조편성 완료", True)
 
     # ── 6. 점수 입력 (일시 중단 → 재개 → 저장) ──
-    go(pg, 'pg-matches'); pg.click("#pg-matches button:has-text('📊 점수')"); time.sleep(0.6)
+    go(pg, 'pg-matches'); pg.click("#pg-matches button:has-text('점수')"); time.sleep(0.6)
     pg.click("#score-controls button:has-text('경기 중단')"); time.sleep(0.3)
     check(f"[{label}] 경기 중단 표시", "중단된 경기" in pg.inner_text("#score-controls"))
     pg.click("#score-controls button:has-text('경기 재개')"); time.sleep(0.3)
     for p in (A, B):
         for h in range(9):
             pg.fill(f"input[data-p='{p}'][data-h='{h}']", "4")
-    pg.click("#pg-score .btn-wrap button:has-text('💾 저장')"); time.sleep(0.6)
+    pg.click("#pg-score .btn-wrap button:has-text('저장')"); time.sleep(0.6)
     check(f"[{label}] 점수 저장 후 이력 기록됨", pg.evaluate("(S.matches[S.mid].scoreLog||[]).length") >= 18)
 
     # ── 7. 결과 확정 → 8. 동점 순위 ──
-    pg.click("#pg-score .btn-wrap button:has-text('🏆 포인트 결과')"); time.sleep(0.8)
+    pg.click("#pg-score .btn-wrap button:has-text('포인트 결과')"); time.sleep(0.8)
     pg.click("#final-area button:has-text('결과 확정')"); time.sleep(0.5)
     fin = pg.inner_text("#final-area")
     check(f"[{label}] 결과 확정 → 순위 표시 (동점 공동 1위)", "1위" in fin and fin.count("1위") == 2, fin[:120])
     pg.evaluate("openScore(S.mid)"); time.sleep(0.3)
-    pg.click("#pg-score .btn-wrap button:has-text('💾 저장')"); time.sleep(0.2)
+    pg.click("#pg-score .btn-wrap button:has-text('저장')"); time.sleep(0.2)
     check(f"[{label}] 확정 후 점수 저장은 승인 없이 차단", "확정된 결과" in pg.inner_text("#toast"), pg.inner_text("#toast")[:60])
 
     # ── 9. 확정 후 수정 승인 ──

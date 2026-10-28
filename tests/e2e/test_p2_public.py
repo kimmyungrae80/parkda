@@ -52,7 +52,7 @@ def main():
             pg.goto(BASE); time.sleep(0.5)
 
             # 구장: 데이터 파일 로드, 없는 이름이면 안내
-            pg.fill("#hub-q", "없는구장이름"); pg.click("form.hub-search .hub-btn"); time.sleep(0.5)
+            pg.fill("#hub-q", "없는구장이름"); pg.click("form.home-search button"); time.sleep(0.5)
             check("구장 검색 결과 없음: 안내 문구", "조건에 맞는 구장이 없어요" in pg.inner_text("#venue-list"))
 
             # 맛집: 키 미설정 → 안내

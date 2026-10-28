@@ -1,4 +1,4 @@
-2026-10-28T14:27:06 PASS 20/20
+2026-10-28T14:57:34 PASS 20/20
 PASS 신규 기기: 샘플 경기 자동 주입 없음 pd_matches 없음
 PASS 기존 데이터 로드 후 변경 없음 
 PASS 로그인 후 홈 화면 표시 
@@ -7,10 +7,10 @@ PASS 자동 조편성: 가상 참가자 표시
 PASS 생성 경기 저장(match_<코드>) + 기존 경기 보존 
 PASS 게임코드 4자리 생성 len=4
 PASS 점수 입력칸 존재 count=1
-PASS 점수 저장 반영 player=가나다
+PASS 점수 저장 반영 player=라마바
 PASS 결과 표 생성 
 PASS 결과 공유: 게임코드·경기명·참가 링크 포함 len=154
-PASS 게임코드 참여 처리 S.mid=MMVRO9W5B
+PASS 게임코드 참여 처리 S.mid=MMVRPD2M0
 PASS 최종: 생성 경기 점수 유지 
 PASS 최종: 기존 가상 경기 보존 
 PASS XSS 헬퍼: 이스케이프·URL·ID 검증 
