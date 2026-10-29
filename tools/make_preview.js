@@ -30,6 +30,9 @@ fs.writeFileSync(path.join(out, 'config', 'client.js'), 'window.PARKDA_CONFIG = 
 for (const f of ['sw.js', 'manifest.json', 'icon-192.png', 'icon-512.png', 'parkda-toss.css']) {
   fs.copyFileSync(path.join(root, f), path.join(out, f));
 }
+// 글꼴 (Pretendard, SIL OFL)
+fs.rmSync(path.join(out, 'fonts'), { recursive: true, force: true });
+fs.cpSync(path.join(root, 'fonts'), path.join(out, 'fonts'), { recursive: true });
 // 화면 규칙 파일 (순수 함수, 비밀값 없음). index.html 이 config/client.js 다음에 불러온다.
 fs.rmSync(path.join(out, 'lib'), { recursive: true, force: true });
 fs.cpSync(path.join(root, 'lib'), path.join(out, 'lib'), { recursive: true });
