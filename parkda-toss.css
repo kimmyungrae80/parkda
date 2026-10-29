@@ -1,0 +1,24 @@
+/* PARKDA 2.0 — original, Toss-inspired clarity; non-destructive visual layer */
+:root{--g1:#116a49;--g2:#16845b;--g3:#1d9669;--g4:#b8e4d0;--g5:#e9f7ef;--b1:#255f9e;--b2:#3276bb;--b3:#4485c4;--gray1:#f5f6f8;--gray2:#e5e8eb;--gray3:#667085;--gray4:#475467;--text:#171b26;--white:#fff;--sh:0 4px 18px rgba(16,24,40,.055);--shs:0 2px 8px rgba(16,24,40,.04);--r:18px}
+html,body{background:#f5f6f8!important;color:var(--text)!important;font-family:Pretendard,'Noto Sans KR',system-ui,sans-serif!important;font-size:17px;line-height:1.55}
+#app{background:#f5f6f8!important;max-width:760px!important;box-shadow:0 0 40px rgba(16,24,40,.035)}
+.pg{padding-bottom:104px}
+.bar{background:rgba(255,255,255,.97)!important;color:#171b26!important;box-shadow:none!important;border-bottom:1px solid #e5e8eb!important;padding:16px 20px!important;backdrop-filter:blur(12px)}
+.bar-title{font-size:19px!important;font-weight:800!important}.bar-sub{color:#667085!important;opacity:1!important}.bar-back{font-size:26px!important}
+.hero{background:#fff!important;color:#171b26!important;padding:32px 22px 26px!important;border-bottom:1px solid #e5e8eb}
+.hero-logo img{filter:none!important;max-width:65%;object-fit:contain}.hero-logo-text{color:#16845b!important;text-shadow:none!important;letter-spacing:2px!important}.hero-sub{color:#667085!important;font-size:15px!important;opacity:1!important}
+.card,.kpi,.ucard{background:#fff!important;border:1px solid #eef0f2!important;border-radius:18px!important;box-shadow:var(--sh)!important}
+.card{margin:12px 16px!important}.card-hd{background:#fff!important;color:#171b26!important;border-bottom:1px solid #eef0f2!important;font-size:18px!important;padding:16px 18px!important}.card-bd{padding:18px!important}
+.sec{font-size:15px!important;font-weight:800!important;color:#344054!important;letter-spacing:0!important;padding:24px 20px 10px!important;text-transform:none!important}
+.mbtn{background:#fff!important;color:#171b26!important;border:1px solid #e5e8eb!important;box-shadow:var(--sh)!important;border-radius:18px!important;min-height:74px!important;margin:0 16px 10px!important;width:calc(100% - 32px)!important;padding:16px 18px!important}
+.mbtn-label{font-size:19px!important;line-height:1.4!important}.mbtn-desc{font-size:14px!important;color:#667085!important;opacity:1!important}.mbtn-arr{color:#98a2b3!important;opacity:1!important}
+.mbtn-green{border-left:5px solid #16845b!important}.mbtn-blue{border-left:5px solid #3276bb!important}.mbtn-teal{border-left:5px solid #16845b!important}.mbtn-orange{border-left:5px solid #e5a143!important}
+.btn{min-height:54px!important;border-radius:14px!important;box-shadow:none!important;font-size:18px!important;font-weight:800!important;line-height:1.4!important}.btn-green{background:#16845b!important}.btn-blue{background:#3276bb!important}.btn-orange{background:#b65c27!important}
+.fi{min-height:52px!important;border:1.5px solid #d0d5dd!important;border-radius:12px!important;background:#fff!important;color:#171b26!important;font-size:17px!important;padding:13px 15px!important}.fi:focus{border-color:#16845b!important;box-shadow:0 0 0 3px rgba(22,132,91,.12)!important}.fl{font-size:17px!important;margin-bottom:8px!important}.fh{font-size:14px!important;color:#667085!important}
+.rbi{min-height:48px!important;border:1.5px solid #d0d5dd!important;color:#344054!important}.rb input:checked+.rbi{border-color:#16845b!important;background:#e9f7ef!important;color:#116a49!important}
+.ucard{margin:16px!important}.uname{font-size:18px!important}.uclub{font-size:14px!important}.kpi-row{gap:10px!important;padding:12px 16px!important}.kpi-n{font-family:inherit!important;font-size:24px!important}.kpi-l{font-size:13px!important;color:#667085!important}
+button,a,input,select,textarea{touch-action:manipulation}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #16845b!important;outline-offset:3px!important}
+button:not(.rb),[role='button']{min-height:44px}a{overflow-wrap:anywhere}p,li{line-height:1.65}
+@media(min-width:900px){#app{max-width:960px!important}.hero{padding:42px 32px!important}.card{margin:16px 24px!important}.sec{padding-left:28px!important}}
+@media(max-width:390px){.card{margin:10px 12px!important}.mbtn{margin-left:12px!important;margin-right:12px!important;width:calc(100% - 24px)!important}.mbtn-label{font-size:18px!important}.bar{padding:14px!important}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}

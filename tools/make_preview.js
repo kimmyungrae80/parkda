@@ -27,7 +27,7 @@ fs.writeFileSync(path.join(out, 'index.html'), html, 'utf8');
 // 미리보기는 빈 설정 (운영 연결 값 없음)
 fs.mkdirSync(path.join(out, 'config'), { recursive: true });
 fs.writeFileSync(path.join(out, 'config', 'client.js'), 'window.PARKDA_CONFIG = {"env":"preview","supabaseUrl":"","supabaseAnonKey":""};\n');
-for (const f of ['sw.js', 'manifest.json', 'icon-192.png', 'icon-512.png']) {
+for (const f of ['sw.js', 'manifest.json', 'icon-192.png', 'icon-512.png', 'parkda-toss.css']) {
   fs.copyFileSync(path.join(root, f), path.join(out, f));
 }
 // 화면 규칙 파일 (순수 함수, 비밀값 없음). index.html 이 config/client.js 다음에 불러온다.
