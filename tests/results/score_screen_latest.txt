@@ -1,0 +1,35 @@
+2026-10-29T15:45:35 SCORE PASS 34/34
+PASS [PC] 현재 홀과 참가자 이름 표시 
+PASS [PC] 파(PAR) 표시 PAR 4
+PASS [PC] +/- 로 타수 변경 (파+1 기대) val=5 par=4
+PASS [PC] 입력창과 패널 값 일치 input=5 panel=5 sd=[0, 0, 0, 0, 0, 0, 0, 0, 0] cnt=9 html=<input class="sinp" type="number" min="1" max="20" inputmode="numeric" data-p="라마바" data-h="0" aria-label="라마바 1홀 타수" value="5" oninput="onSI(this)">
+PASS [PC] 자동 저장 상태 표시 
+PASS [PC] 점수 이력 기록 
+PASS [PC] 다음 홀 이동 (2홀) 
+PASS [PC] 입력 전 상태 표시 
+PASS [PC] 이전 홀 복귀 (1홀 값 유지) 
+PASS [PC] 중단 중에는 +/- 버튼 비활성 
+PASS [PC] 중단 안내 표시 
+PASS [PC] 직접 입력 정정 후 자동 저장 
+PASS [PC] 결과 확정 (순위 표시) 
+PASS [PC] 확정 후 +/- 버튼 비활성 
+PASS [PC] 확정 후 안내 표시 
+PASS [PC] 가로 넘침 없음 
+PASS [모바일] 현재 홀과 참가자 이름 표시 
+PASS [모바일] 파(PAR) 표시 PAR 4
+PASS [모바일] +/- 로 타수 변경 (파+1 기대) val=5 par=4
+PASS [모바일] 입력창과 패널 값 일치 input=5 panel=5 sd=[0, 0, 0, 0, 0, 0, 0, 0, 0] cnt=9 html=<input class="sinp" type="number" min="1" max="20" inputmode="numeric" data-p="라마바" data-h="0" aria-label="라마바 1홀 타수" value="5" oninput="onSI(this)">
+PASS [모바일] 자동 저장 상태 표시 
+PASS [모바일] 점수 이력 기록 
+PASS [모바일] 다음 홀 이동 (2홀) 
+PASS [모바일] 입력 전 상태 표시 
+PASS [모바일] 이전 홀 복귀 (1홀 값 유지) 
+PASS [모바일] 중단 중에는 +/- 버튼 비활성 
+PASS [모바일] 중단 안내 표시 
+PASS [모바일] 직접 입력 정정 후 자동 저장 
+PASS [모바일] 결과 확정 (순위 표시) 
+PASS [모바일] 확정 후 +/- 버튼 비활성 
+PASS [모바일] 확정 후 안내 표시 
+PASS [모바일] 가로 넘침 없음 
+PASS 외부 요청 없음 []
+PASS JavaScript 오류 없음 

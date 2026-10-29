@@ -73,7 +73,7 @@ html,body{height:100%;background:#e8f0e8;font-family:'Noto Sans KR',sans-serif;c
 .mbtn-teal{background:linear-gradient(135deg,var(--teal),#00897b);color:var(--white)}
 .mbtn-orange{background:linear-gradient(135deg,var(--o2),var(--o3));color:var(--white)}
 .mbtn-gray{background:var(--white);color:var(--text);border:1.5px solid var(--gray2);opacity:.7}
-.mbtn-lock::after{content:'🔒 PRO';position:absolute;top:9px;right:12px;font-size:9px;font-weight:700;background:rgba(0,0,0,.2);color:#fff;padding:2px 7px;border-radius:99px}
+.mbtn-lock::after{content:'PRO';position:absolute;top:9px;right:12px;font-size:14px;font-weight:700;background:rgba(0,0,0,.2);color:#fff;padding:2px 7px;border-radius:99px}
 .mbtn-ico{font-size:30px;flex-shrink:0}
 .mbtn-info{flex:1;min-width:0}
 .mbtn-label{font-size:17px;font-weight:900;display:block;line-height:1.2}
@@ -575,7 +575,45 @@ button[onclick^="toggleTip"]{min-width:44px;min-height:44px;font-size:15px !impo
 </style>
   <!-- 카카오 SDK: 버튼 클릭 시 동적 로드 -->
 <link rel="stylesheet" href="/parkda-toss.css">
-<style>/* 패치 적용 후 대비 보정: 파란 글씨가 회색 배경에서 4.5:1 미달 */:root{--b2:#2B6198}</style>
+<style>/* 패치 적용 후 대비 보정: 파란 글씨가 회색 배경에서 4.5:1 미달 */:root{--b2:#2B6198}
+/* Pretendard 자체 호스팅 (OFL, fonts/LICENSE.txt). 로컬에 있으면 그것을 쓰고, 실패하면 아래 글꼴 스택의 Noto Sans KR·시스템 글꼴로 넘어간다. */
+@font-face{font-family:'Pretendard';font-style:normal;font-weight:400;font-display:swap;src:local('Pretendard Regular'),local('Pretendard-Regular'),url('fonts/Pretendard-Regular.woff2') format('woff2')}
+@font-face{font-family:'Pretendard';font-style:normal;font-weight:700;font-display:swap;src:local('Pretendard Bold'),local('Pretendard-Bold'),url('fonts/Pretendard-Bold.woff2') format('woff2')}
+@font-face{font-family:'Pretendard';font-style:normal;font-weight:800;font-display:swap;src:local('Pretendard ExtraBold'),local('Pretendard-ExtraBold'),url('fonts/Pretendard-ExtraBold.woff2') format('woff2')}
+html,body,button,input,select,textarea{font-family:'Pretendard','Noto Sans KR',system-ui,-apple-system,'Apple SD Gothic Neo',sans-serif}
+/* 점수 입력: 현재 홀·참가자 크게, 타수 큰 숫자, +/- 큰 버튼 (강한 햇빛에서도 읽히도록 대비 강화) */
+#score-focus{background:#fff;border-bottom:2px solid #e5e8eb}
+.sf-head{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid #e5e8eb}
+.sf-hole{text-align:center;color:#171b26}
+.sf-hole b{display:inline-block;font-size:48px;line-height:1;font-weight:800;font-variant-numeric:tabular-nums}
+.sf-hole span{font-size:22px;font-weight:800;margin-left:2px}
+.sf-hole small{display:block;font-size:16px;font-weight:700;color:#475467;margin-top:2px}
+.sf-nav{min-height:56px;min-width:92px;padding:0 12px;border:2px solid #475467;background:#fff;border-radius:14px;font-size:18px;font-weight:800;color:#171b26;cursor:pointer}
+.sf-nav:disabled{opacity:.35;cursor:default}
+.sf-list{list-style:none;margin:0;padding:4px 16px 8px}
+.sf-row{display:grid;grid-template-columns:1fr auto;grid-template-areas:"who num" "cmp num" "btn btn";gap:6px 12px;padding:14px 0;border-bottom:1px solid #eef0f2}
+.sf-row:last-child{border-bottom:0}
+.sf-who{grid-area:who;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.sf-name{font-size:22px;font-weight:800;color:#171b26;line-height:1.3}
+.sf-tag{font-size:15px;font-weight:700;color:#0f6a47;background:#e6f4ed;border-radius:8px;padding:2px 10px}
+.sf-num{grid-area:num;font-size:60px;font-weight:800;line-height:1;color:#171b26;text-align:right;font-variant-numeric:tabular-nums;min-width:96px;align-self:center}
+.sf-num small{font-size:18px;font-weight:800;margin-left:3px;color:#475467}
+.sf-cmp{grid-area:cmp;font-size:17px;font-weight:700;color:#344054}
+.sf-btns{grid-area:btn;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sf-btn{min-height:68px;font-size:36px;font-weight:800;line-height:1;border-radius:16px;border:2px solid #0f6a47;background:#fff;color:#0f6a47;cursor:pointer}
+.sf-btn-p{background:#0f6a47;color:#fff}
+.sf-btn:disabled{opacity:.35;cursor:default}
+.sf-status{margin:0;padding:14px 16px;font-size:17px;font-weight:700;color:#0f6a47;background:#e6f4ed;line-height:1.5}
+.sf-status[data-kind="pend"]{color:#344054;background:#f5f6f8}
+.sf-status[data-kind="err"]{color:#912018;background:#fdecec}
+/* 관리자 콘솔: 데모 표시와 요약 카드 */
+.adm-banner{background:#fff4e5;border:2px solid #b54708;color:#7a2e0e;border-radius:14px;padding:14px 16px;font-size:17px;font-weight:700;line-height:1.5;margin-bottom:16px}
+.adm-sum{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0 18px}
+.adm-card{background:#fff;border:1px solid #e5e8eb;border-radius:16px;padding:14px 16px}
+.adm-card b{display:block;font-size:30px;font-weight:800;color:#171b26;line-height:1.2}
+.adm-card span{font-size:15px;font-weight:700;color:#475467}
+@media (max-width:390px){.sf-num{font-size:52px;min-width:80px}.sf-btn{font-size:32px}}
+</style>
 </head>
 <body>
 <div id="app">
@@ -1040,6 +1078,7 @@ button[onclick^="toggleTip"]{min-width:44px;min-height:44px;font-size:15px !impo
  </div>
  </div>
  <div class="group-tabs" id="group-tabs"></div>
+ <div id="score-focus"></div>
  <div class="score-scroll"><table class="stbl" id="score-tbl"></table></div>
  <div id="live-area"></div>
  <div class="btn-wrap">
@@ -1384,13 +1423,13 @@ function _updateSyncBadge(ok) {
     document.body.appendChild(el);
   }
   if (ok) {
-    el.textContent = '☁️ 동기화됨';
+    el.textContent = ' 동기화됨';
     el.style.background = 'rgba(46,125,50,.12)';
     el.style.color = '#2e7d32';
     el.style.opacity = '1';
     setTimeout(() => { el.style.opacity = '0'; }, 2500);
   } else {
-    el.textContent = '⚠️ 오프라인';
+    el.textContent = '⚠ 오프라인';
     el.style.background = 'rgba(198,40,40,.10)';
     el.style.color = '#c62828';
     el.style.opacity = '1';
@@ -1449,7 +1488,7 @@ function kakaoInit() {
 async function kakaoLogin() {
   await kakaoInit();
   if (!window.Kakao || !Kakao.isInitialized()) {
-    _showKakaoFallback('카카오 앱 설정이 필요해요. 아래에 직접 입력해 주세요 👇');
+    _showKakaoFallback('카카오 앱 설정이 필요해요. 아래에 직접 입력해 주세요 ');
     return;
   }
   try {
@@ -1462,12 +1501,12 @@ async function kakaoLogin() {
             prompt: 'select_account'
           });
         } catch(e2) {
-          _showKakaoFallback('카카오 도메인 설정이 필요해요. 아래에 직접 입력해 주세요 👇');
+          _showKakaoFallback('카카오 도메인 설정이 필요해요. 아래에 직접 입력해 주세요 ');
         }
       }
     });
   } catch(e) {
-    _showKakaoFallback('카카오 로그인을 사용할 수 없어요. 아래에 직접 입력해 주세요 👇');
+    _showKakaoFallback('카카오 로그인을 사용할 수 없어요. 아래에 직접 입력해 주세요 ');
   }
 }
 
@@ -1500,14 +1539,14 @@ async function handleKakaoAuth() {
     const saved = lsGet('user');
     if (saved && saved.phone === fakePhone) {
       S.user = saved; showHome();
-      toast(`👋 ${saved.name}님, 반갑습니다!`);
+      toast(` ${saved.name}님, 반갑습니다!`);
     } else {
       S.user = { name: kakaoName, phone: fakePhone,
         club: '', region: '', role: '일반회원',
         privacyAgreed: true, kakao: true };
       lsSet('user', S.user);
       showHome();
-      toast(`✅ ${kakaoName}님, PARKDA에 오신 걸 환영해요!`);
+      toast(` ${kakaoName}님, PARKDA에 오신 걸 환영해요!`);
     }
   } catch(e) {
     toast('카카오 정보를 불러오지 못했어요: ' + e.message);
@@ -1533,7 +1572,7 @@ function checkReturningUser() {
   const timerHtml = (n) => `<span id="rb-count" style="font-size:11px;color:var(--gray3);margin-left:6px">${n}초 후 자동 이동...</span>`;
 
   banner.innerHTML = `
-    <div style="font-size:11px;color:var(--g2);font-weight:700;margin-bottom:6px;letter-spacing:.05em">👋 최근 접속 계정</div>
+    <div style="font-size:11px;color:var(--g2);font-weight:700;margin-bottom:6px;letter-spacing:.05em"> 최근 접속 계정</div>
     <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
       <div style="min-width:0">
         <span style="font-size:17px;font-weight:900;color:var(--g1)">${u.name}</span>
@@ -1568,7 +1607,7 @@ async function quickLoginNow() {
     const old = lsGet('matches'); S.matches = old || {};
   }
   showHome();
-  toast(`👋 ${u.name}님, 반갑습니다!`);
+  toast(` ${u.name}님, 반갑습니다!`);
 }
 
 /* ══ 초기화 ══ */
@@ -1589,7 +1628,7 @@ async function init() {
 
   const u = lsGet('user');
   if (u && u.name && u.phone) {
-    // ✅ 재방문자: 로그인 페이지에 바로시작 배너 표시 후 1.2초 뒤 자동 이동
+    //  재방문자: 로그인 페이지에 바로시작 배너 표시 후 1.2초 뒤 자동 이동
     checkReturningUser();
     setTimeout(async () => {
       S.user = u;
@@ -1600,7 +1639,7 @@ async function init() {
         S.matches = oldMatches || {};
       }
       showHome();
-      toast(`👋 ${u.name}님, 반갑습니다!`);
+      toast(` ${u.name}님, 반갑습니다!`);
       // URL 게임코드로 자동 참가
       if (urlCode && /^[A-Z0-9]{4}$/i.test(urlCode)) {
         setTimeout(async () => { await joinGame(); }, 500);
@@ -2526,8 +2565,15 @@ function renderConsole() {
     return `<li>${escHtml(m.title)} · 신고 ${m.reports.length}건${m.reports.length >= 3 ? ' (운영 검토 대기)' : ''} · 사유: ${escHtml(reasons)}${m.reviewedAt ? ' · 검토 완료' : ` <button class="hub-act" data-dm="adm-review" data-id="${escHtml(m.id)}">검토 완료</button>`}</li>`;
   }).join('') || '<li>신고가 없어요</li>';
   const vr = venueReportsAll().map(r => `<li>${escHtml(r.venueName || r.venueId)} · ${escHtml(r.text)} <small>(${escHtml(r.at.slice(0, 10))})</small> <button class="hub-act" data-dm="adm-venue-done" data-id="${escHtml(r.id)}">처리 완료</button></li>`).join('') || '<li>제보가 없어요</li>';
-  box.innerHTML = `<p class="hub-msg hub-demo">개발용 데모 콘솔입니다. 관리자 인증은 서버 연결 전이라 실제 운영 권한이 아닙니다. 이 기기의 데모 데이터만 보여요.</p>
-    <h3 class="hub-sub">회원·동호회 현황</h3><p class="hub-vs">동호회 ${clubs.length}개 · 승인 회원 ${members.approved}명 · 승인 대기 ${members.pending}명 · 함께 치기 모임 ${meetings.length}개</p>
+  const unresolved = reported.filter(m => !m.reviewedAt).length;
+  box.innerHTML = `<div class="adm-banner" role="note">데모 관리자 화면입니다. 서버 인증이 없어 실제 운영 권한이 아니며, 운영 기능을 실행하지 않습니다. 이 기기에 저장된 데모 데이터만 보여요.</div>
+    <div class="adm-sum">
+      <div class="adm-card"><b>${clubs.length}</b><span>동호회</span></div>
+      <div class="adm-card"><b>${members.approved}</b><span>승인 회원 (대기 ${members.pending}명)</span></div>
+      <div class="adm-card"><b>${unresolved}</b><span>검토 필요 신고</span></div>
+      <div class="adm-card"><b>${venueReportsAll().length}</b><span>구장 정보 제보</span></div>
+    </div>
+    <h3 class="hub-sub">회원·동호회 현황</h3><p class="hub-vs">함께 치기 모임 ${meetings.length}개 (이 기기 기준)</p>
     <h3 class="hub-sub">신고 관리</h3><ul class="hub-ul">${reports}</ul>
     <h3 class="hub-sub">구장 정보 수정 제보</h3><ul class="hub-ul">${vr}</ul>
     <h3 class="hub-sub">데이터 품질 현황</h3><p class="hub-vs" id="console-quality">불러오는 중…</p>
@@ -2536,7 +2582,8 @@ function renderConsole() {
     const el = document.getElementById('console-quality'); if (!el) return;
     const mv = cs.filter(c => c.map_visible).length;
     const byStatus = cs.reduce((a, c) => { a[c.verification_status] = (a[c.verification_status] || 0) + 1; return a; }, {});
-    el.textContent = `구장 ${cs.length}곳 · 지도 표시 ${mv}곳 · 위치 확인 중 ${cs.length - mv}곳 · 확인 상태 ${Object.entries(byStatus).map(([k, v]) => `${k} ${v}`).join(', ')}`;
+    const checked = (byStatus.official_dataset || 0) + (byStatus.official_page_checked || 0);
+    el.textContent = `구장 ${cs.length}곳 · 공식 자료로 확인 ${checked}곳 · 지도 표시 ${mv}곳 · 위치 확인 중 ${cs.length - mv}곳`;
   });
 }
 window.addEventListener('error', e => errLog(e.message));
@@ -2566,9 +2613,9 @@ function renderScoreControls() {
   const box = document.getElementById('score-controls'); if (!box) return;
   const m = S.matches[S.mid]; if (!m) { box.innerHTML = ''; return; }
   const isCreator = m.by === S.user?.name;
-  const pauseBtn = isCreator ? `<button class="btn btn-gray btn-sm" onclick="togglePause()">${m.paused ? '▶ 경기 재개' : '⏸ 경기 중단'}</button>` : '';
-  const hist = `<button class="btn btn-gray btn-sm" onclick="toggleScoreLog()">📜 수정 이력 (${(m.scoreLog || []).length})</button>`;
-  box.innerHTML = `<div class="btn-row" style="padding:0 14px 8px">${m.paused ? '<span class="auth-box">⏸ 중단된 경기입니다. 재개 후 저장할 수 있어요.</span> ' : ''}${pauseBtn} ${hist}</div>
+  const pauseBtn = isCreator ? `<button class="btn btn-gray btn-sm" onclick="togglePause()">${m.paused ? ' 경기 재개' : ' 경기 중단'}</button>` : '';
+  const hist = `<button class="btn btn-gray btn-sm" onclick="toggleScoreLog()"> 수정 이력 (${(m.scoreLog || []).length})</button>`;
+  box.innerHTML = `<div class="btn-row" style="padding:0 14px 8px">${m.paused ? '<span class="auth-box"> 중단된 경기입니다. 재개 후 저장할 수 있어요.</span> ' : ''}${pauseBtn} ${hist}</div>
     <div id="score-log" hidden></div>`;
 }
 function togglePause() {
@@ -2577,7 +2624,7 @@ function togglePause() {
   const r = m.paused ? PD_SCORE.resume(g, me) : PD_SCORE.pause(g, me);
   if (!r.ok) { toast('생성자만 중단·재개할 수 있어요'); return; }
   m.paused = !m.paused;
-  saveMatch(m); renderScoreControls(); toast(m.paused ? '경기를 중단했어요' : '경기를 재개했어요');
+  saveMatch(m); renderScoreControls(); renderScoreFocus(); toast(m.paused ? '경기를 중단했어요' : '경기를 재개했어요');
 }
 function toggleScoreLog() {
   const el = document.getElementById('score-log'); if (!el) return;
@@ -2594,12 +2641,12 @@ function renderFinalArea() {
     body = `<ul class="hub-ul">${m.final.rows.map(r => `<li>${r.rank}위 · ${escHtml(r.id)} · 총 ${r.total}타</li>`).join('')}</ul>
       <p class="hub-vs">확정 ${escHtml(m.final.at.slice(0, 16).replace('T', ' '))} · 동점은 같은 순위로 표시합니다 (뒤 9홀 → 마지막 홀 순으로 먼저 비교)</p>
       ${m.editApproval ? `<p class="hub-vs">수정 승인됨 (${escHtml(m.editApproval.by)}). 점수를 저장하면 확정 결과가 다시 계산됩니다.</p>` : ''}`;
-    if (isCreator && !m.editApproval) body += `<button class="btn btn-gold btn-sm" onclick="approveEdit()">✏️ 확정 후 수정 승인</button>`;
+    if (isCreator && !m.editApproval) body += `<button class="btn btn-gold btn-sm" onclick="approveEdit()"> 확정 후 수정 승인</button>`;
   } else if (isCreator) {
-    body = `<button class="btn btn-green btn-sm" onclick="finalizeResult()">🔒 결과 확정</button>
+    body = `<button class="btn btn-green btn-sm" onclick="finalizeResult()"> 결과 확정</button>
       <p class="hub-vs">모든 참가자의 전체 홀 점수가 입력되어야 확정할 수 있어요.</p>`;
   } else body = '<p class="hub-vs">결과는 총무(생성자)가 확정합니다.</p>';
-  box.innerHTML = `<div class="card"><div class="card-hd">🔒 결과 확정</div><div style="padding:10px 14px">${body}</div></div>`;
+  box.innerHTML = `<div class="card"><div class="card-hd"> 결과 확정</div><div style="padding:10px 14px">${body}</div></div>`;
 }
 function finalizeResult() {
   const m = S.matches[S.mid]; if (!m) return;
@@ -2651,6 +2698,93 @@ function renderMy() {
     <button class="hub-btn-ghost" type="button" onclick="go('pg-club')">Club Pro 안내</button>
     <button class="hub-btn-ghost" type="button" onclick="doLogout()">로그아웃</button>`;
 }
+/* ══ 점수 입력 화면: 현재 홀 패널 · +/- · 자동 저장 ══ */
+let _saveT = null, _saveMsg = '', _saveKind = '';
+function setSaveStatus(msg, kind) {
+  _saveMsg = msg; _saveKind = kind || '';
+  const el = document.getElementById('save-status');
+  if (el) { el.textContent = msg; el.dataset.kind = _saveKind; }
+}
+function renderScoreFocus() {
+  const box = document.getElementById('score-focus'); if (!box) return;
+  const m = S.matches[S.mid], g = m && m.groups[S.cg];
+  if (!g) { box.innerHTML = ''; return; }
+  const h = Math.min(S.curHole || 0, m.holes - 1), par = m.par[h];
+  const locked = !!m.paused || (!!m.final && !m.editApproval);
+  const ok = canEdit() && !locked;
+  const rows = g.players.map(p => {
+    const v = +(((m.sd || {})[p]) || [])[h] || 0;
+    const d = v ? v - par : null;
+    const cmp = !v ? '아직 입력 전' : d === 0 ? '파(PAR)와 같아요' : d < 0 ? `파보다 ${-d} 적어요` : `파보다 ${d} 많아요`;
+    const pe = escHtml(p);
+    return `<li class="sf-row">
+      <div class="sf-who"><span class="sf-name">${pe}</span>${p === g.leader ? '<span class="sf-tag">조장</span>' : ''}</div>
+      <div class="sf-num" aria-live="polite">${v || '–'}<small>타</small></div>
+      <div class="sf-cmp">${cmp}</div>
+      <div class="sf-btns">
+        <button type="button" class="sf-btn" data-sf="-1" data-p="${pe}" aria-label="${pe} ${h + 1}홀 1타 줄이기" ${ok ? '' : 'disabled'}>−</button>
+        <button type="button" class="sf-btn sf-btn-p" data-sf="1" data-p="${pe}" aria-label="${pe} ${h + 1}홀 1타 늘리기" ${ok ? '' : 'disabled'}>+</button>
+      </div></li>`;
+  }).join('');
+  const lockMsg = m.paused ? '경기가 중단되어 입력할 수 없어요. 재개하면 다시 입력할 수 있어요'
+    : (m.final && !m.editApproval) ? '확정된 결과예요. 총무 승인 후 수정할 수 있어요' : '조장만 점수를 입력할 수 있어요';
+  const status = locked ? lockMsg : (_saveMsg || (ok ? '입력하면 자동으로 저장돼요' : '조장만 점수를 입력할 수 있어요'));
+  box.innerHTML = `<div class="sf-head">
+      <button type="button" class="sf-nav" onclick="moveHole(-1)" ${h <= 0 ? 'disabled' : ''} aria-label="이전 홀">‹ 이전</button>
+      <div class="sf-hole"><b>${h + 1}</b><span>홀</span><small>PAR ${par}</small></div>
+      <button type="button" class="sf-nav" onclick="moveHole(1)" ${h >= m.holes - 1 ? 'disabled' : ''} aria-label="다음 홀">다음 ›</button>
+    </div>
+    <ul class="sf-list">${rows}</ul>
+    <p class="sf-status" id="save-status" data-kind="${_saveKind}" role="status" aria-live="polite">${escHtml(status)}</p>`;
+}
+function moveHole(d) {
+  const m = S.matches[S.mid]; if (!m) return;
+  if (canEdit()) collectScores();
+  S.curHole = Math.max(0, Math.min(m.holes - 1, (S.curHole || 0) + d));
+  const half = m.holes === 18 ? Math.floor(S.curHole / 9) : 0;
+  if (m.holes === 18 && half !== S.ch) switchHalf(half); else renderScoreTbl();
+}
+function bumpScore(p, delta) {
+  const m = S.matches[S.mid]; if (!m) return;
+  if (!canEdit()) { toast('조장만 입력할 수 있어요'); return; }
+  if (m.paused) { toast('중단된 경기예요. 재개한 뒤 입력해 주세요'); return; }
+  if (m.final && !m.editApproval) { toast('확정된 결과예요. 총무 승인 후 수정할 수 있어요'); return; }
+  collectScores();  // 입력창에 적힌 값을 먼저 반영 (아직 저장 전 값 보존)
+  const h = S.curHole || 0;
+  if (m.holes === 18 && Math.floor(h / 9) !== S.ch) switchHalf(Math.floor(h / 9));
+  if (!m.sd[p]) m.sd[p] = Array(m.holes).fill(0);
+  const before = m.sd[p].slice();
+  const cur = +m.sd[p][h] || 0;
+  m.sd[p][h] = Math.min(20, Math.max(1, (cur || m.par[h]) + delta));
+  logScoreDiffs(m, [p], [h], { [p]: before });
+  renderScoreTbl();
+  scheduleAutoSave();
+}
+function scheduleAutoSave() {
+  clearTimeout(_saveT);
+  setSaveStatus('입력 중…', 'pend');
+  _saveT = setTimeout(autoSaveNow, 700);
+}
+async function autoSaveNow() {
+  const m = S.matches[S.mid]; if (!m) return;
+  if (!canEdit()) { setSaveStatus('조장만 입력할 수 있어요', 'err'); return; }
+  if (m.paused) { setSaveStatus('중단된 경기예요. 재개한 뒤 저장돼요', 'err'); return; }
+  if (m.final && !m.editApproval) { setSaveStatus('확정된 결과예요. 총무 승인 후 수정할 수 있어요', 'err'); return; }
+  collectScores();
+  setSaveStatus('저장 중…', 'pend');
+  try {
+    await saveMatch(m);
+    afterScoreSave(m);
+    const t = new Date(), pz = n => String(n).padStart(2, '0');
+    setSaveStatus(`자동 저장됨 · ${pz(t.getHours())}:${pz(t.getMinutes())}`, 'ok');
+  } catch (e) {
+    setSaveStatus('저장하지 못했어요. 저장 버튼을 눌러 다시 시도해 주세요', 'err');
+  }
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-sf]');
+  if (b && !b.disabled) bumpScore(b.dataset.p, +b.dataset.sf);
+});
 function venueReportHtml(c) {
   return `<div class="hub-box"><h3 class="hub-sub">정보 수정 제보</h3>
     <label class="hub-sr" for="vr-${escHtml(c.id)}">수정할 내용</label>
@@ -2711,7 +2845,7 @@ function closePrivacyModal(e) {
 function agreeAndClose() {
   document.getElementById('privacy-agree').checked = true;
   document.getElementById('privacy-modal').classList.remove('on');
-  toast('✅ 개인정보 수집에 동의했습니다');
+  toast(' 개인정보 수집에 동의했습니다');
 }
 
 /* ══ 회원 유형 선택 ══ */
@@ -2736,12 +2870,12 @@ function onMembershipChange(type) {
 /* ══ 로그인 ══ */
 function doLogin() {
   if (!document.getElementById('privacy-agree').checked) {
-    toast('개인정보 수집·이용에 동의해 주세요 🔒'); return;
+    toast('개인정보 수집·이용에 동의해 주세요 '); return;
   }
   const name  = V('l-name').trim();
   const phone = V('l-phone').trim();
-  if (!name)  { toast('이름을 입력해 주세요 👤'); return; }
-  if (!phone.startsWith('010') || phone.length < 10) { toast('전화번호를 확인해 주세요 📱'); return; }
+  if (!name)  { toast('이름을 입력해 주세요 '); return; }
+  if (!phone.startsWith('010') || phone.length < 10) { toast('전화번호를 확인해 주세요 '); return; }
   const existing = lsGet('user');
   // 같은 전화번호면 기존 role·joinedAt 유지 (실수로 역할 바꿔 덮어쓰는 것 방지)
   const isSamePerson = existing && existing.phone === phone;
@@ -2768,7 +2902,7 @@ function doLogin() {
   lsSet('user', S.user);
   saveMeta();
   showHome();
-  toast(`✅ ${name}님, PARKDA에 오신 걸 환영해요!`);
+  toast(` ${name}님, PARKDA에 오신 걸 환영해요!`);
 }
 async function saveMeta() {
   if (!S.user?.club) return;
@@ -2806,7 +2940,7 @@ async function joinGame() {
   }
 
   if (!match) {
-    toast('해당 코드의 경기를 찾을 수 없어요 😢\n총무/회장에게 코드를 다시 확인하세요');
+    toast('해당 코드의 경기를 찾을 수 없어요 \n총무/회장에게 코드를 다시 확인하세요');
     return;
   }
 
@@ -2823,7 +2957,7 @@ async function joinGame() {
 
   S.mid = match.id;
   const role = isCreator ? '총무/회장' : isLeader ? '조장' : '조원';
-  toast(`✅ "${match.title}" 참가! (${role})`);
+  toast(` "${match.title}" 참가! (${role})`);
   setTimeout(() => openScore(match.id), 600);
 }
 
@@ -2901,7 +3035,7 @@ function renderMyRankCard() {
     <div style="background:linear-gradient(135deg,#1b5e20,#2e7d32);border-radius:14px;padding:15px 16px;color:#fff;box-shadow:var(--sh)">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
         <div style="font-size:16px;font-weight:900">${myName} 님</div>
-        <div style="background:rgba(255,255,255,.18);border-radius:99px;padding:4px 11px;font-size:11px;font-weight:700">🏆 ${rankLabel}</div>
+        <div style="background:rgba(255,255,255,.18);border-radius:99px;padding:4px 11px;font-size:11px;font-weight:700"> ${rankLabel}</div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
         <div style="background:rgba(255,255,255,.12);border-radius:10px;padding:9px;text-align:center">
@@ -2957,9 +3091,9 @@ async function createMatch() {
   const gs     = +QV('input[name="gs"]:checked');
   const custom = +V('c-unit-custom');
   const unit   = custom > 0 ? custom : +QV('input[name="unit"]:checked') || 100;
-  if (!title) { toast('경기 이름을 입력하세요 📝'); return; }
+  if (!title) { toast('경기 이름을 입력하세요 '); return; }
   const players = parsePlayers(V('c-players'));
-  if (players.length < 2) { toast('참가자를 2명 이상 입력하세요 👥'); return; }
+  if (players.length < 2) { toast('참가자를 2명 이상 입력하세요 '); return; }
 
   const id   = 'M' + Date.now().toString(36).toUpperCase();
   const code = makeUniqueCode();
@@ -3025,19 +3159,19 @@ function renderGamecode() {
 function copyCode() {
   const m = S.matches[S.mid]; if (!m) return;
   const baseUrl = location.origin + location.pathname;
-  const txt = `⛳ PARKDA 경기 참가\n\n경기: ${m.title}\n게임코드: ${m.code}\n\n아래 링크를 클릭하거나 코드를 입력하세요\n${baseUrl}?game=${m.code}`;
-  navigator.clipboard?.writeText(txt).then(() => toast('📋 복사됐어요! 카톡에 붙여넣으세요'))
+  const txt = ` PARKDA 경기 참가\n\n경기: ${m.title}\n게임코드: ${m.code}\n\n아래 링크를 클릭하거나 코드를 입력하세요\n${baseUrl}?game=${m.code}`;
+  navigator.clipboard?.writeText(txt).then(() => toast(' 복사됐어요! 카톡에 붙여넣으세요'))
     .catch(() => fbCopy(txt));
   if (!navigator.clipboard) fbCopy(txt);
 }
 function shareKakao() {
   const m = S.matches[S.mid]; if (!m) return;
   const baseUrl = location.origin + location.pathname;
-  const txt = `⛳ PARKDA 경기 참가\n\n📌 ${m.title}\n📅 ${m.date}  🏌️ ${m.course}\n👥 ${m.players.length}명 · ${m.holes}홀 · ${m.unit}P/타\n\n🔑 게임코드: ${m.code}\n🔗 ${baseUrl}?game=${m.code}\n\nPARKDA 앱에서 코드를 입력하면 바로 참가!`;
-  navigator.clipboard?.writeText(txt).then(() => toast('💬 카톡 공유용 텍스트 복사됐어요!'))
+  const txt = ` PARKDA 경기 참가\n\n ${m.title}\n ${m.date}   ${m.course}\n ${m.players.length}명 · ${m.holes}홀 · ${m.unit}P/타\n\n 게임코드: ${m.code}\n ${baseUrl}?game=${m.code}\n\nPARKDA 앱에서 코드를 입력하면 바로 참가!`;
+  navigator.clipboard?.writeText(txt).then(() => toast(' 카톡 공유용 텍스트 복사됐어요!'))
     .catch(() => fbCopy(txt));
   if (!navigator.clipboard) fbCopy(txt);
-  toast('💬 복사됐어요! 카톡에 붙여넣으세요');
+  toast(' 복사됐어요! 카톡에 붙여넣으세요');
 }
 
 /* ══ 조편성 ══ */
@@ -3048,7 +3182,7 @@ function renderGroupsPage() {
     const c = GC[i % GC.length];
     const chips = g.players.map(p => `
       <div class="chip" style="border-color:${c};color:${c}">
-        ${p}${p === g.leader ? '<span class="chip-ldr">👑조장</span>' : ''}
+        ${p}${p === g.leader ? '<span class="chip-ldr">조장</span>' : ''}
       </div>`).join('');
     return `<div class="group-wrap"><div class="group-card" style="background:${c}14;border-color:${c}">
       <div class="group-title" style="color:${c}">${g.no}조
@@ -3061,7 +3195,7 @@ function renderGroupsPage() {
 function reshuffle() {
   const m = S.matches[S.mid]; if (!m) return;
   m.groups = makeGroups(m.players, m.gs);
-  saveMatch(S.matches[S.mid]); renderGroupsPage(); toast('🔀 다시 섞었어요!');
+  saveMatch(S.matches[S.mid]); renderGroupsPage(); toast(' 다시 섞었어요!');
 }
 function changeLeader(gi) {
   const m = S.matches[S.mid]; if (!m) return;
@@ -3071,13 +3205,13 @@ function changeLeader(gi) {
   const name = input.trim();
   if (!g.players.includes(name)) { toast('조원 이름을 정확히 입력해주세요'); return; }
   m.groups[gi].leader = name;
-  saveMatch(S.matches[S.mid]); renderGroupsPage(); toast(`👑 ${name} 님이 조장!`);
+  saveMatch(S.matches[S.mid]); renderGroupsPage(); toast(` ${name} 님이 조장!`);
 }
 function goScore() { openScore(S.mid); }
 
 /* ══ 점수 입력 ══ */
 function openScore(mid) {
-  S.mid = mid; S.cg = 0; S.ch = 0;
+  S.mid = mid; S.cg = 0; S.ch = 0; S.curHole = 0; _saveMsg = ''; _saveKind = '';
   const m = S.matches[mid]; if (!m) return;
   // 접근 권한 체크: 생성자, 참가자, 관리자만
   const myName  = S.user?.name;
@@ -3085,12 +3219,12 @@ function openScore(mid) {
   const isCreator = m.by === myName;
   const isMember  = m.players?.includes(myName);
   if (!isAdmin && !isCreator && !isMember) {
-    toast('❌ 이 경기의 참가자만 점수를 볼 수 있어요');
+    toast(' 이 경기의 참가자만 점수를 볼 수 있어요');
     return;
   }
   // 상태 업데이트 (생성자만 play로 변경 가능)
   if (m.status === 'wait' && (isCreator || isAdmin)) { m.status = 'play'; saveMatch(m); }
-  document.getElementById('score-bar-title').textContent = `📊 ${m.title}`;
+  document.getElementById('score-bar-title').textContent = ` ${m.title}`;
   document.getElementById('score-bar-sub').textContent = `코드: ${m.code}`;
   document.getElementById('half-tab-wrap').style.display = m.holes >= 18 ? 'block' : 'none';
   // 27홀: 전반9/중반9/후반9, 36홀: 1~9/10~18/19~27/28~36
@@ -3105,7 +3239,7 @@ function renderGroupTabs() {
     const c = GC[i % GC.length];
     return `<button class="gtab${i===0?' on':''}" id="gtab-${i}"
       style="${i===0?`background:${c};color:#fff;border-color:${c}`:`border-color:${c}66;color:${c}`}"
-      onclick="switchGroup(${i})">${g.no}조 👑${g.leader}</button>`;
+      onclick="switchGroup(${i})">${g.no}조 ${g.leader}</button>`;
   }).join('');
 }
 function switchGroup(i) {
@@ -3137,7 +3271,7 @@ function renderAuthBox() {
   const isCreator = m?.by === S.user?.name;
   const label = isCreator ? '생성자(총무)' : `${g?.no||''}조 조장`;
   document.getElementById('score-auth-box').innerHTML = ok ? '' :
-    `<div class="auth-box">🔒 이 조의 점수는 <b>${g?.leader||''}</b> 조장님만 입력할 수 있어요.</div>`;
+    `<div class="auth-box"> 이 조의 점수는 <b>${g?.leader||''}</b> 조장님만 입력할 수 있어요.</div>`;
   document.getElementById('score-help').textContent = ok
     ? `${g?.no}조 ${label} 입력 모드 · 단가 ${m?.unit}P/타`
     : `조장만 점수를 입력할 수 있습니다.`;
@@ -3208,7 +3342,7 @@ async function applyParEdit() {
   renderGroupTabs();
   renderAuthBox();
   renderScoreTbl();
-  toast('✅ PAR 설정이 저장됐어요!');
+  toast(' PAR 설정이 저장됐어요!');
 }
 
 // openScore 후 PAR 요약 업데이트
@@ -3228,7 +3362,7 @@ function renderScoreTbl() {
   g.players.forEach(p => {
     const sc = (m.sd || {})[p] || Array(H).fill('');
     const isL = p === g.leader;
-    body += `<tr><td class="td-n">${p}${isL?'<small style="margin-left:3px">👑</small>':''}</td>`;
+    body += `<tr><td class="td-n">${p}${isL?'<small style="margin-left:3px"></small>':''}</td>`;
     hr.forEach(h => {
       const v = sc[h] || '';
       if (ok) {
@@ -3246,6 +3380,7 @@ function renderScoreTbl() {
   body += '</tbody>';
   document.getElementById('score-tbl').innerHTML = head + body;
   updLive();
+  renderScoreFocus();
 }
 /* 외부(유튜브·뉴스·카카오 장소) 데이터를 HTML/속성에 넣기 전 처리 */
 function escHtml(v){ return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
@@ -3253,12 +3388,13 @@ function safeUrl(v){ const u = String(v ?? ''); const m = {' ':'%20','\'':'%27',
 function safeId(v){ const u = String(v ?? ''); return /^[A-Za-z0-9_-]{6,20}$/.test(u) ? u : ''; }
 function esc(s) { return s.replace(/[^가-힣a-zA-Z0-9]/g, '_'); }
 function onSI(el) {
-  if (!canEdit()) { el.value = ''; toast('조장만 입력할 수 있어요 🔒'); return; }
+  if (!canEdit()) { el.value = ''; toast('조장만 입력할 수 있어요 '); return; }
   const v = +el.value, par = S.matches[S.mid].par[+el.dataset.h];
   el.className = 'sinp';
   const cls = v < par ? 'un' : v > par ? 'ov' : '';
   if (v > 0 && cls) el.classList.add(cls); // 파(par)와 같으면 클래스 없음 (빈 토큰 add 오류 방지)
   updLive();
+  scheduleAutoSave();
 }
 function updLive() {
   const m = S.matches[S.mid]; if (!m) return;
@@ -3277,11 +3413,11 @@ function updLive() {
   pairs.sort((a, b) => a.tot - b.tot);
   const la = document.getElementById('live-area');
   if (pairs.length) {
-    la.innerHTML = `<div class="live-box"><div class="live-title">⚡ ${g.no}조 현황</div><div class="live-chips">${
+    la.innerHTML = `<div class="live-box"><div class="live-title"> ${g.no}조 현황</div><div class="live-chips">${
       pairs.map((r, i) => {
         const d = r.tot - parT, ds = d === 0 ? 'E' : d > 0 ? '+' + d : String(d);
         const dc = d < 0 ? 'var(--b2)' : d > 0 ? 'var(--red)' : 'var(--g2)';
-        return `<div class="live-chip">${i===0?'🥇':i===1?'🥈':i===2?'🥉':''} ${r.p} <b style="font-size:15px">${r.tot}</b><span style="color:${dc};font-size:11px">${ds}</span></div>`;
+        return `<div class="live-chip">${i===0?'':i===1?'':i===2?'':''} ${r.p} <b style="font-size:15px">${r.tot}</b><span style="color:${dc};font-size:11px">${ds}</span></div>`;
       }).join('')
     }</div></div>`;
   } else la.innerHTML = '';
@@ -3315,7 +3451,7 @@ function afterScoreSave(m) {
   saveMatch(m);
 }
 async function saveScore() {
-  if (!canEdit()) { toast('조장 또는 총무/회장만 저장할 수 있어요 🔒'); return; }
+  if (!canEdit()) { toast('조장 또는 총무/회장만 저장할 수 있어요 '); return; }
   if (scoreBlocked()) return;
   collectScores();
 
@@ -3341,7 +3477,7 @@ async function saveScore() {
   await saveMatch(S.matches[S.mid]);
   afterScoreSave(S.matches[S.mid]);
   renderFinalArea();
-  toast('💾 저장됐어요!');
+  toast(' 저장됐어요!');
 }
 async function saveAndResult() {
   if (canEdit() && !scoreBlocked()) { collectScores(); await saveMatch(S.matches[S.mid]); afterScoreSave(S.matches[S.mid]); }
@@ -3406,14 +3542,14 @@ function openResult(mid) {
   const isCreator = m.by === myName;
   const isMember  = m.players?.includes(myName);
   if (!isAdmin && !isCreator && !isMember) {
-    toast('❌ 이 경기의 참가자만 정산 결과를 볼 수 있어요');
+    toast(' 이 경기의 참가자만 정산 결과를 볼 수 있어요');
     return;
   }
   m.status = 'done'; saveMatch(S.matches[S.mid]);
-  document.getElementById('result-title').textContent = `🏆 ${m.title} 포인트 결과`;
+  document.getElementById('result-title').textContent = ` ${m.title} 포인트 결과`;
   const H = m.holes, par = m.par, parT = par.slice(0, H).reduce((a,b)=>a+b,0), unit = m.unit||100;
   const sd = m.sd || {};
-  const halves = H===18 ? [{idx:0,label:'⛳ 전반 1~9홀'},{idx:1,label:'⛳ 후반 10~18홀'}] : [{idx:0,label:'⛳ 9홀 포인트'}];
+  const halves = H===18 ? [{idx:0,label:' 전반 1~9홀'},{idx:1,label:' 후반 10~18홀'}] : [{idx:0,label:' 9홀 포인트'}];
 
   // ── 9홀별 정산 ──
   let sHtml = '';
@@ -3430,7 +3566,7 @@ function openResult(mid) {
         return {p, tot, amt: hs[p]||0};
       }).filter(r => r.tot > 0).sort((a,b)=>a.tot-b.tot);
       if (!rows.length) return;
-      const ri = i => i===0?'<span class="sr-rank sr1">🥇</span>':i===1?'<span class="sr-rank sr2">🥈</span>':i===2?'<span class="sr-rank sr3">🥉</span>':'<span class="sr-rank srn">'+(i+1)+'</span>';
+      const ri = i => i===0?'<span class="sr-rank sr1"></span>':i===1?'<span class="sr-rank sr2"></span>':i===2?'<span class="sr-rank sr3"></span>':'<span class="sr-rank srn">'+(i+1)+'</span>';
       const ac = v => v>0?'aplus':v<0?'aminus':'azero';
       const as = v => v>0?`+${fa(v)}`:v<0?`-${fa(v)}`:'0원';
       const gMap = {}; rows.forEach(r=>gMap[r.p]=hs[r.p]||0);
@@ -3440,7 +3576,7 @@ function openResult(mid) {
         <div style="background:var(--white)">
           ${rows.map((r,i)=>`<div class="settle-row">
             ${ri(i)}
-            <div class="settle-name">${r.p}${g.leader===r.p?'<span style="font-size:10px;margin-left:3px;background:#ffd54f;color:#5d4037;padding:1px 5px;border-radius:99px">👑</span>':''}</div>
+            <div class="settle-name">${r.p}${g.leader===r.p?'<span style="font-size:10px;margin-left:3px;background:#ffd54f;color:#5d4037;padding:1px 5px;border-radius:99px"></span>':''}</div>
             <div class="settle-score">${r.tot}타</div>
             <div class="settle-amt ${ac(r.amt)}">${as(r.amt)}</div>
           </div>`).join('')}
@@ -3459,13 +3595,13 @@ function openResult(mid) {
   const tArrows = calcArrows(ts, m.players);
   document.getElementById('result-total-area').innerHTML = `
     <div class="total-board">
-      <div class="tb-hd">🏆 최종 포인트 합산 (${H}홀)</div>
+      <div class="tb-hd"> 최종 포인트 합산 (${H}홀)</div>
       ${tSorted.map(({p,v})=>`<div class="tb-row">
         <div class="tb-name">${p}</div>
         <div class="tb-total ${v>0?'tplus':v<0?'tminus':'tzero'}">${v>0?'+':''}${fa(v)}</div>
       </div>`).join('')}
       ${tArrows.length?`<div style="padding:10px 15px;background:#fafafa;border-top:1px solid var(--gray1)">
-        <div style="font-size:12px;font-weight:700;color:var(--gray4);margin-bottom:6px">📋 정산 방법</div>
+        <div style="font-size:12px;font-weight:700;color:var(--gray4);margin-bottom:6px"> 정산 방법</div>
         ${tArrows.map(a=>`<div style="font-size:13px;padding:4px 0;display:flex;align-items:center;gap:6px">
           <span style="color:var(--red);font-weight:700">${a.from}</span> →
           <span style="color:var(--g2);font-weight:700">${a.to}</span>
@@ -3478,10 +3614,10 @@ function openResult(mid) {
   const logs = m.manualLogs || [];
   document.getElementById('result-manual-area').innerHTML = `
     <div class="manual-box">
-      <div class="mb-title">💸 추가 포인트 조정</div>
+      <div class="mb-title"> 추가 포인트 조정</div>
       <div class="mb-row"><div class="mb-lbl">보내는 분</div><select class="mb-sel" id="mb-from" aria-label="보내는 분">${m.players.map(p=>`<option>${p}</option>`).join('')}</select></div>
       <div class="mb-row"><div class="mb-lbl">받는 분</div><select class="mb-sel" id="mb-to" aria-label="받는 분">${m.players.map(p=>`<option>${p}</option>`).join('')}</select></div>
-      <div class="mb-row"><div class="mb-lbl">포인트</div><input class="mb-amt" id="mb-amt" aria-label="포인트" type="number" min="100" placeholder="100"><button class="mb-btn" onclick="doManual()">전송 💸</button></div>
+      <div class="mb-row"><div class="mb-lbl">포인트</div><input class="mb-amt" id="mb-amt" aria-label="포인트" type="number" min="100" placeholder="100"><button class="mb-btn" onclick="doManual()">전송 </button></div>
       ${logs.length?`<div class="mb-logs">${logs.map((l,i)=>`<div class="mb-log"><span>${l.from} → ${l.to} <b>${fa(l.amt)}</b></span><span class="mb-del" onclick="delManual(${i})">✕</span></div>`).join('')}</div>`:''}
     </div>`;
 
@@ -3492,7 +3628,7 @@ function openResult(mid) {
     return {p, tot, diff:tot-parT, money:ts[p]||0};
   }).sort((a,b)=>a.tot-b.tot);
   allRows.forEach((r,i)=>r.rank=i+1);
-  const pm = [{cls:'p-gold',ico:'🥇'},{cls:'p-silver',ico:'🥈'},{cls:'p-bronze',ico:'🥉'}];
+  const pm = [{cls:'p-gold',ico:''},{cls:'p-silver',ico:''},{cls:'p-bronze',ico:''}];
   document.getElementById('podium-area').innerHTML = `<div class="podium">${
     allRows.slice(0,3).map((r,i)=>`<div class="p-card ${pm[i].cls}">
       <div class="p-medal">${pm[i].ico}</div><div class="p-rnk">${i+1}위</div>
@@ -3502,7 +3638,7 @@ function openResult(mid) {
     </div>`).join('')}</div>`;
 
   // ── 순위표 ──
-  const rb = r => r===1?`<span class="rbadge rb1">🥇</span>`:r===2?`<span class="rbadge rb2">🥈</span>`:r===3?`<span class="rbadge rb3">🥉</span>`:`<span class="rbadge rbn">${r}</span>`;
+  const rb = r => r===1?`<span class="rbadge rb1"></span>`:r===2?`<span class="rbadge rb2"></span>`:r===3?`<span class="rbadge rb3"></span>`:`<span class="rbadge rbn">${r}</span>`;
   const dc = d => d<0?'dun':d>0?'dov':'dev';
   const dt = d => d===0?'E':d>0?'+'+d:String(d);
   document.getElementById('result-tbl').innerHTML = `
@@ -3515,22 +3651,22 @@ function openResult(mid) {
     </tr>`).join('')}</tbody>`;
 
   // ── 공유 텍스트 ──
-  const lines = [`⛳ ━━━━━━━━━━━━━━`,`  PARKDA 포인트 결과`,`⛳ ━━━━━━━━━━━━━━`,
-    `📌 ${m.title}`,`📅 ${m.date}  🏌️ ${m.course}`,`단가: ${unit}P/타 · ${H}홀`,``,
-    `🏆 최종 포인트`,
+  const lines = [` ━━━━━━━━━━━━━━`,`  PARKDA 포인트 결과`,` ━━━━━━━━━━━━━━`,
+    ` ${m.title}`,` ${m.date}   ${m.course}`,`단가: ${unit}P/타 · ${H}홀`,``,
+    ` 최종 포인트`,
     ...tSorted.map(({p,v})=>`  ${p.padEnd(5)} ${v>0?'+':v<0?'':' '}${v!==0?fa(v):'±0'}`),
-    ...(tArrows.length?[``,`📋 정산 방법`,...tArrows.map(a=>`  ${a.from} → ${a.to}  ${fa(a.amt)}`)]:[]),
-    ``,`🏆 최종 순위`,
-    ...allRows.map(r=>`  ${r.rank===1?'🥇':r.rank===2?'🥈':r.rank===3?'🥉':r.rank+'.'} ${r.p.padEnd(4)} ${r.tot>0?r.tot+'타':'—'}`),
-    ``,`🔑 게임코드: ${m.code}`,`📱 PARKDA 앱으로 확인`,`⛳ ━━━━━━━━━━━━━━`];
+    ...(tArrows.length?[``,` 정산 방법`,...tArrows.map(a=>`  ${a.from} → ${a.to}  ${fa(a.amt)}`)]:[]),
+    ``,` 최종 순위`,
+    ...allRows.map(r=>`  ${r.rank===1?'':r.rank===2?'':r.rank===3?'':r.rank+'.'} ${r.p.padEnd(4)} ${r.tot>0?r.tot+'타':'—'}`),
+    ``,` 게임코드: ${m.code}`,` PARKDA 앱으로 확인`,` ━━━━━━━━━━━━━━`];
   document.getElementById('share-box').textContent = lines.join('\n');
 
   // ── 공유 복사 버튼: 생성자만 ──
   const copyBtnWrap = document.getElementById('result-copy-btn-wrap');
   if (copyBtnWrap) {
     copyBtnWrap.innerHTML = (isCreator || isAdmin)
-      ? `<button class="btn btn-orange btn-sm" onclick="copyShare()">📋 &nbsp;복사하기</button>`
-      : `<div style="font-size:12px;color:var(--gray3);text-align:center;padding:4px 0">🔒 결과 공유는 경기 생성자만 할 수 있어요</div>`;
+      ? `<button class="btn btn-orange btn-sm" onclick="copyShare()"> &nbsp;복사하기</button>`
+      : `<div style="font-size:12px;color:var(--gray3);text-align:center;padding:4px 0"> 결과 공유는 경기 생성자만 할 수 있어요</div>`;
   }
 
   // ── 점수 수정 버튼 (생성자 또는 조장만) ──
@@ -3539,8 +3675,8 @@ function openResult(mid) {
   const editBtnWrap = document.getElementById('result-edit-btn-wrap');
   if (editBtnWrap) {
     editBtnWrap.innerHTML = canEditResult
-      ? `<button class="btn btn-gray btn-sm" onclick="go('pg-score')">✏️ 점수 수정</button>`
-      : `<div style="text-align:center;font-size:12px;color:var(--gray3);padding:6px 0">🔒 점수 수정은 경기 생성자 또는 조장만 가능해요</div>`;
+      ? `<button class="btn btn-gray btn-sm" onclick="go('pg-score')"> 점수 수정</button>`
+      : `<div style="text-align:center;font-size:12px;color:var(--gray3);padding:6px 0"> 점수 수정은 경기 생성자 또는 조장만 가능해요</div>`;
   }
 
   // ── 수동 정산 영역: 생성자만 ──
@@ -3550,10 +3686,10 @@ function openResult(mid) {
       const logs = m.manualLogs || [];
       manualArea.innerHTML = `
         <div class="manual-box">
-          <div class="mb-title">💸 추가 포인트 조정</div>
+          <div class="mb-title"> 추가 포인트 조정</div>
           <div class="mb-row"><div class="mb-lbl">보내는 분</div><select class="mb-sel" id="mb-from" aria-label="보내는 분">${m.players.map(p=>`<option>${p}</option>`).join('')}</select></div>
           <div class="mb-row"><div class="mb-lbl">받는 분</div><select class="mb-sel" id="mb-to" aria-label="받는 분">${m.players.map(p=>`<option>${p}</option>`).join('')}</select></div>
-          <div class="mb-row"><div class="mb-lbl">포인트</div><input class="mb-amt" id="mb-amt" aria-label="포인트" type="number" min="100" placeholder="100"><button class="mb-btn" onclick="doManual()">전송 💸</button></div>
+          <div class="mb-row"><div class="mb-lbl">포인트</div><input class="mb-amt" id="mb-amt" aria-label="포인트" type="number" min="100" placeholder="100"><button class="mb-btn" onclick="doManual()">전송 </button></div>
           ${logs.length?`<div class="mb-logs">${logs.map((l,i)=>`<div class="mb-log"><span>${l.from} → ${l.to} <b>${fa(l.amt)}</b></span><span class="mb-del" onclick="delManual(${i})">✕</span></div>`).join('')}</div>`:''}
         </div>`;
     } else {
@@ -3571,7 +3707,7 @@ async function doManual() {
   const m=S.matches[S.mid];
   if(!m.manualLogs)m.manualLogs=[];
   m.manualLogs.push({from,to,amt,at:new Date().toISOString()});
-  await saveMatch(S.matches[S.mid]); toast(`💸 ${from} → ${to} ${fa(amt)}`);
+  await saveMatch(S.matches[S.mid]); toast(` ${from} → ${to} ${fa(amt)}`);
   setTimeout(()=>openResult(S.mid),500);
 }
 async function delManual(i){const m=S.matches[S.mid];m.manualLogs.splice(i,1);await saveMatch(S.matches[S.mid]);openResult(S.mid);}
@@ -3592,14 +3728,14 @@ function renderMatches() {
   });
 
   if (!ms.length) {
-    el.innerHTML=`<div class="empty"><div class="empty-ico">📋</div><div class="empty-t">내 경기가 없어요</div><div class="empty-s">홈에서 새 경기를 만들거나,<br>총무/회장에게 게임 코드를 받아 참가하세요!</div></div>`;
+    el.innerHTML=`<div class="empty"><div class="empty-ico"></div><div class="empty-t">내 경기가 없어요</div><div class="empty-s">홈에서 새 경기를 만들거나,<br>총무/회장에게 게임 코드를 받아 참가하세요!</div></div>`;
     return;
   }
 
   const statusHtml = s => {
-    if (s==='play') return '<span class="status-badge status-play">🟢 진행중</span>';
-    if (s==='done') return '<span class="status-badge status-done">✅ 완료</span>';
-    return '<span class="status-badge status-wait">⏳ 대기중</span>';
+    if (s==='play') return '<span class="status-badge status-play"> 진행중</span>';
+    if (s==='done') return '<span class="status-badge status-done"> 완료</span>';
+    return '<span class="status-badge status-wait"> 대기중</span>';
   };
 
   // 내가 만든 경기 / 참가한 경기 그룹 분리
@@ -3625,22 +3761,22 @@ function renderMatches() {
           <div style="display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap">
             ${statusHtml(m.status||'wait')}
             <span class="mc-code">${m.code}</span>
-            ${isCreator ? '<span style="font-size:10px;background:var(--g4);color:var(--g1);border-radius:6px;padding:1px 6px">📝 내 경기</span>' : '<span style="font-size:10px;background:var(--b5);color:var(--b2);border-radius:6px;padding:1px 6px">🙋 참가중</span>'}
+            ${isCreator ? '<span style="font-size:10px;background:var(--g4);color:var(--g1);border-radius:6px;padding:1px 6px"> 내 경기</span>' : '<span style="font-size:10px;background:var(--b5);color:var(--b2);border-radius:6px;padding:1px 6px"> 참가중</span>'}
           </div>
         </div>
         <div class="mc-date">${m.date}</div>
       </div>
       <div class="mc-body">
-        <span class="mc-tag">⛳ ${m.holes}홀</span>
-        <span class="mc-tag">👥 ${m.players.length}명</span>
-        <span class="mc-tag">💵 ${m.unit}P/타</span>
-        ${top&&top[1]>0?`<span class="mc-tag" style="background:var(--gold2);color:var(--gold)">🏆${top[0]} +${fa(top[1])}</span>`:''}
+        <span class="mc-tag"> ${m.holes}홀</span>
+        <span class="mc-tag"> ${m.players.length}명</span>
+        <span class="mc-tag"> ${m.unit}P/타</span>
+        ${top&&top[1]>0?`<span class="mc-tag" style="background:var(--gold2);color:var(--gold)">${top[0]} +${fa(top[1])}</span>`:''}
       </div>
       <div class="mc-foot">
-        <button class="mc-btn mc-btn-g" onclick="openScore('${m.id}')">📊 점수</button>
-        ${canResult ? `<button class="mc-btn mc-btn-b" onclick="openResult('${m.id}')">💰 정산</button>` : ''}
-        ${isCreator ? `<button class="mc-btn mc-btn-share" onclick="shareMatch('${m.id}')">💬 공유</button>` : ''}
-        ${isCreator ? `<button class="mc-btn mc-btn-r" onclick="delMatch('${m.id}')" style="flex:.4">🗑️</button>` : ''}
+        <button class="mc-btn mc-btn-g" onclick="openScore('${m.id}')"> 점수</button>
+        ${canResult ? `<button class="mc-btn mc-btn-b" onclick="openResult('${m.id}')"> 정산</button>` : ''}
+        ${isCreator ? `<button class="mc-btn mc-btn-share" onclick="shareMatch('${m.id}')"> 공유</button>` : ''}
+        ${isCreator ? `<button class="mc-btn mc-btn-r" onclick="delMatch('${m.id}')" style="flex:.4"></button>` : ''}
       </div>
     </div>`;
   };
@@ -3648,11 +3784,11 @@ function renderMatches() {
   let html = '';
 
   if (myCreated.length) {
-    html += `<div style="padding:10px 16px 4px;font-size:11px;font-weight:700;color:var(--gray3);letter-spacing:.08em;text-transform:uppercase">📝 내가 만든 경기 (${myCreated.length})</div>`;
+    html += `<div style="padding:10px 16px 4px;font-size:11px;font-weight:700;color:var(--gray3);letter-spacing:.08em;text-transform:uppercase"> 내가 만든 경기 (${myCreated.length})</div>`;
     html += myCreated.map(renderCard).join('');
   }
   if (myJoined.length) {
-    html += `<div style="padding:14px 16px 4px;font-size:11px;font-weight:700;color:var(--gray3);letter-spacing:.08em;text-transform:uppercase">🙋 참가한 경기 (${myJoined.length})</div>`;
+    html += `<div style="padding:14px 16px 4px;font-size:11px;font-weight:700;color:var(--gray3);letter-spacing:.08em;text-transform:uppercase"> 참가한 경기 (${myJoined.length})</div>`;
     html += myJoined.map(renderCard).join('');
   }
 
@@ -3661,8 +3797,8 @@ function renderMatches() {
 function shareMatch(id) {
   const m = S.matches[id]; if (!m) return;
   const baseUrl = location.origin + location.pathname;
-  const txt = `⛳ PARKDA 경기 참가\n\n📌 ${m.title}\n📅 ${m.date}  🏌️ ${m.course}\n👥 ${m.players.length}명 · ${m.holes}홀 · ${m.unit}P/타\n\n🔑 게임코드: ${m.code}\n🔗 ${baseUrl}?game=${m.code}\n\nPARKDA 앱에서 코드를 입력하면 바로 참가!`;
-  navigator.clipboard?.writeText(txt).then(()=>toast('💬 복사됐어요! 카톡에 붙여넣으세요')).catch(()=>fbCopy(txt));
+  const txt = ` PARKDA 경기 참가\n\n ${m.title}\n ${m.date}   ${m.course}\n ${m.players.length}명 · ${m.holes}홀 · ${m.unit}P/타\n\n 게임코드: ${m.code}\n ${baseUrl}?game=${m.code}\n\nPARKDA 앱에서 코드를 입력하면 바로 참가!`;
+  navigator.clipboard?.writeText(txt).then(()=>toast(' 복사됐어요! 카톡에 붙여넣으세요')).catch(()=>fbCopy(txt));
   if(!navigator.clipboard)fbCopy(txt);
 }
 async function delMatch(id) {
@@ -3672,7 +3808,7 @@ async function delMatch(id) {
   const isCreator = m.by === S.user?.name;
   const isAdmin   = lsGet('admin_ok') === true;
   if (!isCreator && !isAdmin) {
-    toast('❌ 경기 생성자만 삭제할 수 있어요');
+    toast(' 경기 생성자만 삭제할 수 있어요');
     return;
   }
   if (!confirm(`"${m.title}" 경기를 삭제할까요?\n삭제하면 점수·정산 기록이 모두 사라집니다.`)) return;
@@ -3686,7 +3822,7 @@ async function delMatch(id) {
   lsSet(myKey, myList);
   try { await dbSave(myKey, myList); } catch(e) {}
   renderMatches();
-  toast('🗑️ 삭제됐어요');
+  toast(' 삭제됐어요');
 }
 
 /* ══ 랭킹 ══ */
@@ -3706,8 +3842,8 @@ function renderRanking() {
   const sorted = Object.entries(stats).filter(([,s])=>s.n>0)
     .map(([p,s])=>({p,n:s.n,avg:(s.sum/s.n).toFixed(1),money:s.money}))
     .sort((a,b)=>+a.avg-+b.avg);
-  if(!sorted.length){el.innerHTML=`<div class="empty"><div class="empty-ico">🏅</div><div class="empty-t">데이터가 없어요</div><div class="empty-s">점수를 입력하면 랭킹이 표시돼요</div></div>`;return;}
-  const medals=['🥇','🥈','🥉'];
+  if(!sorted.length){el.innerHTML=`<div class="empty"><div class="empty-ico"></div><div class="empty-t">데이터가 없어요</div><div class="empty-s">점수를 입력하면 랭킹이 표시돼요</div></div>`;return;}
+  const medals=['','',''];
   el.innerHTML = sorted.map((r,i)=>`<div class="rank-card">
     <div class="rank-medal">${medals[i]||(i+1+'위')}</div>
     <div class="rank-info"><div class="rank-name">${r.p}</div><div class="rank-sub">${r.n}경기 참가</div></div>
@@ -3723,7 +3859,7 @@ function renderRanking() {
 function showPro(){document.getElementById('pro-modal').classList.add('on');}
 function closePro(e){if(!e||e.target.id==='pro-modal')document.getElementById('pro-modal').classList.remove('on');}
 function registerPro(){
-  toast('✉️ 신청 감사합니다! 오픈 시 연락드릴게요');
+  toast(' 신청 감사합니다! 오픈 시 연락드릴게요');
   dbLoad('early_adopters',[]).then(arr=>{if(!arr.find(a=>a.phone===S.user?.phone)){arr.push({...S.user,at:new Date().toISOString()});dbSave('early_adopters',arr);}});
   closePro();
 }
@@ -3757,17 +3893,17 @@ function doAdminLogin(){
     isAdmin = true;
     document.getElementById('admin-modal').classList.remove('on');
     document.getElementById('admin-pw').value = '';
-    toast('🔧 관리자 모드 활성화!');
+    toast(' 관리자 모드 활성화!');
     renderAdmin();
     go('pg-admin');
   } else {
-    toast('❌ 코드가 틀렸습니다');
+    toast(' 코드가 틀렸습니다');
     document.getElementById('admin-pw').value = '';
   }
 }
 function adminLogout(){
   isAdmin = false;
-  toast('🔒 관리자 로그아웃');
+  toast(' 관리자 로그아웃');
   go('pg-home');
 }
 function renderAdmin(){
@@ -3791,13 +3927,13 @@ function renderAdmin(){
     </div>`;
 
   if(!ms.length){
-    document.getElementById('admin-matches').innerHTML = '<div class="empty"><div class="empty-ico">📋</div><div class="empty-t">경기 없음</div></div>';
+    document.getElementById('admin-matches').innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-t">경기 없음</div></div>';
     return;
   }
 
   document.getElementById('admin-matches').innerHTML = `
     <div style="padding:0 14px 8px">
-      <button class="btn btn-gray btn-sm" onclick="adminDeleteAll()" style="margin-bottom:8px;color:var(--red)">🗑️ 전체 경기 삭제</button>
+      <button class="btn btn-gray btn-sm" onclick="adminDeleteAll()" style="margin-bottom:8px;color:var(--red)"> 전체 경기 삭제</button>
     </div>` +
     [...ms].reverse().map(m=>{
       const isDone = m.sd&&Object.keys(m.sd).length>0;
@@ -3807,11 +3943,11 @@ function renderAdmin(){
             <div style="font-size:14px;font-weight:700;color:${isDone?'var(--g2)':'var(--gray4)'}">${m.title}</div>
             <div style="font-size:11px;color:var(--gray3)">${m.date} · ${m.course} · ${m.players.length}명 · 코드:${m.code}</div>
           </div>
-          <span style="font-size:11px;background:${isDone?'var(--g5)':'var(--gray2)'};color:${isDone?'var(--g2)':'var(--gray4)'};padding:3px 8px;border-radius:99px">${isDone?'✅완료':'⏳미완료'}</span>
+          <span style="font-size:11px;background:${isDone?'var(--g5)':'var(--gray2)'};color:${isDone?'var(--g2)':'var(--gray4)'};padding:3px 8px;border-radius:99px">${isDone?'완료':'미완료'}</span>
         </div>
         <div style="padding:8px 14px;display:flex;gap:7px">
-          <button onclick="openResult('${m.id}')" style="flex:1;padding:8px;border:none;border-radius:9px;background:var(--b5);color:var(--b2);font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:700;cursor:pointer">🏆 결과</button>
-          <button onclick="adminDelMatch('${m.id}')" style="flex:0.5;padding:8px;border:none;border-radius:9px;background:var(--red2);color:var(--red);font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:700;cursor:pointer">🗑️ 삭제</button>
+          <button onclick="openResult('${m.id}')" style="flex:1;padding:8px;border:none;border-radius:9px;background:var(--b5);color:var(--b2);font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:700;cursor:pointer"> 결과</button>
+          <button onclick="adminDelMatch('${m.id}')" style="flex:0.5;padding:8px;border:none;border-radius:9px;background:var(--red2);color:var(--red);font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:700;cursor:pointer"> 삭제</button>
         </div>
       </div>`;
     }).join('');
@@ -3827,13 +3963,13 @@ async function adminDelMatch(id){
   if (m) myList = myList.filter(c => c !== m.code);
   lsSet(myKey, myList);
   await dbSave(myKey, myList);
-  toast('🗑️ 삭제됐어요');
+  toast(' 삭제됐어요');
   renderAdmin();
   renderHome();
 }
 async function adminDeleteAll(){
   // 전체 삭제는 되돌릴 수 없어 차단함. 대체 경로: 경기별 삭제(adminDelMatch)
-  toast('🔒 전체 삭제는 차단되어 있어요. 경기별로 삭제해 주세요');
+  toast(' 전체 삭제는 차단되어 있어요. 경기별로 삭제해 주세요');
 }
 
 
@@ -3939,7 +4075,7 @@ async function loadMatchList() {
   const listEl = document.getElementById('mt-list');
 
   if (!venue || !date) {
-    listEl.innerHTML = '<div class="empty"><div class="empty-ico">🤝</div><div class="empty-t">구장과 날짜를 선택하면<br>대기자 목록이 보여요</div></div>';
+    listEl.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-t">구장과 날짜를 선택하면<br>대기자 목록이 보여요</div></div>';
     return;
   }
 
@@ -3950,7 +4086,7 @@ async function loadMatchList() {
     `venue_id=eq.${venue}&play_date=eq.${date}&play_time=eq.${time}&status=eq.대기중&order=created_at`);
 
   if (!rows || rows.length === 0) {
-    listEl.innerHTML = '<div class="empty"><div class="empty-ico">👋</div><div class="empty-t">아직 대기자가 없어요<br>첫 번째로 신청해보세요!</div></div>';
+    listEl.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-t">아직 대기자가 없어요<br>첫 번째로 신청해보세요!</div></div>';
     return;
   }
 
@@ -3960,8 +4096,8 @@ async function loadMatchList() {
     return `<div style="background:var(--white);border-radius:12px;border:1.5px solid ${isMe?'var(--g3)':'var(--gray2)'};padding:14px;margin-bottom:8px;${isMe?'box-shadow:0 0 0 2px var(--g4)':''}">
       <div style="display:flex;justify-content:space-between;align-items:flex-start">
         <div>
-          <div style="font-size:15px;font-weight:700;color:var(--text)">${r.user_name} <span style="font-size:12px;font-weight:400;background:var(--g5);color:var(--g2);padding:2px 8px;border-radius:99px">${r.level||'초급'}</span>${isMe?'<span style="font-size:11px;color:var(--g2);margin-left:6px">👤 내 신청</span>':''}</div>
-          <div style="font-size:12px;color:var(--gray3);margin-top:3px">👥 ${r.party_size}명 · ⏰ ${r.play_time} · ${r.memo||'메모 없음'}</div>
+          <div style="font-size:15px;font-weight:700;color:var(--text)">${r.user_name} <span style="font-size:12px;font-weight:400;background:var(--g5);color:var(--g2);padding:2px 8px;border-radius:99px">${r.level||'초급'}</span>${isMe?'<span style="font-size:11px;color:var(--g2);margin-left:6px"> 내 신청</span>':''}</div>
+          <div style="font-size:12px;color:var(--gray3);margin-top:3px"> ${r.party_size}명 ·  ${r.play_time} · ${r.memo||'메모 없음'}</div>
         </div>
         ${isMe
           ? `<button onclick="cancelMyRequest('${r.id}')" style="padding:6px 10px;border:1px solid var(--red);border-radius:8px;background:none;color:var(--red);font-size:12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif">취소</button>`
@@ -3982,8 +4118,8 @@ async function applyMatching() {
   const level      = document.querySelector('input[name="mt-level"]:checked')?.value || '초급';
   const memo       = document.getElementById('mt-memo')?.value.trim();
 
-  if (!venue_id)  { toast('구장을 선택해주세요 📍'); return; }
-  if (!play_date) { toast('날짜를 선택해주세요 📅'); return; }
+  if (!venue_id)  { toast('구장을 선택해주세요 '); return; }
+  if (!play_date) { toast('날짜를 선택해주세요 '); return; }
 
   const venueName = MT.venues.find(v => String(v.id) === String(venue_id))?.name || '';
 
@@ -4000,11 +4136,11 @@ async function applyMatching() {
   const result = await sbPost(MT_MATCH_T, data);
   if (result && result.id) {
     MT.myRequest = result;
-    toast('✅ 파트너 찾기 신청 완료!');
+    toast(' 파트너 찾기 신청 완료!');
     await loadMatchList();
   } else {
     // Supabase 미연결 시 로컬 시뮬레이션
-    toast('✅ 신청됐어요! (오프라인 모드)');
+    toast(' 신청됐어요! (오프라인 모드)');
   }
 }
 
@@ -4015,15 +4151,15 @@ function showMatchDetail(r) {
     <div style="background:var(--g5);border-radius:12px;padding:14px">
       <div style="font-size:18px;font-weight:900;margin-bottom:8px">${r.user_name}</div>
       <div style="font-size:13px;color:var(--gray4);line-height:2">
-        📍 ${r.venue_name || '구장 정보 없음'}<br>
-        📅 ${r.play_date} ${r.play_time}<br>
-        👥 ${r.party_size}명 참여<br>
-        🎯 실력: ${r.level || '초급'}<br>
-        💬 ${r.memo || '메모 없음'}
+         ${r.venue_name || '구장 정보 없음'}<br>
+         ${r.play_date} ${r.play_time}<br>
+         ${r.party_size}명 참여<br>
+         실력: ${r.level || '초급'}<br>
+         ${r.memo || '메모 없음'}
       </div>
     </div>
     <div style="margin-top:12px;padding:12px;background:var(--b5);border-radius:10px;font-size:13px;color:var(--b1)">
-      ✅ 함께하기를 확정하면 상대방 연락처가 공개됩니다.
+       함께하기를 확정하면 상대방 연락처가 공개됩니다.
     </div>`;
   document.getElementById('match-detail-modal').classList.add('on');
 }
@@ -4048,11 +4184,11 @@ async function confirmMatching() {
   document.getElementById('match-detail-modal').classList.remove('on');
 
   // 연락처 공개
-  toast(`📞 ${r.user_name} 님 연락처: ${r.user_phone}`);
+  toast(` ${r.user_name} 님 연락처: ${r.user_phone}`);
 
   // 게임코드 자동 생성 안내
   setTimeout(() => {
-    if (confirm(`🎉 ${r.user_name} 님과 매칭됐어요!\n\n연락처: ${r.user_phone}\n\n경기를 바로 만들까요?`)) {
+    if (confirm(` ${r.user_name} 님과 매칭됐어요!\n\n연락처: ${r.user_phone}\n\n경기를 바로 만들까요?`)) {
       go('pg-create');
     }
   }, 500);
@@ -4080,7 +4216,7 @@ async function renderMyRequests() {
     `user_phone=eq.${S.user.phone}&order=created_at.desc&limit=20`);
 
   if (!rows || rows.length === 0) {
-    el.innerHTML = '<div class="empty"><div class="empty-ico">📋</div><div class="empty-t">신청 내역이 없어요</div></div>';
+    el.innerHTML = '<div class="empty"><div class="empty-ico"></div><div class="empty-t">신청 내역이 없어요</div></div>';
     return;
   }
 
@@ -4092,8 +4228,8 @@ async function renderMyRequests() {
         <span style="font-size:12px;background:var(--gray1);color:${statusColor[r.status]||'var(--gray3)'};padding:3px 10px;border-radius:99px;font-weight:700">${r.status}</span>
       </div>
       <div style="font-size:12px;color:var(--gray3);line-height:1.8">
-        📅 ${r.play_date} ${r.play_time} · 👥 ${r.party_size}명 · 🎯 ${r.level||'초급'}
-        ${r.status==='매칭완료' ? `<br>✅ 매칭: ${r.matched_name} (${r.matched_phone})` : ''}
+         ${r.play_date} ${r.play_time} ·  ${r.party_size}명 ·  ${r.level||'초급'}
+        ${r.status==='매칭완료' ? `<br> 매칭: ${r.matched_name} (${r.matched_phone})` : ''}
       </div>
       ${r.status==='대기중' ? `<button onclick="cancelMyRequest('${r.id}')" style="margin-top:8px;padding:5px 12px;border:1px solid var(--red);border-radius:8px;background:none;color:var(--red);font-size:12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif">취소</button>` : ''}
     </div>`).join('');
@@ -4126,7 +4262,7 @@ async function submitVenueRequest() {
 
   await sbPost(MT_VENUES_T, data);
   document.getElementById('venue-req-modal').classList.remove('on');
-  toast('✅ 구장 추가 요청이 접수됐어요! 검토 후 등록됩니다 🙏');
+  toast(' 구장 추가 요청이 접수됐어요! 검토 후 등록됩니다 ');
 
   // 폼 초기화
   ['vr-name','vr-addr'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
@@ -4292,7 +4428,7 @@ async function addToMyList(code) {
     await dbSave(myKey, myList);
   }
 }
-function copyShare(){const t=document.getElementById('share-box').textContent;navigator.clipboard?.writeText(t).then(()=>toast('📋 복사됐어요!')).catch(()=>fbCopy(t));if(!navigator.clipboard)fbCopy(t);}
+function copyShare(){const t=document.getElementById('share-box').textContent;navigator.clipboard?.writeText(t).then(()=>toast(' 복사됐어요!')).catch(()=>fbCopy(t));if(!navigator.clipboard)fbCopy(t);}
 function fbCopy(t){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');document.body.removeChild(a);}
 function V(id){return document.getElementById(id)?.value||'';}
 function QV(sel){return document.querySelector(sel)?.value||'';}
