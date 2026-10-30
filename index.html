@@ -1390,9 +1390,10 @@ async function dbLoad(key, def = null) {
   }
 }
 
+// 반환값: 'local' = 이 기기에만 저장 (서버 연결 없음), 'server' = 서버 저장 완료, 'failed' = 서버 저장 실패 (이 기기에는 저장됨)
 async function dbSave(key, data) {
   lsSet(key, data); // 로컬 우선 저장 (항상)
-  if (!SB_OK()) return;
+  if (!SB_OK()) return 'local';
   try {
     const r = await _sbFetch(
       `${SB_URL}/rest/v1/${SB_T}`,
@@ -1405,11 +1406,12 @@ async function dbSave(key, data) {
         body: JSON.stringify({ key, value: data, updated_at: new Date().toISOString() })
       }
     );
-    if (r.ok) { _sbOnline = true; _updateSyncBadge(true); }
-    else { _sbOnline = false; _updateSyncBadge(false); }
+    if (r.ok) { _sbOnline = true; _updateSyncBadge(true); return 'server'; }
+    _sbOnline = false; _updateSyncBadge(false); return 'failed';
   } catch(e) {
     _sbOnline = false;
     _updateSyncBadge(false);
+    return 'failed';
   }
 }
 
@@ -2771,15 +2773,14 @@ async function autoSaveNow() {
   if (m.paused) { setSaveStatus('중단된 경기예요. 재개한 뒤 저장돼요', 'err'); return; }
   if (m.final && !m.editApproval) { setSaveStatus('확정된 결과예요. 총무 승인 후 수정할 수 있어요', 'err'); return; }
   collectScores();
-  setSaveStatus('저장 중…', 'pend');
-  try {
-    await saveMatch(m);
-    afterScoreSave(m);
-    const t = new Date(), pz = n => String(n).padStart(2, '0');
-    setSaveStatus(`자동 저장됨 · ${pz(t.getHours())}:${pz(t.getMinutes())}`, 'ok');
-  } catch (e) {
-    setSaveStatus('저장하지 못했어요. 저장 버튼을 눌러 다시 시도해 주세요', 'err');
-  }
+  const t = new Date(), pz = n => String(n).padStart(2, '0'), at = `${pz(t.getHours())}:${pz(t.getMinutes())}`;
+  // 서버 연결이 켜져 있을 때만 '서버에 저장 중'을 보인다. 데모(기본)에서는 항상 이 기기 저장만 한다.
+  setSaveStatus(SB_OK() ? '서버에 저장 중…' : '이 기기에 저장 중…', 'pend');
+  let result = 'failed';
+  try { result = await saveMatch(m); afterScoreSave(m); } catch (e) { result = 'failed'; }
+  if (result === 'server') setSaveStatus(`서버에 저장됨 · ${at}`, 'ok');
+  else if (result === 'local') setSaveStatus(`이 기기에 저장됨 · ${at}`, 'ok');
+  else setSaveStatus('저장하지 못했습니다. 다시 시도해 주세요.', 'err');
 }
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-sf]');
@@ -4413,9 +4414,9 @@ async function loadMatchByCode(code) {
 }
 
 async function saveMatch(m) {
-  // 단일 경기 저장
+  // 단일 경기 저장. 반환: 'local' | 'server' | 'failed' (dbSave 참고)
   S.matches[m.id] = m;
-  await dbSave('match_' + m.code, m);
+  return await dbSave('match_' + m.code, m);
 }
 
 async function addToMyList(code) {

@@ -36,8 +36,10 @@ def run(pg, label, vw):
     input_val = pg.get_attribute(f"input[data-p='{P}'][data-h='0']", "value")
     check(f"[{label}] 입력창과 패널 값 일치", input_val == val, f"input={input_val} panel={val} sd={pg.evaluate("S.matches[S.mid].sd['가나다']")} cnt={pg.locator('input[data-p="가나다"]').count()} html={pg.inner_html('#score-tbl tbody tr:first-child td:nth-child(2)')[:160]}")
     # 자동 저장 상태
-    pg.wait_for_function("document.getElementById('save-status').textContent.includes('자동 저장됨')", timeout=5000)
-    check(f"[{label}] 자동 저장 상태 표시", "자동 저장됨" in pg.inner_text("#save-status"))
+    pg.wait_for_function("document.getElementById('save-status').textContent.includes('이 기기에 저장됨')", timeout=5000)
+    st = pg.inner_text("#save-status")
+    check(f"[{label}] 데모: '이 기기에 저장됨' 표시", "이 기기에 저장됨" in st, st)
+    check(f"[{label}] 데모: '서버에 저장됨' 은 표시하지 않음", "서버에 저장됨" not in st)
     check(f"[{label}] 점수 이력 기록", pg.evaluate("(S.matches[S.mid].scoreLog||[]).length") >= 3)
     # 홀 이동
     pg.click("#score-focus button:has-text('다음')"); time.sleep(0.3)
@@ -67,6 +69,16 @@ def run(pg, label, vw):
     check(f"[{label}] 확정 후 안내 표시", "확정" in pg.inner_text("#save-status"))
     # 가로 넘침
     check(f"[{label}] 가로 넘침 없음", pg.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 1"))
+    # 서버 연결 설정만 켠 상태(설정 값 없음): 저장 실패 문구가 나와야 한다
+    pg.goto(BASE + "?sync=1"); pg.wait_for_function("document.getElementById('pg-home').classList.contains('on')", timeout=20000)
+    # 테스트 설정: 저장 실패 경로를 보기 위해 이 테스트 경기의 확정 표시만 지운다 (실제 사용자 흐름이 아님)
+    pg.evaluate("(() => { const m = S.matches[Object.keys(S.matches)[0]]; m.final = null; saveMatch(m); })()"); time.sleep(0.3)
+    pg.evaluate("openScore(Object.keys(S.matches)[0])"); time.sleep(0.5)
+    pg.evaluate("localStorage.setItem('pd_user', JSON.stringify({name: '가나다', phone: '010-0000-0000', role: '일반회원', privacyAgreed: true}))")
+    pg.fill(f"input[data-p='{P}'][data-h='1']", str(par + 1)); time.sleep(0.5)  # 서버 연결 실패 → 저장 실패 문구 (5초 제한 후 실패)
+    pg.wait_for_function("document.getElementById('save-status').textContent.includes('저장하지 못했습니다')", timeout=15000)
+    fail_txt = pg.inner_text("#save-status")
+    check(f"[{label}] 서버 저장 실패 시 안내 문구", "저장하지 못했습니다. 다시 시도해 주세요." in fail_txt, fail_txt)
     pg.screenshot(path=str(OUT / "design" / f"score_{label}.png"), full_page=True)
 
 def main():
