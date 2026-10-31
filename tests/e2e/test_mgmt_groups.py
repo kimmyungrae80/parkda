@@ -20,7 +20,7 @@ def flow(pg, label):
     pg.fill("#c-players", "가나다\n라마바\n마바사\n사아자")
     pg.click("button:has-text('경기 만들고 코드 받기')"); time.sleep(0.8)
     check(f"[{label}] 조편성 화면 진입", on(pg, 'pg-groups'))
-    check(f"[{label}] 조편성 수정 패널 표시", pg.locator("#group-edit .gedit-row").count() == 4)
+    check(f"[{label}] 조편성 수정 패널 표시", pg.locator("#group-edit .gedit-row:not(.gedit-leader)").count() == 4)
     # 참가자 한 명을 다른 조로 이동
     before = pg.evaluate("S.matches[S.mid].groups.map(g => g.players.slice())")
     if len(before) >= 2:

@@ -582,6 +582,27 @@ button[onclick^="toggleTip"]{min-width:44px;min-height:44px;font-size:15px !impo
 .gedit-sel{min-width:110px;flex:0 0 auto}
 .score-nav{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:0 14px 10px}
 .score-nav .btn{min-height:52px;font-size:16px}
+.result-kakao{width:100%;background:#FEE500;color:#191919;border:0;font-weight:800}
+.result-summary{padding:12px 14px 0}
+.rs-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.rs-row{border:1px solid var(--bd);border-radius:16px;padding:14px;background:var(--sf)}
+.rs-top1{border:2px solid var(--pk)}
+.rs-head{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center}
+.rs-rank{font-size:16px;font-weight:800;color:var(--pk-d);background:var(--pk-l);border-radius:10px;padding:4px 10px}
+.rs-name{font-size:20px;font-weight:800;color:var(--tx)}
+.rs-total{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums}
+.rs-details summary{min-height:44px;display:flex;align-items:center;font-size:16px;font-weight:700;color:var(--pk-d);cursor:pointer}
+.rs-holes{list-style:none;margin:6px 0 0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.rs-holes li{display:grid;grid-template-columns:auto auto 1fr;gap:8px;align-items:center;font-size:16px;padding:6px 8px;background:var(--bg);border-radius:10px}
+.rs-h{color:var(--tx2);font-weight:700}
+.rs-c{color:var(--tx2);text-align:right;font-size:14px}
+@media (max-width:390px){.rs-holes{grid-template-columns:1fr}.rs-name{font-size:18px}}
+.grp-status{margin:0 0 12px;padding:12px 14px;border-radius:14px;background:var(--bg);font-size:17px;font-weight:700;color:var(--tx)}
+.grp-ok{background:var(--pk-l);color:var(--pk-d)}
+.grp-count{font-size:15px;font-weight:700;opacity:.9;margin-left:4px}
+.chip-leader{box-shadow:inset 0 0 0 2px currentColor}
+/* 결과 순위는 상단 '최종 순위' 하나만 보인다. 기존 시상대·순위표는 같은 데이터로 계산되므로 숨긴다 (DOM 은 유지: 기존 스크립트가 채움) */
+#podium-area,#result-rank-card.dup-rank{display:none !important}
 </style>
   <!-- 카카오 SDK: 버튼 클릭 시 동적 로드 -->
 <link rel="stylesheet" href="/parkda-toss.css">
@@ -1049,7 +1070,7 @@ html,body,button,input,select,textarea{font-family:'Pretendard','Noto Sans KR',s
  </div>
 
  <div class="bubble"><span class="bubble-ico"></span> 표시가 <b>조장</b>이에요. 조장만 점수를 입력할 수 있어요. <b>변경</b>을 누르면 바꿀 수 있어요.</div>
- <div class="btn-wrap" style="padding-bottom:6px"><button class="btn btn-gray btn-sm" onclick="reshuffle()"> &nbsp;다시 섞기</button></div>
+ <div class="btn-wrap" style="padding-bottom:6px"><button id="reshuffle-btn" class="btn btn-gray btn-sm" onclick="reshuffle()">다시 섞기</button></div>
  <div id="groups-area"></div>
  <div id="group-edit" style="padding:0 0 12px"></div>
  <div class="btn-wrap"><button class="btn btn-green" onclick="goScore()"> &nbsp;점수 입력 시작</button></div>
@@ -1105,12 +1126,22 @@ html,body,button,input,select,textarea{font-family:'Pretendard','Noto Sans KR',s
 <!-- ══ 정산 결과 ══ -->
 <div class="pg" id="pg-result">
  <div class="bar"><span class="bar-back" onclick="go('pg-matches')">‹</span><span class="bar-title" id="result-title"> 포인트 결과</span><button class="bar-home" type="button" onclick="go('pg-home')" aria-label="홈으로">홈</button></div>
+ <div id="result-summary" class="result-summary" aria-live="polite"></div>
  <div id="result-settle-area"></div>
  <div id="result-total-area"></div>
  <div id="result-manual-area"></div>
  <div id="podium-area"></div>
- <div class="card"><div class="card-hd" style="display:flex;align-items:center;justify-content:space-between"><span> 전체 순위</span><button onclick="toggleTip('tip-rank')" style="background:none;border:1px solid var(--g3);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--g2);cursor:pointer">? 설명</button></div><div id="tip-rank" style="display:none;background:var(--g5);border-radius:10px;padding:10px 12px;margin:6px 0;font-size:13px;color:var(--g2);line-height:1.6">전체 참가자의 최종 순위와 총 타수, PAR 대비 성적, 포인트 합산 결과를 보여줍니다.</div><div style="overflow-x:auto"><table class="rtbl" id="result-tbl"></table></div></div>
- <div class="card" id="result-share-card"><div class="card-hd" style="display:flex;align-items:center;justify-content:space-between"><span> 카카오톡 공유</span><button onclick="toggleTip('tip-share')" style="background:none;border:1px solid var(--b3);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--b2);cursor:pointer">? 설명</button></div><div id="tip-share" style="display:none;background:var(--b5);border-radius:10px;padding:10px 12px;margin:6px 0;font-size:13px;color:var(--b1);line-height:1.6">순위와 포인트 정산 결과를 텍스트로 자동 생성합니다. 복사 버튼을 눌러 카카오톡에 붙여넣기 하세요!</div><div class="card-bd"><div class="share-box" id="share-box"></div><div style="margin-top:9px" id="result-copy-btn-wrap"></div></div></div>
+ <div class="card dup-rank" id="result-rank-card"><div class="card-hd" style="display:flex;align-items:center;justify-content:space-between"><span> 전체 순위</span><button onclick="toggleTip('tip-rank')" style="background:none;border:1px solid var(--g3);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--g2);cursor:pointer">? 설명</button></div><div id="tip-rank" style="display:none;background:var(--g5);border-radius:10px;padding:10px 12px;margin:6px 0;font-size:13px;color:var(--g2);line-height:1.6">전체 참가자의 최종 순위와 총 타수, PAR 대비 성적, 포인트 합산 결과를 보여줍니다.</div><div style="overflow-x:auto"><table class="rtbl" id="result-tbl"></table></div></div>
+ <div class="card" id="result-share-card">
+  <div class="card-hd">결과 공유</div>
+  <div style="padding:12px 14px">
+    <button class="btn result-kakao" type="button" onclick="kakaoShareResult()">카카오톡으로 결과 공유</button>
+    <button class="btn btn-gray" type="button" style="margin-top:10px;width:100%" onclick="copyResultLink()">결과 링크 복사</button>
+    <p id="share-status" class="hub-vs" role="status" aria-live="polite" style="margin:10px 0 0"></p>
+    <details class="share-preview"><summary>공유 내용 미리보기</summary><pre id="share-box" class="share-box"></pre></details>
+    <div id="result-copy-btn-wrap" style="margin-top:10px"></div>
+  </div>
+</div>
  <div id="final-area" style="padding:0 14px"></div>
  <div class="btn-wrap" id="result-edit-btn-wrap"></div>
   <div class="btn-wrap nav-two"><button class="btn btn-gray" type="button" onclick="go('pg-matches')">내 경기로</button><button class="btn btn-gray" type="button" onclick="go('pg-home')">홈으로</button></div>
@@ -2654,6 +2685,60 @@ function renderScoreControls() {
     <nav class="score-nav" aria-label="이동"><button type="button" class="btn btn-gray" onclick="goBackOrMgmt()">‹ 이전 화면</button><button type="button" class="btn btn-gray" onclick="go('pg-mgmt')">경기 목록</button><button type="button" class="btn btn-gray" onclick="go('pg-home')">홈</button></nav>
     <div id="score-log" hidden></div>`;
 }
+/* 결과 화면 요약: 최종 순위(동점 공동 순위), 총타수, 홀별 점수. 점수 계산은 lib/score-logic.js 의 standings 를 그대로 쓴다. */
+function renderResultSummary(m) {
+  const box = document.getElementById('result-summary'); if (!box) return;
+  const r = PD_SCORE.standings(scoreGame(m));
+  const par = m.par || [];
+  const rows = r.rows.map(x => {
+    const sc = (m.sd || {})[x.id] || [];
+    const holes = Array.from({ length: m.holes }, (_, h) => {
+      const v = +sc[h] || 0, d = v ? v - (par[h] || 0) : null;
+      const cmp = !v ? '–' : d === 0 ? '파' : d < 0 ? `${-d} 적음` : `${d} 많음`;
+      return `<li><span class="rs-h">${h + 1}홀</span><b>${v || '–'}타</b><span class="rs-c">${cmp}</span></li>`;
+    }).join('');
+    const top = x.rank <= 3 ? ` rs-top${x.rank}` : '';
+    const tie = r.rows.filter(y => y.rank === x.rank).length > 1;
+    const rankTxt = x.total == null ? '집계 전' : (tie ? `공동 ${x.rank}위` : `${x.rank}위`);
+    return `<li class="rs-row${top}">
+      <div class="rs-head"><span class="rs-rank">${rankTxt}</span><span class="rs-name">${escHtml(x.id)}</span><span class="rs-total">${x.total == null ? '–' : x.total + '타'}</span></div>
+      <details class="rs-details"><summary>홀별 점수 보기</summary><ul class="rs-holes">${holes}</ul></details>
+    </li>`;
+  }).join('');
+  box.innerHTML = `<div class="card"><div class="card-hd">최종 순위</div>
+    <div style="padding:8px 14px 14px">
+      ${r.complete ? '' : '<p class="hub-vs">모든 홀의 점수가 입력되지 않아 순위가 임시예요.</p>'}
+      <ol class="rs-list">${rows}</ol>
+    </div></div>`;
+}
+function resultLink(m) { return `${location.origin}${location.pathname}?game=${m.code}`; }
+function setShareStatus(t) { const el = document.getElementById('share-status'); if (el) el.textContent = t; }
+function kakaoShareResult() {
+  const m = S.matches[S.mid]; if (!m) return;
+  const r = PD_SCORE.standings(scoreGame(m));
+  const top = r.rows.find(x => x.rank === 1);
+  const text = `PARKDA 경기 결과\n${m.title}\n${m.date || ''} ${m.course || ''}\n${top && top.total != null ? `1위 ${top.id} · ${top.total}타` : '점수 집계 중'}`;
+  const link = resultLink(m);
+  const kakaoReady = !!(window.Kakao && Kakao.isInitialized && Kakao.isInitialized() && Kakao.Share && Kakao.Share.sendDefault);
+  if (kakaoReady) {
+    try {
+      Kakao.Share.sendDefault({ objectType: 'text', text, link: { mobileWebUrl: link, webUrl: link }, buttonTitle: '결과 보기' });
+      setShareStatus('카카오톡 공유 창을 열었어요.');
+      return;
+    } catch (e) { /* 아래 복사로 대체 */ }
+  }
+  copyText(`${text}\n${link}`, '카카오 공유를 열 수 없어 결과 내용을 복사했어요. 카카오톡에 붙여넣으세요.');
+}
+function copyResultLink() {
+  const m = S.matches[S.mid]; if (!m) return;
+  copyText(resultLink(m), '결과 링크를 복사했어요.');
+}
+function copyText(txt, okMsg) {
+  const done = () => { setShareStatus(okMsg); toast(okMsg); };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(txt).then(done).catch(() => { fbCopy(txt); done(); });
+  } else { fbCopy(txt); done(); }
+}
 function goBackOrMgmt() {
   // 기록이 있으면 브라우저 뒤로가기와 같은 화면으로, 없으면 경기 목록
   if (history.state && history.state.pg && history.state.pg !== 'pg-score') history.back();
@@ -2900,7 +2985,7 @@ function go(id, opts) {
   if (id === 'pg-club')        renderPro();
   if (id === 'pg-console')     renderConsole();
   if (id === 'pg-score')       renderScoreControls();
-  if (id === 'pg-result')      renderFinalArea();
+  if (id === 'pg-result')      { renderFinalArea(); const rm = S.matches[S.mid]; if (rm) renderResultSummary(rm); }
   if (id === 'pg-tournaments') loadParkgolfNews();
   if (id === 'pg-video')       loadYoutubeVideos('대회');
   // 맛집 화면은 구장 상세에서 구장을 고른 뒤 검색한다 (독립 진입 시 안내 문구만 표시)
@@ -3038,7 +3123,8 @@ async function joinGame() {
   S.mid = match.id;
   const role = isCreator ? '총무/회장' : isLeader ? '조장' : '조원';
   toast(` "${match.title}" 참가! (${role})`);
-  setTimeout(() => openScore(match.id), 600);
+  // 끝난 경기의 링크는 결과 화면으로, 진행 중인 경기는 점수 입력으로
+  setTimeout(() => (isMatchDone(match) ? openResult(match.id) : openScore(match.id)), 600);
 }
 
 /* ══ 홈 ══ */
@@ -3259,14 +3345,18 @@ function renderGroupsPage() {
   const m = S.matches[S.mid]; if (!m) return;
   renderGamecode();
   renderGroupEdit(m);
-  document.getElementById('groups-area').innerHTML = m.groups.map((g, i) => {
+  const rb = document.getElementById('reshuffle-btn'); if (rb) rb.disabled = !!m.groupsConfirmed;
+  const status = m.groupsConfirmed
+    ? '<p class="grp-status grp-ok">조편성이 확정되었어요. 참가자 이동은 확정을 취소해야 할 수 있어요.</p>'
+    : '<p class="grp-status">조편성을 확인하고 필요하면 참가자를 옮긴 뒤 확정하세요.</p>';
+  document.getElementById('groups-area').innerHTML = status + m.groups.map((g, i) => {
     const c = GC[i % GC.length];
     const chips = g.players.map(p => `
-      <div class="chip" style="border-color:${c};color:${c}">
-        ${p}${p === g.leader ? '<span class="chip-ldr">조장</span>' : ''}
+      <div class="chip${p === g.leader ? ' chip-leader' : ''}" style="border-color:${c};color:${c}">
+        ${escHtml(p)}${p === g.leader ? '<span class="chip-ldr">조장</span>' : ''}
       </div>`).join('');
     return `<div class="group-wrap"><div class="group-card" style="background:${c}14;border-color:${c}">
-      <div class="group-title" style="color:${c}">${g.no}조</div>
+      <div class="group-title" style="color:${c}">${g.no}조 <span class="grp-count">${g.players.length}명</span>${g.leader ? ` · 조장 ${escHtml(g.leader)}` : ''}</div>
       <div class="chips">${chips}</div>
     </div></div>`;
   }).join('');
@@ -3281,16 +3371,16 @@ function renderGroupEdit(m) {
        <select id="mv-${escHtml(p)}" class="hub-input gedit-sel" data-mv="${escHtml(p)}" ${locked ? 'disabled' : ''}>
          ${m.groups.map((x, xi) => `<option value="${xi}"${xi === gi ? ' selected' : ''}>${x.no}조</option>`).join('')}
        </select></div>`).join('')}
-     <label class="hub-sr" for="ld-${gi}">${g.no}조 조장</label>
-     <select id="ld-${gi}" class="hub-input gedit-sel" data-ld="${gi}" ${locked ? 'disabled' : ''}>
-       ${g.players.map(p => `<option${p === g.leader ? ' selected' : ''}>${escHtml(p)}</option>`).join('')}
-     </select></div>`).join('');
+     <div class="gedit-row gedit-leader"><span class="gedit-name">조장 지정</span>
+       <label class="hub-sr" for="ld-${gi}">${g.no}조 조장</label>
+       <select id="ld-${gi}" class="hub-input gedit-sel" data-ld="${gi}" ${locked ? 'disabled' : ''}>
+         ${g.players.map(p => `<option${p === g.leader ? ' selected' : ''}>${escHtml(p)}</option>`).join('')}
+       </select></div></div>`).join('');
   box.innerHTML = `<div class="card"><div class="card-hd">조편성 수정</div><div style="padding:12px 14px">
      <p class="hub-vs">${locked ? '조편성이 확정되었어요. 수정하려면 확정을 취소하세요.' : '참가자를 다른 조로 옮기거나 조장을 바꿀 수 있어요. 조에 한 명은 남아야 해요.'}</p>
      ${rows}
      <div class="nav-two" style="padding:0;margin-top:12px">
        ${locked ? '<button class="btn btn-gray" type="button" onclick="setGroupsConfirmed(false)">확정 취소</button>' : '<button class="btn btn-green" type="button" onclick="setGroupsConfirmed(true)">조편성 확정</button>'}
-       <button class="btn btn-gray" type="button" onclick="reshuffle()" ${locked ? 'disabled' : ''}>다시 섞기</button>
      </div></div></div>`;
 }
 function moveMember(p, toIdx) {
