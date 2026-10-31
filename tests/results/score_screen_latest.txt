@@ -1,9 +1,9 @@
-2026-10-30T09:33:49 SCORE PASS 38/38
+2026-10-31T09:09:43 SCORE PASS 38/38
 PASS [PC] 현재 홀과 참가자 이름 표시 
 PASS [PC] 파(PAR) 표시 PAR 4
 PASS [PC] +/- 로 타수 변경 (파+1 기대) val=5 par=4
-PASS [PC] 입력창과 패널 값 일치 input=5 panel=5 sd=[0, 0, 0, 0, 0, 0, 0, 0, 0] cnt=9 html=<input class="sinp" type="number" min="1" max="20" inputmode="numeric" data-p="라마바" data-h="0" aria-label="라마바 1홀 타수" value="5" oninput="onSI(this)">
-PASS [PC] 데모: '이 기기에 저장됨' 표시 이 기기에 저장됨 · 09:33
+PASS [PC] 입력창과 패널 값 일치 input=5 panel=5 sd=[5, 0, 0, 0, 0, 0, 0, 0, 0] cnt=9 html=<input class="sinp" type="number" min="1" max="20" inputmode="numeric" data-p="가나다" data-h="0" aria-label="가나다 1홀 타수" value="5" oninput="onSI(this)">
+PASS [PC] 데모: '이 기기에 저장됨' 표시 이 기기에 저장됨 · 09:09
 PASS [PC] 데모: '서버에 저장됨' 은 표시하지 않음 
 PASS [PC] 점수 이력 기록 
 PASS [PC] 다음 홀 이동 (2홀) 
@@ -20,8 +20,8 @@ PASS [PC] 서버 저장 실패 시 안내 문구 저장하지 못했습니다. �
 PASS [모바일] 현재 홀과 참가자 이름 표시 
 PASS [모바일] 파(PAR) 표시 PAR 4
 PASS [모바일] +/- 로 타수 변경 (파+1 기대) val=5 par=4
-PASS [모바일] 입력창과 패널 값 일치 input=5 panel=5 sd=[0, 0, 0, 0, 0, 0, 0, 0, 0] cnt=9 html=<input class="sinp" type="number" min="1" max="20" inputmode="numeric" data-p="라마바" data-h="0" aria-label="라마바 1홀 타수" value="5" oninput="onSI(this)">
-PASS [모바일] 데모: '이 기기에 저장됨' 표시 이 기기에 저장됨 · 09:33
+PASS [모바일] 입력창과 패널 값 일치 input=5 panel=5 sd=[5, 0, 0, 0, 0, 0, 0, 0, 0] cnt=9 html=<input class="sinp" type="number" min="1" max="20" inputmode="numeric" data-p="가나다" data-h="0" aria-label="가나다 1홀 타수" value="5" oninput="onSI(this)">
+PASS [모바일] 데모: '이 기기에 저장됨' 표시 이 기기에 저장됨 · 09:09
 PASS [모바일] 데모: '서버에 저장됨' 은 표시하지 않음 
 PASS [모바일] 점수 이력 기록 
 PASS [모바일] 다음 홀 이동 (2홀) 

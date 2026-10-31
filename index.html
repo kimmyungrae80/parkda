@@ -572,6 +572,9 @@ button[onclick^="toggleTip"]{min-width:44px;min-height:44px;font-size:15px !impo
 /* MY 화면 */
 .my-card{background:var(--bg);border-radius:var(--r);padding:20px;display:grid;gap:12px}
 .my-list{display:grid;gap:10px;list-style:none;margin-top:16px}
+/* 경기 화면 공통 이동 */
+.bar-home{min-height:44px;min-width:56px;padding:0 12px;margin-left:auto;border:1.5px solid #fff;border-radius:12px;background:transparent;color:#fff;font:inherit;font-size:16px;font-weight:700;cursor:pointer}
+.nav-two{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px}
 </style>
   <!-- 카카오 SDK: 버튼 클릭 시 동적 로드 -->
 <link rel="stylesheet" href="/parkda-toss.css">
@@ -929,7 +932,7 @@ html,body,button,input,select,textarea{font-family:'Pretendard','Noto Sans KR',s
 </div>
 
 <div class="pg" id="pg-create">
- <div class="bar"><span class="bar-back" onclick="go('pg-home')">‹</span><span class="bar-title"> 새 경기 만들기</span></div>
+ <div class="bar"><span class="bar-back" onclick="go('pg-home')">‹</span><span class="bar-title"> 새 경기 만들기</span><button class="bar-home" type="button" onclick="go('pg-home')" aria-label="홈으로">홈</button></div>
  <div class="bubble"><span class="bubble-ico"></span>소모임 3~4명도, 단체 30명도 똑같이 만들면 돼요!</div>
  <div class="card">
  <div class="card-hd" style="display:flex;align-items:center;justify-content:space-between"><span> 기본 정보</span><button onclick="toggleTip('tip-basic')" style="background:none;border:1px solid var(--g3);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--g2);cursor:pointer">? 설명</button></div><div id="tip-basic" style="display:none;background:var(--g5);border-radius:10px;padding:10px 12px;margin:6px 14px;font-size:13px;color:var(--g2);line-height:1.6">경기 이름, 날짜, 코스명을 입력하세요. 경기 목록에서 구분하는 데 사용됩니다.</div>
@@ -1023,7 +1026,7 @@ html,body,button,input,select,textarea{font-family:'Pretendard','Noto Sans KR',s
 
 <!-- ══ 조편성 + 게임코드 ══ -->
 <div class="pg" id="pg-groups">
- <div class="bar"><span class="bar-back" onclick="go('pg-create')">‹</span><span class="bar-title"> 조편성 완료!</span><button onclick="toggleTip('tip-groups')" style="background:none;border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:2px 8px;font-size:11px;color:rgba(255,255,255,.9);cursor:pointer;margin-right:4px">?</button></div><div id="tip-groups" style="display:none;background:var(--g5);border-radius:10px;padding:10px 12px;margin:6px 14px;font-size:13px;color:var(--g2);line-height:1.6">조편성이 자동으로 완성됐습니다! 게임코드를 카카오톡으로 공유하면 조원들이 바로 참가할 수 있어요. 조장을 변경하려면 조장 버튼을 탭하세요.</div>
+ <div class="bar"><span class="bar-back" onclick="go('pg-create')">‹</span><span class="bar-title"> 조편성 완료!</span><button onclick="toggleTip('tip-groups')" style="background:none;border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:2px 8px;font-size:11px;color:rgba(255,255,255,.9);cursor:pointer;margin-right:4px">?</button><button class="bar-home" type="button" onclick="go('pg-home')" aria-label="홈으로">홈</button></div><div id="tip-groups" style="display:none;background:var(--g5);border-radius:10px;padding:10px 12px;margin:6px 14px;font-size:13px;color:var(--g2);line-height:1.6">조편성이 자동으로 완성됐습니다! 게임코드를 카카오톡으로 공유하면 조원들이 바로 참가할 수 있어요. 조장을 변경하려면 조장 버튼을 탭하세요.</div>
 
  <!-- 게임 코드 공유 박스 -->
  <div class="gamecode-box" id="gamecode-display">
@@ -1044,14 +1047,14 @@ html,body,button,input,select,textarea{font-family:'Pretendard','Noto Sans KR',s
 
 <!-- ══ 경기 목록 ══ -->
 <div class="pg" id="pg-matches">
- <div class="bar"><span class="bar-back" onclick="go('pg-home')">‹</span><span class="bar-title"> 경기 목록</span><button onclick="toggleTip('tip-matches')" style="background:none;border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:2px 8px;font-size:11px;color:rgba(255,255,255,.9);cursor:pointer;margin-right:4px">?</button></div><div id="tip-matches" style="display:none;background:var(--b5);border-radius:10px;padding:10px 12px;margin:6px 14px;font-size:13px;color:var(--b1);line-height:1.6">생성된 경기 목록입니다. 경기를 탭하면 점수 입력 화면으로 이동합니다. 코드 공유로 조원을 초대할 수 있어요.</div>
+ <div class="bar"><span class="bar-back" onclick="go('pg-home')">‹</span><span class="bar-title"> 경기 목록</span><button onclick="toggleTip('tip-matches')" style="background:none;border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:2px 8px;font-size:11px;color:rgba(255,255,255,.9);cursor:pointer;margin-right:4px">?</button><button class="bar-home" type="button" onclick="go('pg-home')" aria-label="홈으로">홈</button></div><div id="tip-matches" style="display:none;background:var(--b5);border-radius:10px;padding:10px 12px;margin:6px 14px;font-size:13px;color:var(--b1);line-height:1.6">생성된 경기 목록입니다. 경기를 탭하면 점수 입력 화면으로 이동합니다. 코드 공유로 조원을 초대할 수 있어요.</div>
  <div class="bubble"><span class="bubble-ico"></span>경기 카드의 <b> 공유</b> 버튼으로 조원들에게 게임 코드를 전송하세요.</div>
  <div id="matches-area" style="padding-top:6px"></div>
 </div>
 
 <!-- ══ 점수 입력 ══ -->
 <div class="pg" id="pg-score">
- <div class="bar"><span class="bar-back" onclick="go('pg-matches')">‹</span><span class="bar-title" id="score-bar-title"> 점수 입력</span><span class="bar-sub" id="score-bar-sub"></span><button onclick="toggleTip('tip-score')" style="background:none;border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:2px 8px;font-size:11px;color:rgba(255,255,255,.9);cursor:pointer;margin-right:4px">?</button></div><div id="tip-score" style="display:none;background:var(--g5);border-radius:10px;padding:10px 12px;margin:6px 14px;font-size:13px;color:var(--g2);line-height:1.6">조장만 점수를 입력할 수 있습니다(총무/회장 예외). 홀별 타수 입력 → 저장 → 모두 완료되면 포인트 결과를 확인하세요.</div>
+ <div class="bar"><span class="bar-back" onclick="go('pg-matches')">‹</span><span class="bar-title" id="score-bar-title"> 점수 입력</span><span class="bar-sub" id="score-bar-sub"></span><button onclick="toggleTip('tip-score')" style="background:none;border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:2px 8px;font-size:11px;color:rgba(255,255,255,.9);cursor:pointer;margin-right:4px">?</button><button class="bar-home" type="button" onclick="go('pg-home')" aria-label="홈으로">홈</button></div><div id="tip-score" style="display:none;background:var(--g5);border-radius:10px;padding:10px 12px;margin:6px 14px;font-size:13px;color:var(--g2);line-height:1.6">조장만 점수를 입력할 수 있습니다(총무/회장 예외). 홀별 타수 입력 → 저장 → 모두 완료되면 포인트 결과를 확인하세요.</div>
  <div id="score-auth-box"></div>
  <div id="score-controls"></div>
  <div class="bubble"><span class="bubble-ico"></span><span id="score-help">조장만 점수를 입력할 수 있어요.</span></div>
@@ -1091,7 +1094,7 @@ html,body,button,input,select,textarea{font-family:'Pretendard','Noto Sans KR',s
 
 <!-- ══ 정산 결과 ══ -->
 <div class="pg" id="pg-result">
- <div class="bar"><span class="bar-back" onclick="go('pg-matches')">‹</span><span class="bar-title" id="result-title"> 포인트 결과</span></div>
+ <div class="bar"><span class="bar-back" onclick="go('pg-matches')">‹</span><span class="bar-title" id="result-title"> 포인트 결과</span><button class="bar-home" type="button" onclick="go('pg-home')" aria-label="홈으로">홈</button></div>
  <div id="result-settle-area"></div>
  <div id="result-total-area"></div>
  <div id="result-manual-area"></div>
@@ -1100,6 +1103,7 @@ html,body,button,input,select,textarea{font-family:'Pretendard','Noto Sans KR',s
  <div class="card" id="result-share-card"><div class="card-hd" style="display:flex;align-items:center;justify-content:space-between"><span> 카카오톡 공유</span><button onclick="toggleTip('tip-share')" style="background:none;border:1px solid var(--b3);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--b2);cursor:pointer">? 설명</button></div><div id="tip-share" style="display:none;background:var(--b5);border-radius:10px;padding:10px 12px;margin:6px 0;font-size:13px;color:var(--b1);line-height:1.6">순위와 포인트 정산 결과를 텍스트로 자동 생성합니다. 복사 버튼을 눌러 카카오톡에 붙여넣기 하세요!</div><div class="card-bd"><div class="share-box" id="share-box"></div><div style="margin-top:9px" id="result-copy-btn-wrap"></div></div></div>
  <div id="final-area" style="padding:0 14px"></div>
  <div class="btn-wrap" id="result-edit-btn-wrap"></div>
+  <div class="btn-wrap nav-two"><button class="btn btn-gray" type="button" onclick="go('pg-matches')">내 경기로</button><button class="btn btn-gray" type="button" onclick="go('pg-home')">홈으로</button></div>
 </div>
 
 <!-- ══ 랭킹 ══ -->
@@ -1110,7 +1114,7 @@ html,body,button,input,select,textarea{font-family:'Pretendard','Noto Sans KR',s
  <span class="bar-back" onclick="go('pg-home')">‹</span>
  <span class="bar-title"> 파트너 찾기</span>
  <button onclick="toggleTip('tip-matching-info')" style="background:none;border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:2px 8px;font-size:11px;color:rgba(255,255,255,.9);cursor:pointer;margin-right:4px">? 설명</button>
- </div>
+ <button class="bar-home" type="button" onclick="go('pg-home')" aria-label="홈으로">홈</button></div>
  <div id="tip-matching-info" style="display:none;background:var(--o5);border-radius:10px;padding:10px 12px;margin:6px 14px;font-size:13px;color:var(--o2);line-height:1.6">
  혼자 또는 소수로 구장에 오셨나요? 같이 칠 파트너를 찾아보세요!<br>신청하면 같은 구장·시간대 신청자 목록에 표시됩니다.
  </div>
@@ -1266,7 +1270,7 @@ html,body,button,input,select,textarea{font-family:'Pretendard','Noto Sans KR',s
 </div>
 
 <div class="pg" id="pg-ranking">
- <div class="bar"><span class="bar-back" onclick="go('pg-home')">‹</span><span class="bar-title"> 누적 랭킹</span><button onclick="toggleTip('tip-ranking')" style="background:none;border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:2px 8px;font-size:11px;color:rgba(255,255,255,.9);cursor:pointer;margin-right:4px">?</button></div><div id="tip-ranking" style="display:none;background:var(--g5);border-radius:10px;padding:10px 12px;margin:6px 14px;font-size:13px;color:var(--g2);line-height:1.6">전체 경기의 누적 기록입니다. 평균 타수가 낮을수록, 누적 포인트가 높을수록 상위에 랭크됩니다.</div>
+ <div class="bar"><span class="bar-back" onclick="go('pg-home')">‹</span><span class="bar-title"> 누적 랭킹</span><button onclick="toggleTip('tip-ranking')" style="background:none;border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:2px 8px;font-size:11px;color:rgba(255,255,255,.9);cursor:pointer;margin-right:4px">?</button><button class="bar-home" type="button" onclick="go('pg-home')" aria-label="홈으로">홈</button></div><div id="tip-ranking" style="display:none;background:var(--g5);border-radius:10px;padding:10px 12px;margin:6px 14px;font-size:13px;color:var(--g2);line-height:1.6">전체 경기의 누적 기록입니다. 평균 타수가 낮을수록, 누적 포인트가 높을수록 상위에 랭크됩니다.</div>
  <div class="bubble"><span class="bubble-ico"></span>평균 타수 낮을수록, 누적 수익 높을수록 상위 랭킹이에요.</div>
  <div id="ranking-area" style="padding-top:6px"></div>
 </div>
@@ -1540,14 +1544,14 @@ async function handleKakaoAuth() {
     const fakePhone = 'KK' + kakaoId.slice(-8);
     const saved = lsGet('user');
     if (saved && saved.phone === fakePhone) {
-      S.user = saved; showHome();
+      S.user = saved; finishLogin();
       toast(` ${saved.name}님, 반갑습니다!`);
     } else {
       S.user = { name: kakaoName, phone: fakePhone,
         club: '', region: '', role: '일반회원',
         privacyAgreed: true, kakao: true };
       lsSet('user', S.user);
-      showHome();
+      finishLogin();
       toast(` ${kakaoName}님, PARKDA에 오신 걸 환영해요!`);
     }
   } catch(e) {
@@ -1608,7 +1612,7 @@ async function quickLoginNow() {
   try { await loadMyMatches(); } catch(e) {
     const old = lsGet('matches'); S.matches = old || {};
   }
-  showHome();
+  finishLogin();
   toast(` ${u.name}님, 반갑습니다!`);
 }
 
@@ -1711,10 +1715,19 @@ function toggleFav(id) {
 }
 
 /* 회원 전용 기능 진입 전 로그인 확인 */
+// 로그인이 필요한 화면을 누르면 그 화면을 기억해 두고 로그인 화면으로 간다. 로그인 후 그 화면으로 돌아간다.
+let _afterLogin = null;
 function needLogin(pageId) {
   if (S.user) { go(pageId); return; }
+  _afterLogin = pageId;
   toast('로그인하면 이용할 수 있어요');
   go('pg-login');
+}
+// 로그인 성공 뒤 이동: 기억해 둔 화면이 있으면 그리로 (로그인 화면은 기록에서 대체), 없으면 홈
+function finishLogin() {
+  const target = _afterLogin; _afterLogin = null;
+  if (target && target !== 'pg-login') go(target, { replace: true });
+  else go('pg-home', { replace: true });
 }
 function clubNotify() { toast('Club Pro는 준비 중이에요. 오픈 알림은 아직 받지 않아요'); }
 
@@ -2084,6 +2097,16 @@ function hubJoin(e) {
 }
 
 window.addEventListener('hashchange', () => { openCourseFromHash(); });
+// 브라우저 뒤로가기·앞으로가기: 화면 기록을 따라간다 (기록이 없으면 홈)
+window.addEventListener('popstate', e => {
+  const id = e.state && e.state.pg ? e.state.pg : 'pg-home';
+  go(id, { fromHistory: true });
+});
+function flushPendingScoreSave() {
+  if (!_saveT) return;
+  clearTimeout(_saveT); _saveT = null;
+  autoSaveNow();
+}
 
 /* ══ 함께 치기 · 동호회 (데모: 이 기기에만 저장, 서버 연결 전. 규칙은 lib/ 의 순수 함수 사용) ══ */
 const DEMO_BANNER = '데모 기능입니다. 데이터는 이 기기에만 저장되며 운영 서버에 기록되지 않습니다. 권한 검사는 서버 인증 전까지 임시입니다.';
@@ -2693,7 +2716,8 @@ function renderMy() {
       <button class="hub-btn-big" type="button" onclick="go('pg-login')">로그인 또는 가입</button>`;
     return;
   }
-  box.innerHTML = `<h2 class="hub-h2" style="margin:0">${escHtml(S.user.name)}님</h2>
+  box.innerHTML = `<p class="hub-vs" style="margin:0">이 기기에서만 유지되는 로그인이에요 (서버 인증 아님)</p>
+    <h2 class="hub-h2" style="margin:0">${escHtml(S.user.name)}님</h2>
     <p class="hub-vs" style="margin:0">${escHtml(S.user.club ? S.user.club + (S.user.region ? ' · ' + S.user.region : '') : (S.user.role || '일반회원'))}</p>
     <button class="hub-btn-big" type="button" onclick="needLogin('pg-mgmt')">경기 관리</button>
     <button class="hub-btn-ghost" type="button" onclick="go('pg-clubs')">동호회</button>
@@ -2801,8 +2825,17 @@ const TAB_MAP = { 'pg-home':'home','pg-venues':'venues','pg-course':'venues','pg
   'pg-my':'my','pg-login':'my','pg-tournaments':'home','pg-video':'home','pg-food':'home' };
 
 const HUB_PAGES = ['pg-home','pg-venues','pg-course','pg-tournaments','pg-mgmt','pg-video','pg-food','pg-club','pg-together','pg-clubs','pg-console','pg-my'];
-function go(id) {
+function go(id, opts) {
+  opts = opts || {};
   if (id === 'pg-console' && !consoleAllowed()) { toast('접근할 수 없는 페이지예요'); return; }
+  const cur = document.querySelector('.pg.on');
+  const curId = cur ? cur.id : null;
+  // 점수 입력 화면을 떠날 때 저장 대기 중인 입력을 먼저 저장한다
+  if (curId === 'pg-score' && id !== 'pg-score') flushPendingScoreSave();
+  if (curId !== id && !opts.fromHistory) {
+    if (opts.replace) history.replaceState({ pg: id }, '');
+    else history.pushState({ pg: id }, '');
+  }
   document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
   document.getElementById(id).classList.add('on');
   document.body.classList.toggle('hub-wide', HUB_PAGES.includes(id)); // 홈·공개 페이지만 넓은 화면 사용
@@ -2902,7 +2935,7 @@ function doLogin() {
   };
   lsSet('user', S.user);
   saveMeta();
-  showHome();
+  finishLogin();
   toast(` ${name}님, PARKDA에 오신 걸 환영해요!`);
 }
 async function saveMeta() {
@@ -2916,9 +2949,9 @@ async function saveMeta() {
 function showHome() { go('pg-home'); }
 function doLogout() {
   if (!confirm('로그아웃 하시겠어요?')) return;
-  lsSet('user', null); S.user = null;
-  document.getElementById('tabbar').style.display = 'none';
-  go('pg-login');
+  lsSet('user', null); S.user = null; _afterLogin = null;
+  go('pg-home', { replace: true });  // 로그아웃 후에는 공개 홈 (로그인 화면으로 보내지 않음)
+  toast('로그아웃했어요');
 }
 
 /* ══ 게임 참가 (코드 입력 → Supabase 조회) ══ */
