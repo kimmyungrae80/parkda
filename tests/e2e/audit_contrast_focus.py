@@ -39,7 +39,7 @@ def main():
             ctx = b.new_context(viewport={"width": 390, "height": 844}, locale="ko-KR")
             ctx.route("**/*", lambda r: r.continue_() if r.request.url.startswith(f"http://127.0.0.1:{PORT}") else r.abort())
             pg = ctx.new_page(); pg.goto(BASE); time.sleep(0.6)
-            pg.evaluate("localStorage.clear()"); pg.reload(); time.sleep(0.8)
+            pg.evaluate("localStorage.clear()"); pg.reload(); pg.wait_for_function("typeof go === 'function'", timeout=20000); time.sleep(0.3)
             for name in PAGES:
                 pg.evaluate(f"go('{name}')"); time.sleep(0.4)
                 contrast[name] = pg.evaluate(CONTRAST_JS)

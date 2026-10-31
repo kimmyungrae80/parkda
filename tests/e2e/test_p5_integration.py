@@ -101,7 +101,7 @@ def run(pg, label, vw):
     check(f"[{label}] 자동 조편성 완료", True)
 
     # ── 6. 점수 입력 (일시 중단 → 재개 → 저장) ──
-    go(pg, 'pg-matches'); pg.click("#pg-matches button:has-text('점수')"); time.sleep(0.6)
+    go(pg, 'pg-mgmt'); pg.click("#pg-mgmt button:has-text('점수 입력')"); time.sleep(0.6)
     pg.click("#score-controls button:has-text('경기 중단')"); time.sleep(0.3)
     check(f"[{label}] 경기 중단 표시", "중단된 경기" in pg.inner_text("#score-controls"))
     pg.click("#score-controls button:has-text('경기 재개')"); time.sleep(0.3)

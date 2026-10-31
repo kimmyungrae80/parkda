@@ -24,7 +24,7 @@ def flow(pg, label, vw):
     pg.click("button[onclick='doLogin()']"); time.sleep(0.5)
     check(f"[{label}] 4-5 로그인 후 경기관리로 자동 이동", on(pg, 'pg-mgmt'), str([p for p in ['pg-home','pg-mgmt','pg-login'] if on(pg,p)]))
     # 6. 경기 생성
-    pg.click("button:has-text('새 경기 만들기')"); time.sleep(0.3)
+    pg.click("#pg-mgmt .hub-act-big >> nth=0"); time.sleep(0.3)
     pg.fill("#c-title", f"흐름 테스트 {label}"); pg.fill("#c-players", "가나다\n라마바")
     pg.click("button:has-text('경기 만들고 코드 받기')"); time.sleep(0.6)
     check(f"[{label}] 6-7 경기 생성 후 조편성 화면", on(pg, 'pg-groups'))
@@ -34,20 +34,18 @@ def flow(pg, label, vw):
     # 로그인 상태에서는 경기관리 재진입 시 로그인 화면이 나오지 않는다
     pg.click("#tab-mgmt"); time.sleep(0.3)
     check(f"[{label}] 10 로그인 상태에서 경기관리 재진입 (추가 로그인 없음)", on(pg, 'pg-mgmt'))
-    pg.click("#pg-mgmt button:has-text('경기 목록')"); time.sleep(0.4)
-    pg.click("#pg-matches button:has-text('점수')"); time.sleep(0.5)
+    pg.click("#pg-mgmt button:has-text('점수 입력')"); time.sleep(0.5)
     # 8. 점수 입력 (+ 버튼) 후 홈으로: 저장 대기 중인 입력도 저장되어야 한다
     pg.click("#score-focus .sf-row >> nth=0 >> button[data-sf='1']"); time.sleep(0.1)
     pname = pg.inner_text("#score-focus .sf-row >> nth=0 >> .sf-name").strip()
     val = pg.inner_text("#score-focus .sf-row >> nth=0 >> .sf-num").split("타")[0].strip()
-    pg.click("#pg-score .bar-home"); time.sleep(0.4)
+    pg.click("#score-controls .score-nav button:has-text('홈')"); time.sleep(0.4)
     check(f"[{label}] 9 점수 입력 중 홈으로 이동", on(pg, 'pg-home'))
     stored = pg.evaluate(f"(() => {{ const m = S.matches[Object.keys(S.matches)[0]]; return m && m.sd && m.sd[{pname!r}] ? m.sd[{pname!r}][0] : null; }})()")
     check(f"[{label}] 9 홈 이동 시 점수 저장됨", str(stored) == val, f"stored={stored} shown={val}")
     # 11. 다시 경기 진입: 기존 점수 유지
     pg.click("#tab-mgmt"); time.sleep(0.3)
-    pg.click("#pg-mgmt button:has-text('경기 목록')"); time.sleep(0.4)
-    pg.click("#pg-matches button:has-text('점수')"); time.sleep(0.5)
+    pg.click("#pg-mgmt button:has-text('점수 입력')"); time.sleep(0.5)
     again = pg.inner_text("#score-focus .sf-row >> nth=0 >> .sf-num").split("타")[0].strip()
     check(f"[{label}] 11 재진입 후 기존 점수 유지", again == val, f"{again} vs {val}")
     # 12. 결과 확정: 전 홀 입력 후 확정
@@ -63,9 +61,9 @@ def flow(pg, label, vw):
     check(f"[{label}] 13 결과 공유 기능 존재", pg.locator("#pg-result button:has-text('공유'), #pg-result [onclick*='share']").count() >= 1)
     # 9b. 결과 화면의 내 경기로 / 홈으로
     pg.click("#pg-result .nav-two button:has-text('내 경기로')"); time.sleep(0.4)
-    check(f"[{label}] 결과 → 내 경기로 이동", on(pg, 'pg-matches'))
-    pg.click("#pg-matches .bar-home"); time.sleep(0.3)
-    check(f"[{label}] 목록 → 홈 이동", on(pg, 'pg-home'))
+    check(f"[{label}] 결과 → 내 경기로 이동", on(pg, 'pg-mgmt'))
+    pg.click("#pg-mgmt .hub-back"); time.sleep(0.3)
+    check(f"[{label}] 경기관리 → 홈 이동", on(pg, 'pg-home'))
     # 14-15. 로그아웃 → 공개 홈
     pg.click("#tab-my"); time.sleep(0.3)
     pg.once("dialog", lambda d: d.accept())
@@ -78,7 +76,7 @@ def flow(pg, label, vw):
     pg.goto(BASE + "?game=ABCD"); time.sleep(0.8)
     pg.click("#pg-home .hub-brand") if on(pg, 'pg-home') else None
     pg.evaluate("go('pg-matches')"); time.sleep(0.3)
-    pg.click("#pg-matches .bar-home"); time.sleep(0.3)
+    pg.click("#pg-mgmt .hub-back"); time.sleep(0.3)
     check(f"[{label}] 16 게임코드 직접 접속 후 홈 이동", on(pg, 'pg-home'))
     # 17. 브라우저 뒤로가기
     pg.click("#tab-venues"); time.sleep(0.3)

@@ -575,6 +575,13 @@ button[onclick^="toggleTip"]{min-width:44px;min-height:44px;font-size:15px !impo
 /* 경기 화면 공통 이동 */
 .bar-home{min-height:44px;min-width:56px;padding:0 12px;margin-left:auto;border:1.5px solid #fff;border-radius:12px;background:transparent;color:#fff;font:inherit;font-size:16px;font-weight:700;cursor:pointer}
 .nav-two{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px}
+.mgmt-actions{padding:0 0 12px}
+.gedit-group{padding:12px 0;border-bottom:1px solid var(--bd)}
+.gedit-row{display:flex;align-items:center;gap:10px;min-height:52px;padding:6px 0}
+.gedit-name{flex:1;font-size:18px;font-weight:700}
+.gedit-sel{min-width:110px;flex:0 0 auto}
+.score-nav{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:0 14px 10px}
+.score-nav .btn{min-height:52px;font-size:16px}
 </style>
   <!-- 카카오 SDK: 버튼 클릭 시 동적 로드 -->
 <link rel="stylesheet" href="/parkda-toss.css">
@@ -887,20 +894,22 @@ html,body,button,input,select,textarea{font-family:'Pretendard','Noto Sans KR',s
 </div>
 
 <div class="pg hub" id="pg-mgmt">
- <div class="hub-bar"><button class="hub-back" onclick="go('pg-home')">‹ 홈</button><h2>자동 조편성 및 경기관리</h2></div>
+ <div class="hub-bar"><button class="hub-back" onclick="go('pg-home')">‹ 홈</button><h2>경기관리</h2></div>
  <div class="hub-pad">
- <p class="hub-note">참가자를 입력하면 조편성과 게임코드를 자동으로 만들어요.</p>
- <button class="hub-act-big" onclick="go('pg-create')"><b>새 경기 만들기</b><span>조편성과 게임코드 자동 생성</span></button>
- <button class="hub-act-big" onclick="go('pg-matches')"><b>경기 목록</b><span>점수 입력과 결과 공유</span></button>
- <button class="hub-act-big" onclick="go('pg-ranking')"><b>랭킹</b><span>참가자 평균 타수와 포인트</span></button>
- <div class="hub-box">
- <div class="hub-box-h"><h3>게임코드로 참가</h3></div>
- <form class="hub-search" onsubmit="hubJoin(event)">
- <label class="hub-sr" for="hub-join-code">게임코드 4자리</label>
- <input id="hub-join-code" class="hub-input" maxlength="4" placeholder="4자리 코드" autocomplete="off">
- <button class="hub-btn" type="submit">참가</button>
- </form>
+ <div class="mgmt-actions">
+  <button class="hub-act-big" type="button" onclick="go('pg-create')"><b>경기 만들기</b><span>참가자를 입력하면 조편성과 게임코드를 만들어요</span></button>
  </div>
+ <div class="hub-box">
+  <div class="hub-box-h"><h3>게임코드로 참가</h3></div>
+  <form class="hub-search" onsubmit="hubJoin(event)">
+   <label class="hub-sr" for="hub-join-code">게임코드 4자리</label>
+   <input id="hub-join-code" class="hub-input" maxlength="4" placeholder="4자리 코드" autocomplete="off">
+   <button class="hub-btn" type="submit">참가</button>
+  </form>
+ </div>
+ <section aria-labelledby="mg-prog"><h3 class="hub-sub" id="mg-prog">진행 중인 경기</h3><div id="mgmt-running" class="hub-list"></div></section>
+ <section aria-labelledby="mg-done"><h3 class="hub-sub" id="mg-done">완료된 경기</h3><div id="mgmt-done" class="hub-list"></div></section>
+ <p class="hub-vs"><button class="hub-link" type="button" onclick="go('pg-ranking')">랭킹 보기 ›</button></p>
  </div>
 </div>
 
@@ -1042,6 +1051,7 @@ html,body,button,input,select,textarea{font-family:'Pretendard','Noto Sans KR',s
  <div class="bubble"><span class="bubble-ico"></span> 표시가 <b>조장</b>이에요. 조장만 점수를 입력할 수 있어요. <b>변경</b>을 누르면 바꿀 수 있어요.</div>
  <div class="btn-wrap" style="padding-bottom:6px"><button class="btn btn-gray btn-sm" onclick="reshuffle()"> &nbsp;다시 섞기</button></div>
  <div id="groups-area"></div>
+ <div id="group-edit" style="padding:0 0 12px"></div>
  <div class="btn-wrap"><button class="btn btn-green" onclick="goScore()"> &nbsp;점수 입력 시작</button></div>
 </div>
 
@@ -2641,7 +2651,13 @@ function renderScoreControls() {
   const pauseBtn = isCreator ? `<button class="btn btn-gray btn-sm" onclick="togglePause()">${m.paused ? ' 경기 재개' : ' 경기 중단'}</button>` : '';
   const hist = `<button class="btn btn-gray btn-sm" onclick="toggleScoreLog()"> 수정 이력 (${(m.scoreLog || []).length})</button>`;
   box.innerHTML = `<div class="btn-row" style="padding:0 14px 8px">${m.paused ? '<span class="auth-box"> 중단된 경기입니다. 재개 후 저장할 수 있어요.</span> ' : ''}${pauseBtn} ${hist}</div>
+    <nav class="score-nav" aria-label="이동"><button type="button" class="btn btn-gray" onclick="goBackOrMgmt()">‹ 이전 화면</button><button type="button" class="btn btn-gray" onclick="go('pg-mgmt')">경기 목록</button><button type="button" class="btn btn-gray" onclick="go('pg-home')">홈</button></nav>
     <div id="score-log" hidden></div>`;
+}
+function goBackOrMgmt() {
+  // 기록이 있으면 브라우저 뒤로가기와 같은 화면으로, 없으면 경기 목록
+  if (history.state && history.state.pg && history.state.pg !== 'pg-score') history.back();
+  else go('pg-mgmt');
 }
 function togglePause() {
   const m = S.matches[S.mid]; if (!m) return;
@@ -2810,6 +2826,34 @@ document.addEventListener('click', e => {
   const b = e.target.closest('[data-sf]');
   if (b && !b.disabled) bumpScore(b.dataset.p, +b.dataset.sf);
 });
+/* 경기관리 허브: 내 경기를 진행 중 / 완료로 나눠 보여준다 (기존 경기 데이터 그대로 읽음) */
+function isMatchDone(m) { return m.status === 'done' || !!m.final; }
+function myMatches() {
+  const me = S.user ? S.user.name : null;
+  return Object.values(S.matches || {}).filter(m => m && (m.by === me || (m.players || []).includes(me)))
+    .sort((a, b) => String(b.createdAt || b.date || '').localeCompare(String(a.createdAt || a.date || '')));
+}
+function mgmtCardHtml(m) {
+  const done = isMatchDone(m);
+  const action = done
+    ? `<button class="hub-act hub-act-g" type="button" onclick="openResult('${m.id}')">결과 보기</button>`
+    : `<button class="hub-act hub-act-g" type="button" onclick="openScore('${m.id}')">점수 입력</button>`;
+  return `<article class="hub-venue">
+    <h3 class="hub-vt">${escHtml(m.title || '이름 없는 경기')}</h3>
+    <p class="hub-vs">${escHtml(m.date || '')} · ${escHtml(m.course || '구장 미정')} · 참가 ${(m.players || []).length}명 · ${m.holes || 9}홀</p>
+    <p class="hub-vs">게임코드 <b>${escHtml(m.code || '')}</b>${m.paused ? ' · 중단됨' : ''}</p>
+    <div class="hub-acts">${action}<button class="hub-act" type="button" onclick="S.mid='${m.id}';renderGroupsPage();go('pg-groups')">조편성 보기</button></div>
+  </article>`;
+}
+function renderMgmt() {
+  const run = document.getElementById('mgmt-running'), done = document.getElementById('mgmt-done');
+  if (!run || !done) return;
+  const list = myMatches();
+  const r = list.filter(m => !isMatchDone(m)), d = list.filter(isMatchDone);
+  const me = S.user ? S.user.name : '';
+  run.innerHTML = r.length ? r.map(mgmtCardHtml).join('') : hubMsg(me ? '진행 중인 경기가 없어요. 경기 만들기를 눌러 시작하세요.' : '로그인하면 내 경기를 볼 수 있어요.');
+  done.innerHTML = d.length ? d.slice(0, 20).map(mgmtCardHtml).join('') : hubMsg('완료된 경기가 아직 없어요.');
+}
 function venueReportHtml(c) {
   return `<div class="hub-box"><h3 class="hub-sub">정보 수정 제보</h3>
     <label class="hub-sr" for="vr-${escHtml(c.id)}">수정할 내용</label>
@@ -2827,6 +2871,7 @@ const TAB_MAP = { 'pg-home':'home','pg-venues':'venues','pg-course':'venues','pg
 const HUB_PAGES = ['pg-home','pg-venues','pg-course','pg-tournaments','pg-mgmt','pg-video','pg-food','pg-club','pg-together','pg-clubs','pg-console','pg-my'];
 function go(id, opts) {
   opts = opts || {};
+  if (id === 'pg-matches') id = 'pg-mgmt';  // 경기 목록은 경기관리 허브로 통합
   if (id === 'pg-console' && !consoleAllowed()) { toast('접근할 수 없는 페이지예요'); return; }
   const cur = document.querySelector('.pg.on');
   const curId = cur ? cur.id : null;
@@ -2844,7 +2889,8 @@ function go(id, opts) {
   if (TAB_MAP[id]) setTab(TAB_MAP[id]);
   if (id === 'pg-home')        { renderHub(); renderHome(); renderHomeSections(); }
   if (id === 'pg-my')          renderMy();
-  if (id === 'pg-matches')     renderMatches();
+  if (id === 'pg-mgmt')        renderMgmt();
+  if (id === 'pg-groups' && S.mid && S.matches[S.mid]) renderGroupsPage();
   if (id === 'pg-ranking')     renderRanking();
   if (id === 'pg-matching')    renderMatching();
   if (id === 'pg-create')      setTimeout(initCourseRegion, 150);
@@ -3212,6 +3258,7 @@ function shareKakao() {
 function renderGroupsPage() {
   const m = S.matches[S.mid]; if (!m) return;
   renderGamecode();
+  renderGroupEdit(m);
   document.getElementById('groups-area').innerHTML = m.groups.map((g, i) => {
     const c = GC[i % GC.length];
     const chips = g.players.map(p => `
@@ -3219,16 +3266,66 @@ function renderGroupsPage() {
         ${p}${p === g.leader ? '<span class="chip-ldr">조장</span>' : ''}
       </div>`).join('');
     return `<div class="group-wrap"><div class="group-card" style="background:${c}14;border-color:${c}">
-      <div class="group-title" style="color:${c}">${g.no}조
-        <span class="ldr-chg" onclick="changeLeader(${i})">조장 변경</span>
-      </div>
+      <div class="group-title" style="color:${c}">${g.no}조</div>
       <div class="chips">${chips}</div>
     </div></div>`;
   }).join('');
 }
+/* 조편성 수정: 참가자 조 이동, 조장 지정, 확정. 점수는 이름 기준이라 이동해도 그대로 유지된다. */
+function renderGroupEdit(m) {
+  const box = document.getElementById('group-edit'); if (!box) return;
+  const locked = !!m.groupsConfirmed;
+  const rows = m.groups.map((g, gi) => `<div class="gedit-group"><h4 class="hub-sub">${g.no}조</h4>
+     ${g.players.map(p => `<div class="gedit-row"><span class="gedit-name">${escHtml(p)}${p === g.leader ? ' · 조장' : ''}</span>
+       <label class="hub-sr" for="mv-${escHtml(p)}">${escHtml(p)} 조 선택</label>
+       <select id="mv-${escHtml(p)}" class="hub-input gedit-sel" data-mv="${escHtml(p)}" ${locked ? 'disabled' : ''}>
+         ${m.groups.map((x, xi) => `<option value="${xi}"${xi === gi ? ' selected' : ''}>${x.no}조</option>`).join('')}
+       </select></div>`).join('')}
+     <label class="hub-sr" for="ld-${gi}">${g.no}조 조장</label>
+     <select id="ld-${gi}" class="hub-input gedit-sel" data-ld="${gi}" ${locked ? 'disabled' : ''}>
+       ${g.players.map(p => `<option${p === g.leader ? ' selected' : ''}>${escHtml(p)}</option>`).join('')}
+     </select></div>`).join('');
+  box.innerHTML = `<div class="card"><div class="card-hd">조편성 수정</div><div style="padding:12px 14px">
+     <p class="hub-vs">${locked ? '조편성이 확정되었어요. 수정하려면 확정을 취소하세요.' : '참가자를 다른 조로 옮기거나 조장을 바꿀 수 있어요. 조에 한 명은 남아야 해요.'}</p>
+     ${rows}
+     <div class="nav-two" style="padding:0;margin-top:12px">
+       ${locked ? '<button class="btn btn-gray" type="button" onclick="setGroupsConfirmed(false)">확정 취소</button>' : '<button class="btn btn-green" type="button" onclick="setGroupsConfirmed(true)">조편성 확정</button>'}
+       <button class="btn btn-gray" type="button" onclick="reshuffle()" ${locked ? 'disabled' : ''}>다시 섞기</button>
+     </div></div></div>`;
+}
+function moveMember(p, toIdx) {
+  const m = S.matches[S.mid]; if (!m) return;
+  if (m.groupsConfirmed) { toast('조편성이 확정되어 바꿀 수 없어요'); renderGroupsPage(); return; }
+  const from = m.groups.findIndex(g => g.players.includes(p));
+  if (from < 0 || from === toIdx || !m.groups[toIdx]) return;
+  if (m.groups[from].players.length <= 1) { toast('조에 한 명은 남아 있어야 해요'); renderGroupsPage(); return; }
+  m.groups[from].players = m.groups[from].players.filter(x => x !== p);
+  if (m.groups[from].leader === p) m.groups[from].leader = m.groups[from].players[0];
+  m.groups[toIdx].players.push(p);
+  if (!m.groups[toIdx].leader) m.groups[toIdx].leader = p;
+  saveMatch(m); renderGroupsPage(); toast(`${p} 님을 ${m.groups[toIdx].no}조로 옮겼어요`);
+}
+function setLeader(gi, name) {
+  const m = S.matches[S.mid]; if (!m || m.groupsConfirmed) return;
+  if (!m.groups[gi].players.includes(name)) return;
+  m.groups[gi].leader = name; saveMatch(m); renderGroupsPage(); toast(`${name} 님이 조장이에요`);
+}
+function setGroupsConfirmed(on) {
+  const m = S.matches[S.mid]; if (!m) return;
+  if (on && m.groups.some(g => g.players.length < 1)) { toast('빈 조가 있어요'); return; }
+  m.groupsConfirmed = !!on; saveMatch(m); renderGroupsPage();
+  toast(on ? '조편성을 확정했어요' : '확정을 취소했어요');
+}
+document.addEventListener('change', e => {
+  const mv = e.target.closest('[data-mv]');
+  if (mv) { moveMember(mv.dataset.mv, Number(mv.value)); return; }
+  const ld = e.target.closest('[data-ld]');
+  if (ld) setLeader(Number(ld.dataset.ld), ld.value);
+});
 function reshuffle() {
   const m = S.matches[S.mid]; if (!m) return;
   m.groups = makeGroups(m.players, m.gs);
+  if (m.groupsConfirmed) { toast('확정된 조편성은 다시 섞을 수 없어요'); return; }
   saveMatch(S.matches[S.mid]); renderGroupsPage(); toast(' 다시 섞었어요!');
 }
 function changeLeader(gi) {
