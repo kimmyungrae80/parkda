@@ -5,7 +5,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 PORT = 8777; BASE = f"http://127.0.0.1:{PORT}/index.html"
 SERVE = pathlib.Path(os.environ.get("PARKDA_SERVE_DIR", ROOT))  # 변경 전 비교용으로 다른 폴더를 가리킬 수 있다
 OUT = pathlib.Path(os.environ.get("PARKDA_SHOT_OUT", ROOT / "tests/results/design")); OUT.mkdir(parents=True, exist_ok=True)
-PAGES = ["pg-home", "pg-venues", "pg-together", "pg-clubs", "pg-club", "pg-my", "pg-tournaments", "pg-mgmt", "pg-login", "pg-video", "pg-food"]
+PAGES = ["pg-home", "pg-venues", "pg-together", "pg-clubs", "pg-club", "pg-my", "pg-tournaments", "pg-mgmt", "pg-login", "pg-video", "pg-food", "pg-guide"]
 def main():
     srv = subprocess.Popen([sys.executable, "-m", "http.server", str(PORT), "--bind", "127.0.0.1"], cwd=SERVE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     time.sleep(1)

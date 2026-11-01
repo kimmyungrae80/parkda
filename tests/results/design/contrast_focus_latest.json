@@ -27,6 +27,11 @@
    "outline": "solid 3px"
   },
   {
+   "tag": "BUTTON",
+   "id": "",
+   "outline": "solid 3px"
+  },
+  {
    "tag": "INPUT",
    "id": "hub-q",
    "outline": "solid 3px"
@@ -62,17 +67,12 @@
    "outline": "solid 3px"
   },
   {
-   "tag": "A",
+   "tag": "BUTTON",
    "id": "",
    "outline": "solid 3px"
   },
   {
-   "tag": "A",
-   "id": "",
-   "outline": "solid 3px"
-  },
-  {
-   "tag": "A",
+   "tag": "BUTTON",
    "id": "",
    "outline": "solid 3px"
   },

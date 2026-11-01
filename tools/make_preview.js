@@ -30,6 +30,9 @@ fs.writeFileSync(path.join(out, 'config', 'client.js'), 'window.PARKDA_CONFIG = 
 for (const f of ['sw.js', 'manifest.json', 'icon-192.png', 'icon-512.png', 'parkda-toss.css']) {
   fs.copyFileSync(path.join(root, f), path.join(out, f));
 }
+// 로고 등 정적 자산
+fs.rmSync(path.join(out, 'assets'), { recursive: true, force: true });
+fs.cpSync(path.join(root, 'assets'), path.join(out, 'assets'), { recursive: true });
 // 글꼴 (Pretendard, SIL OFL)
 fs.rmSync(path.join(out, 'fonts'), { recursive: true, force: true });
 fs.cpSync(path.join(root, 'fonts'), path.join(out, 'fonts'), { recursive: true });
