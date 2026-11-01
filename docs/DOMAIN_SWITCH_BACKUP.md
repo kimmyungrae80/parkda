@@ -23,3 +23,7 @@
 2. `parkda` 프로젝트에 parkda.co.kr (redirect → www.parkda.co.kr), www.parkda.co.kr 을 다시 추가.
 3. 기존 프로젝트 `parkda` 는 삭제하지 않았으므로 그대로 재배포 가능.
 4. DNS 는 바꾸지 않았으므로 복구 불필요.
+
+## 롤백 기준 배포 (2026-10-31 재확인)
+- parkda 프로젝트 production 배포: `dpl_8NABuKWsqtEg5zoYVu8XRTrtBdi7` (main 60ead74, READY)
+- 롤백은 이 배포를 기준으로 도메인을 다시 붙인다. 추가 배포 기록: dpl_9eDbrcvDzjactgFMAmeSveJ9s5Dc (main 3dbb42f), dpl_8oNsyHqaQ3ie9doFw6LvHnVD9SaJ (main 2e5e337)
